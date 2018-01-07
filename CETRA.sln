@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CETRA.Tests", "CETRA.Tests\CETRA.Tests.csproj", "{6FE3DB35-2343-48EB-AAA8-8E2AA99EB5E3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CETRA", "CETRA\CETRA.csproj", "{FC6CF6DE-A279-4BEA-8EE5-678E4F4A2EFB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspNet.Identity.MySQL", "AspNet.Identity.MySQL\AspNet.Identity.MySQL.csproj", "{26F6ECF9-4369-417B-8CF2-54FA92DF3660}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6FE3DB35-2343-48EB-AAA8-8E2AA99EB5E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6FE3DB35-2343-48EB-AAA8-8E2AA99EB5E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6FE3DB35-2343-48EB-AAA8-8E2AA99EB5E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6FE3DB35-2343-48EB-AAA8-8E2AA99EB5E3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FC6CF6DE-A279-4BEA-8EE5-678E4F4A2EFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC6CF6DE-A279-4BEA-8EE5-678E4F4A2EFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC6CF6DE-A279-4BEA-8EE5-678E4F4A2EFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC6CF6DE-A279-4BEA-8EE5-678E4F4A2EFB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{26F6ECF9-4369-417B-8CF2-54FA92DF3660}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{26F6ECF9-4369-417B-8CF2-54FA92DF3660}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{26F6ECF9-4369-417B-8CF2-54FA92DF3660}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{26F6ECF9-4369-417B-8CF2-54FA92DF3660}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
