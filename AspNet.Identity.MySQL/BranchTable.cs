@@ -145,7 +145,7 @@ namespace AspNet.Identity.MySQL
         public List<IdentityBranch> GetAllBranches()
         {
             List<IdentityBranch> branches = new List<IdentityBranch>();
-            string commandText = "Select Id, BranchName, BankId, GLAccount from Branches where BranchName = @name";
+            string commandText = "Select Id, BranchName, BankId, GLAccount from Branches";
             Dictionary<string, object> parameters = new Dictionary<string, object>() { };
 
             var result = _database.Query(commandText, parameters);

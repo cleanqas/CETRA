@@ -67,7 +67,5 @@ namespace CETRA.Models
         [Required]
         [Display(Name = "Branch")]
         public string Branch { get; set; }
-
-        public string Result { get; set; }
     }
 }

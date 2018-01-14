@@ -20,16 +20,16 @@ namespace CETRA.Controllers
         public AccountNumberManager<IdentityAccountNumber> AccountNumberManager { get; private set; }
 
         public SetUpController()
-            : this(new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(new ApplicationDbContext())), 
-                new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(new ApplicationDbContext())), 
+            : this(new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(new ApplicationDbContext())),
+                new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(new ApplicationDbContext())),
                 new BranchManager<IdentityBranch>(new BranchStore<IdentityBranch>(new ApplicationDbContext())),
                 new BankManager<IdentityBank>(new BankStore<IdentityBank>(new ApplicationDbContext())),
                 new AccountNumberManager<IdentityAccountNumber>(new AccountNumberStore<IdentityAccountNumber>(new ApplicationDbContext())))
         {
         }
 
-        public SetUpController(UserManager<ApplicationUser> userManager, 
-            RoleManager<IdentityRole> roleManager, 
+        public SetUpController(UserManager<ApplicationUser> userManager,
+            RoleManager<IdentityRole> roleManager,
             BranchManager<IdentityBranch> branchManager,
             BankManager<IdentityBank> bankManager,
             AccountNumberManager<IdentityAccountNumber> accountManager)
@@ -40,6 +40,11 @@ namespace CETRA.Controllers
             BankManager = bankManager;
         }
 
+        public ActionResult Index()
+        {
+            return View();
+        }
+
         //
         // POST: /SetUp/RegisterNewUser
         [HttpPost]
@@ -48,6 +53,10 @@ namespace CETRA.Controllers
         {
             if (ModelState.IsValid)
             {
+                var userexist = UserManager.FindByNameAsync(model.UserName);
+
+                if(userexist != null && userexist.Result != null && userexist.Result.Id != null) return Json(new { code = "02", message = userexist }, JsonRequestBehavior.AllowGet);
+
                 var user = new ApplicationUser() { UserName = model.UserName };
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
@@ -75,7 +84,7 @@ namespace CETRA.Controllers
         public async Task<JsonResult> RegisterNewBranch(BranchModel model)
         {
             if (ModelState.IsValid)
-            {                
+            {
                 var branch = new IdentityBranch(model.BranchName, model.BankId, model.GLAccount);
                 var result = await BranchManager.CreateAsync(branch);
                 if (result)
@@ -132,6 +141,16 @@ namespace CETRA.Controllers
                 }
             }
             return Json(new { code = "02", message = "Invalid Data Submitted" }, JsonRequestBehavior.AllowGet);
+        }
+
+        //
+        // POST: /SetUp/GetAllBranches
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<JsonResult> GetAllBranches()
+        {
+            var branches = await new BranchStore<IdentityBranch>(new ApplicationDbContext()).GetAllBranchesAsync();
+            return Json(branches, JsonRequestBehavior.AllowGet);
         }
     }
 }

@@ -92,12 +92,10 @@ namespace CETRA.Controllers
                     UserManager.AddToRole(user.Id, role.Name);
                     var branch = BranchManager.FindBranchById(model.Branch);
                     BranchManager.AddUserToBranch(user.Id, branch.Id);
-                    model.Result = "Successful";
                 }
                 else
                 {
                     AddErrors(result);
-                    model.Result = "Failed";
                 }
             }
 

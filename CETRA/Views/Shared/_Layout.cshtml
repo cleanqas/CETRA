@@ -30,6 +30,10 @@
         </div>
     </div>
     <div class="container body-content">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "_AjaxAntiForgeryForm" }))
+        {
+            @Html.AntiForgeryToken();
+        }
         @RenderBody()
         <hr />
         <footer>
