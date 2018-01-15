@@ -1,0 +1,172 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+<style>
+    html, body, .container-table {
+        height: 500px;
+    }
+
+    .container-table {
+        display: table;
+    }
+
+    .vertical-center-row {
+        display: table-cell;
+        vertical-align: middle;
+    }
+</style>
+<div class="container container-table">
+    <div class="row vertical-center-row">
+        <div class="col-md-3">
+            <h2>Manage Users</h2>
+            <p>
+                Click the button below to add/remove Users
+            </p>
+            <p><a class="btn btn-default" data-toggle="modal" href="#manageUser">Manage Users &raquo;</a></p>
+        </div>
+        <div class="col-md-3">
+            <h2>Banks</h2>
+            <p>Click the button below to add Banks</p>
+            <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301866">Add Bank &raquo;</a></p>
+        </div>
+        <div class="col-md-3">
+            <h2>Customer Accounts</h2>
+            <p>Add Customer accounts</p>
+            <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301867">Accounts &raquo;</a></p>
+        </div>
+        <div class="col-md-3">
+            <h2>Branch</h2>
+            <p>Add/remove Branch</p>
+            <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301867">Manage Branches &raquo;</a></p>
+        </div>
+    </div>
+
+    @*Manage Users Modal*@
+    <div class="row">
+        @*<a class="btn btn-primary" data-toggle="modal" href="#manageUser">Login</a>*@
+        <div class="modal fade" id="manageUser" tabindex="-1" role="dialog" aria-labelledby="ManageUserLabel">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="close"><span aria-hidden="true">&times;</span></button>
+                        <h3 class="modal-title" id="ManageUserLabel">Manage Users</h3>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="form-group">
+                                <label for="username" class="control-label">User Name:</label>
+                                <input type="text" name="username" id="username" placeholder="User Name" autofocus required class="form-control" />
+                            </div>
+                            <div class="form-group">
+                                <label for="password" class="control-label">Password:</label>
+                                <input type="password" name="password" id="password" placeholder="Password" autocomplete="off" required class="form-control" />
+                            </div>
+                            <div class="form-group">
+                                <label for="password" class="control-label">Confirm Password:</label>
+                                <input type="password" name="confirm_password" id="confirm_password" required placeholder="Password" autocomplete="off" class="form-control" />
+                            </div>
+                            <div class="form-group">
+                                <label for="role" class="control-label">Role:</label>
+                                <select name="role" id="role" required class="form-control">
+                                    <optgroup label="Select Role">
+                                        <option value="9263d72f-f46c-434a-aaf3-cbe9caa4a01d" selected>Administrator</option>
+                                        <option value="hocontrol">Head Office Control</option>
+                                        <option value="branchcso">Branch CSO</option>
+                                        <option value="branchcontrol">Branch Control</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="branch" class="control-label">Branch:</label>
+                                <select name="branch" id="branch" required class="form-control">
+                                    <optgroup label="Select Branch"></optgroup>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <button class="btn btn-primary" type="button" id="registerNewUser">Submit </button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <a href="#" class="btn btn-primary">Remove User</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+    <script type="text/javascript">
+        $(function () {
+            $.ajax({
+                type: "POST",
+                url: "/SetUp/GetAllBranches",
+                data: { __RequestVerificationToken: helpers.getAntiForgeryToken() },
+                contentType: 'application/x-www-form-urlencoded',
+                success: function (data) {
+                    helpers.buildDropdown(
+                        data,
+                        $('#branch'),
+                        'Select Branch'
+                    );
+                }
+            });
+        });
+
+
+        var helpers =
+            {
+                buildDropdown: function (result, dropDown, emptyMessage) {
+                    dropDown.html('');
+                    dropDown.append('<option value="">' + emptyMessage + '</option>');
+                    if (result != '') {
+                        $.each(result, function (k, v) {
+                            dropDown.append('<option value="' + v.Id + '">' + v.Name + '</option>');
+                        })
+                    }
+                },
+
+                checkEquality: function (f, s) {
+                    return f == s;
+                },
+
+                getAntiForgeryToken: function () {
+                    var form = $('#_AjaxAntiForgeryForm');
+                    var token = $('input[name="__RequestVerificationToken"]', form).val();
+                    console.log(token);
+                    return token;
+                }
+            }
+
+        $('#registerNewUser').click(function (e) {
+            if (!helpers.checkEquality($('#password').val(), $('#confirm_password').val())) {
+                alert('Password strings does not match');
+                return false;
+            }
+
+            var _data = {
+                __RequestVerificationToken: helpers.getAntiForgeryToken(),
+                UserName: $('#username').val(),
+                Role: $('#role').val(),
+                Branch: $('#branch').val(),
+                Password: $('#password').val(),
+                ConfirmPassword: $('#confirm_password').val()
+            };
+            console.log(_data);
+
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/x-www-form-urlencoded',
+                url: '/SetUp/RegisterNewUser',
+                data: _data,
+                success: function (data) {
+                    console.log(data);
+                }
+            });
+        });
+    </script>
+}
+
