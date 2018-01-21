@@ -71,6 +71,7 @@
     <Compile Include="IdentityBank.cs" />
     <Compile Include="IdentityBranch.cs" />
     <Compile Include="IdentityRole.cs" />
+    <Compile Include="IdentityUserBranch.cs" />
     <Compile Include="RoleStore.cs" />
     <Compile Include="IdentityUser.cs" />
     <Compile Include="UploadDataEntity.cs" />
@@ -81,6 +82,7 @@
     <Compile Include="UploadManager.cs" />
     <Compile Include="UploadTable.cs" />
     <Compile Include="UploadStore.cs" />
+    <Compile Include="UserBranchStore.cs" />
     <Compile Include="UserBranchTable.cs" />
     <Compile Include="UserLoginsTable.cs" />
     <Compile Include="UserClaimsTable.cs" />

@@ -152,5 +152,15 @@ namespace CETRA.Controllers
             var branches = await new BranchStore<IdentityBranch>(new ApplicationDbContext()).GetAllBranchesAsync();
             return Json(branches, JsonRequestBehavior.AllowGet);
         }
+
+        //
+        // POST: /SetUp/GetAllBanks
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<JsonResult> GetAllBanks()
+        {
+            var banks = await new BankStore<IdentityBank>(new ApplicationDbContext()).GetAllBanksAsync();
+            return Json(banks, JsonRequestBehavior.AllowGet);
+        }
     }
 }

@@ -61,5 +61,12 @@ namespace AspNet.Identity.MySQL
 
             return Task.FromResult<TBank>(result);
         }
+
+        public Task<List<TBank>> GetAllBanksAsync()
+        {
+            List<TBank> result = bankTable.GetAllBanks() as List<TBank>;
+
+            return Task.FromResult<List<TBank>>(result);
+        }
     }
 }

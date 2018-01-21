@@ -97,7 +97,7 @@ namespace AspNet.Identity.MySQL
         /// 
         public List<UploadEntity> GetUploadsByBranchID(string branchId)
         {
-            string commandText = "Select Id, UploaderId, BranchId, Status from Uploads where BranchId = @branchId";
+            string commandText = "Select Id, UploaderId, BranchId, Status, UploadDate from Uploads where BranchId = @branchId";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@branchId", branchId);
             List<UploadEntity> uploads = new List<UploadEntity>();
@@ -109,7 +109,8 @@ namespace AspNet.Identity.MySQL
                     BranchId = res["BranchId"],
                     Id = res["Id"],
                     Status = Convert.ToInt32(res["Status"]),
-                    UploaderId = res["UploaderId"]
+                    UploaderId = res["UploaderId"],
+                    UploadDate = Convert.ToDateTime(res["UploadDate"]).ToString("dd-MM-yyyy hh:mm:ss")
                 });
             }
             return uploads;
@@ -123,7 +124,7 @@ namespace AspNet.Identity.MySQL
         /// 
         public List<UploadEntity> GetUploadsByStatus(int status)
         {
-            string commandText = "Select Id, UploaderId, BranchId, Status from Uploads where Status = @status";
+            string commandText = "Select Id, UploaderId, BranchId, Status, UploadDate from Uploads where Status = @status";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@status", status);
             List<UploadEntity> uploads = new List<UploadEntity>();
@@ -135,7 +136,35 @@ namespace AspNet.Identity.MySQL
                     BranchId = res["BranchId"],
                     Id = res["Id"],
                     Status = Convert.ToInt32(res["Status"]),
-                    UploaderId = res["UploaderId"]
+                    UploaderId = res["UploaderId"],
+                    UploadDate = Convert.ToDateTime(res["UploadDate"]).ToString("dd-MM-yyyy hh:mm:ss")
+                });
+            }
+            return uploads;
+        }
+
+        /// <summary>
+        /// Gets all uploads from the Uploads table by Branch ID
+        /// </summary>
+        /// <param name="branchId">The Branch Id</param>
+        /// <returns></returns>
+        /// 
+        public List<UploadEntity> GetPendingUploadsByBranchID(string branchId)
+        {
+            string commandText = "Select Id, UploaderId, BranchId, Status, UploadDate from Uploads where BranchId = @branchId and Status = 0";
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("@branchId", branchId);
+            List<UploadEntity> uploads = new List<UploadEntity>();
+            var result = _database.Query(commandText, parameters);
+            foreach (var res in result)
+            {
+                uploads.Add(new UploadEntity()
+                {
+                    BranchId = res["BranchId"],
+                    Id = res["Id"],
+                    Status = Convert.ToInt32(res["Status"]),
+                    UploaderId = res["UploaderId"],
+                    UploadDate = Convert.ToDateTime(res["UploadDate"]).ToString("dd-MM-yyyy hh:mm:ss")
                 });
             }
             return uploads;

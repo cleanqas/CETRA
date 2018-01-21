@@ -47,5 +47,7 @@ namespace AspNet.Identity.MySQL
         /// Status
         /// </summary>
         public int Status { get; set; }
+
+        public string UploadDate { get; set; }
     }
 }

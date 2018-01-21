@@ -28,23 +28,22 @@
         <div class="col-md-3">
             <h2>Banks</h2>
             <p>Click the button below to add Banks</p>
-            <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301866">Add Bank &raquo;</a></p>
+            <p><a class="btn btn-default" data-toggle="modal" href="#manageBank">Add Bank &raquo;</a></p>
         </div>
         <div class="col-md-3">
             <h2>Customer Accounts</h2>
             <p>Add Customer accounts</p>
-            <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301867">Accounts &raquo;</a></p>
+            <p><a class="btn btn-default" data-toggle="modal" href="#manageAccount">Accounts &raquo;</a></p>
         </div>
         <div class="col-md-3">
             <h2>Branch</h2>
             <p>Add/remove Branch</p>
-            <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301867">Manage Branches &raquo;</a></p>
+            <p><a class="btn btn-default" data-toggle="modal" href="#manageBranch">Manage Branches &raquo;</a></p>
         </div>
     </div>
 
     @*Manage Users Modal*@
     <div class="row">
-        @*<a class="btn btn-primary" data-toggle="modal" href="#manageUser">Login</a>*@
         <div class="modal fade" id="manageUser" tabindex="-1" role="dialog" aria-labelledby="ManageUserLabel">
             <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
@@ -78,8 +77,8 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label for="branch" class="control-label">Branch:</label>
-                                <select name="branch" id="branch" required class="form-control">
+                                <label for="branch_user" class="control-label">Branch:</label>
+                                <select name="branch_user" id="branch_user" required class="form-control">
                                     <optgroup label="Select Branch"></optgroup>
                                 </select>
                             </div>
@@ -95,51 +94,123 @@
             </div>
         </div>
     </div>
+
+    @*Bank*@
+    <div class="row">
+        <div class="modal fade" id="manageBank" tabindex="-1" role="dialog" aria-labelledby="ManageBankLabel">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="close"><span aria-hidden="true">&times;</span></button>
+                        <h3 class="modal-title" id="ManageBankLabel">Manage Bank</h3>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="form-group">
+                                <label for="bankname" class="control-label">Bank Name:</label>
+                                <input type="text" name="bankname" id="bankname" placeholder="Bank Name" autofocus required class="form-control" />
+                            </div>
+                            <div class="form-group">
+                                <button class="btn btn-primary" type="button" id="registerNewBank">Submit </button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @*Account*@
+    <div class="row">
+        <div class="modal fade" id="manageAccount" tabindex="-1" role="dialog" aria-labelledby="ManageAccountLabel">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="close"><span aria-hidden="true">&times;</span></button>
+                        <h3 class="modal-title" id="ManageAccountLabel">Add Customer Accounts</h3>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="form-group">
+                                <label for="accountnumber" class="control-label">Account Number:</label>
+                                <input type="text" name="accountnumber" id="accountnumber" placeholder="Account Number" autofocus autocomplete="off" required class="form-control" />
+                            </div>
+                            <div class="form-group">
+                                <label for="accountname" class="control-label">Account Name:</label>
+                                <input type="text" name="accountname" id="accountname" placeholder="Account Name" required class="form-control" />
+                            </div>
+                            <div class="form-group">
+                                <label for="bank_account" class="control-label">Bank:</label>
+                                <select name="bank_account" id="bank_account" required class="form-control">
+                                    <optgroup label="Select Bank"></optgroup>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <button class="btn btn-primary" type="button" id="registerNewAccount">Submit </button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @*Branch*@
+    <div class="row">
+        <div class="modal fade" id="manageBranch" tabindex="-1" role="dialog" aria-labelledby="ManageBranchLabel">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="close"><span aria-hidden="true">&times;</span></button>
+                        <h3 class="modal-title" id="ManageBranchLabel">Add Branch</h3>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="form-group">
+                                <label for="branchname" class="control-label">Branch Name:</label>
+                                <input type="text" name="branchname" id="branchname" placeholder="Branch Name" autofocus autocomplete="off" required class="form-control" />
+                            </div>
+                            <div class="form-group">
+                                <label for="glaccount" class="control-label">GL Account</label>
+                                <input type="text" name="glaccount" id="glaccount" placeholder="GL Account" required class="form-control" />
+                            </div>
+                            <div class="form-group">
+                                <label for="bank_branch" class="control-label">Bank:</label>
+                                <select name="bank_branch" id="bank_branch" required class="form-control">
+                                    <optgroup label="Select Bank"></optgroup>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <button class="btn btn-primary" type="button" id="registerNewBranch">Submit </button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 @section scripts
 {
     <script type="text/javascript">
         $(function () {
-            $.ajax({
-                type: "POST",
-                url: "/SetUp/GetAllBranches",
-                data: { __RequestVerificationToken: helpers.getAntiForgeryToken() },
-                contentType: 'application/x-www-form-urlencoded',
-                success: function (data) {
-                    helpers.buildDropdown(
-                        data,
-                        $('#branch'),
-                        'Select Branch'
-                    );
-                }
+            helpers.getData("/SetUp/GetAllBranches", function (data) {
+                helpers.buildDropdown(data, $('#branch_user'), 'Select Branch');
             });
+            
+            helpers.getData("/SetUp/GetAllBanks", function (data) {
+                helpers.buildDropdown(data, $('#bank_branch'), 'Select Bank');
+                helpers.buildDropdown(data, $('#bank_account'), 'Select Bank');
+            });
+            
         });
-
-
-        var helpers =
-            {
-                buildDropdown: function (result, dropDown, emptyMessage) {
-                    dropDown.html('');
-                    dropDown.append('<option value="">' + emptyMessage + '</option>');
-                    if (result != '') {
-                        $.each(result, function (k, v) {
-                            dropDown.append('<option value="' + v.Id + '">' + v.Name + '</option>');
-                        })
-                    }
-                },
-
-                checkEquality: function (f, s) {
-                    return f == s;
-                },
-
-                getAntiForgeryToken: function () {
-                    var form = $('#_AjaxAntiForgeryForm');
-                    var token = $('input[name="__RequestVerificationToken"]', form).val();
-                    console.log(token);
-                    return token;
-                }
-            }
 
         $('#registerNewUser').click(function (e) {
             if (!helpers.checkEquality($('#password').val(), $('#confirm_password').val())) {
@@ -151,17 +222,65 @@
                 __RequestVerificationToken: helpers.getAntiForgeryToken(),
                 UserName: $('#username').val(),
                 Role: $('#role').val(),
-                Branch: $('#branch').val(),
+                Branch: $('#branch_user').val(),
                 Password: $('#password').val(),
                 ConfirmPassword: $('#confirm_password').val()
             };
-            console.log(_data);
+            //console.log(_data);
 
             $.ajax({
                 type: 'POST',
                 contentType: 'application/x-www-form-urlencoded',
                 url: '/SetUp/RegisterNewUser',
                 data: _data,
+                success: function (data) {
+                    console.log(data);
+                }
+            });
+        });
+
+        $('#registerNewBank').click(function (e) {
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/x-www-form-urlencoded',
+                data: { __RequestVerificationToken: helpers.getAntiForgeryToken(), BankName: $('bankname').val() },
+                url: '/SetUp/RegisterNewBank',
+                success: function (data) {
+                    console.log(data);
+                }
+            });
+        });
+
+        $('#registerNewAccount').click(function (e) {
+            var _data = {
+                __RequestVerificationToken: helpers.getAntiForgeryToken(),
+                BankId: $('bank_account').val(),
+                AccountNumber: $('accountnumber').val(),
+                AccountName: $('accountname').val()
+            };
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/x-www-form-urlencoded',
+                data: _data,
+                url: '/SetUp/RegisterNewAccount',
+                success: function (data) {
+                    console.log(data);
+                }
+            });
+        });
+
+        $('#registerNewBranch').click(function (e) {
+            var _data = {
+                __RequestVerificationToken: helpers.getAntiForgeryToken(),
+                BankId: $('bank_branch').val(),
+                BranchName: $('branchname').val(),
+                GLAccount: $('glaccount').val()
+            };
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/x-www-form-urlencoded',
+                data: _data,
+                url: '/SetUp/RegisterNewBranch',
                 success: function (data) {
                     console.log(data);
                 }

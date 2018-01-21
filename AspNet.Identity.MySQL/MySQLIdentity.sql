@@ -149,3 +149,13 @@ ADD CONSTRAINT `Uploaddata_upload`
 
 ALTER TABLE `cetra`.`uploadsdata` 
 CHANGE COLUMN `Id` `Id` BIGINT NOT NULL AUTO_INCREMENT;
+
+INSERT INTO `cetra`.`uploadstatus` (`Id`, `Descr`) VALUES ('0', 'Pending');
+INSERT INTO `cetra`.`uploadstatus` (`Id`, `Descr`) VALUES ('1', 'Processed');
+
+
+ALTER TABLE `cetra`.`uploads` 
+ADD COLUMN `UploadDate` DATETIME NULL DEFAULT CURRENT_TIMESTAMP AFTER `Status`;
+
+ALTER TABLE `cetra`.`uploadsdata` 
+CHANGE COLUMN `Id` `Id` VARCHAR(128) NOT NULL ;s

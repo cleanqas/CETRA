@@ -29,11 +29,17 @@ namespace CETRA.Controllers
             UploadDataManager = uploadDataManager;
         }
 
+        [Authorize]
+        public ActionResult Index()
+        {
+            return View();
+        }
+
         //
         // POST: /HOOPeration/Upload
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<JsonResult> Upload(UploadModel model, HttpPostedFileBase postedFile)
+        public async Task<JsonResult> Upload(UploadModel model)
         {
             if (ModelState.IsValid)
             {
@@ -44,7 +50,7 @@ namespace CETRA.Controllers
                     List<PDataModel> PData = null;
                     try
                     {
-                        PData = getPaymentDataFromCSV(postedFile);
+                        PData = getPaymentDataFromCSV(model.PaymentFile);
                     }
                     catch (Exception ex)
                     {

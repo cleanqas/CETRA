@@ -24,24 +24,21 @@ namespace AspNet.Identity.MySQL
         /// </summary>
         /// <param name="userId">The user's id</param>
         /// <returns></returns>
-        public List<IdentityBranch> FindByUserId(string userId)
+        public IdentityBranch FindByUserId(string userId)
         {
-            List<IdentityBranch> branches = new List<IdentityBranch>();
-            string commandText = "Select Branches.Id, Branches.BranchName from userbranches, Branches where userbranches.UserId = @userId and userbranches.RoleId = Branches.Id";
+            IdentityBranch branch = new IdentityBranch();
+            string commandText = "Select Branches.Id, Branches.BranchName from userbranches, Branches where userbranches.UserId = @userId and userbranches.BranchId = Branches.Id";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@userId", userId);
 
             var rows = _database.Query(commandText, parameters);
             foreach(var row in rows)
             {
-                branches.Add(new IdentityBranch() 
-                { 
-                    Id = row["Id"],
-                    Name = row["BranchName"]
-                });
+                branch.Id = row["Id"];
+                branch.Name =  row["BranchName"];
             }
 
-            return branches;
+            return branch;
         }
 
         /// <summary>

@@ -47,5 +47,10 @@ namespace AspNet.Identity.MySQL
                 return false;
             }
         }
+
+        public List<TUpload> FindPendingUploadsByBranchIdAsync(string branchId)
+        {
+            return AsyncHelper.RunSync<List<TUpload>>(() => _store.FindPendingUploadsByBranchIdAsync(branchId));
+        }
     }
 }

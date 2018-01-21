@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace CETRA.Models
 {
@@ -12,22 +9,29 @@ namespace CETRA.Models
     public class BranchModel
     {
         public string Id { get; set; }
+        [Required]
         public string BranchName { get; set; }
+        [Required]
         public string BankId { get; set; }
+        [Required]
         public string GLAccount { get; set; }
     }
 
     public class BankModel
     {
         public string Id { get; set; }
+        [Required]
         public string BankName { get; set; }
     }
 
     public class AccountNumberModel
     {
         public string Id { get; set; }
+        [Required]
         public string BankId { get; set; }
+        [Required]
         public string AccountNumber { get; set; }
+        [Required]
         public string AccountName { get; set; }
     }
 }

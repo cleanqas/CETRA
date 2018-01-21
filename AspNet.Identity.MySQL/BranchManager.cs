@@ -48,5 +48,10 @@ namespace AspNet.Identity.MySQL
             }
             
         }
+
+        public TBranch GetUserBranchByUserId(string userId)
+        {
+           return AsyncHelper.RunSync(() => _store.GetUserBranchByUserId(userId));            
+        }
     }
 }

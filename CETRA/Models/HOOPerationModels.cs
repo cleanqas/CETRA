@@ -12,6 +12,7 @@ namespace CETRA.Models
     public class UploadModel
     {
         public string BranchId { get; set; }
+        public HttpPostedFileBase PaymentFile { get; set; }
         public int Status { get; set; }
     }
 

@@ -20,13 +20,9 @@ namespace AspNet.Identity.MySQL
             Amount = amount;
         }
 
-        public UploadDataEntity(string id, string uploadId, string narration, decimal amount, string accountNumber)
+        public UploadDataEntity(string id)
         {
             Id = id;
-            UploadId = uploadId;
-            Narration = narration;
-            Amount = amount;
-            AccountNumber = accountNumber;
         }
 
         /// <summary>

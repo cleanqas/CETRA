@@ -75,5 +75,12 @@ namespace AspNet.Identity.MySQL
 
             return Task.FromResult<List<TUpload>>(result);
         }
+
+        public Task<List<TUpload>> FindPendingUploadsByBranchIdAsync(string branchId)
+        {
+            List<TUpload> result = uploadTable.GetPendingUploadsByBranchID(branchId) as List<TUpload>;
+
+            return Task.FromResult<List<TUpload>>(result);
+        }
     }
 }

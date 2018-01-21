@@ -1,0 +1,151 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+<style>
+    html, body, .container-table {
+        height: 100%;
+    }
+
+    .container-table {
+        margin-top: 10px;
+        display: table;
+        width: 80%;
+    }
+
+    .vertical-center-row {
+        display: table-cell;
+        vertical-align: middle;
+    }
+</style>
+
+<div class="container container-table">
+    <div class="row vertical-center-row">
+        <div>
+            <table id="UploadsTable" style="width: 100%">
+                <thead>
+                    <tr>
+                        <th>Upload ID</th>
+                        <th>Date and Time</th>
+                        <th>Process</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+
+@*Upload Data Modal*@
+<div class="row">
+    <div class="modal fade" id="uploaddata" tabindex="-1" role="dialog" aria-labelledby="UploadDataLabel">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="close"><span aria-hidden="true">&times;</span></button>
+                    <h3 class="modal-title" id="UploadDataLabel">Process Upload</h3>
+                </div>
+                <div class="modal-body">
+                    <table id="UploadDataTable" style="width: 100%">
+                        <thead>
+                            <tr>
+                                <th>Narration</th>
+                                <th>Amount</th>
+                                <th>Bank</th>
+                                <th>Account Number</th>
+                                <th>Account Name</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+    <script type="text/javascript">
+        var paymentData = {};
+        var accountNumbers = {};
+
+        
+        $(function () {
+
+            $.ajax({
+                type: 'POST',
+                data: { __RequestVerificationToken: helpers.getAntiForgeryToken()},
+                url: '/BranchOperator/GetAllAccounts',
+                success: function (data) {
+                    accountNumbers = data;
+                }
+            });
+
+            $("#UploadsTable").dataTable({
+                columns: [
+                    { data: "Id" },
+                    { data: "UploadDate" },
+                    {
+                        render: function (data, type, full, meta) {
+                            return '<a class="btn btn-default" onClick="openModal(\''+ full.Id +'\')">Process</a>'
+                        }
+                    }
+                ],
+                ajax: {
+                    url: '/BranchOperator/GetAllPendingBranchUploads',
+                    method: 'POST',
+                    data: { __RequestVerificationToken: helpers.getAntiForgeryToken(), branchId: '@ViewBag.UserBranch' }
+                }
+            });
+        });
+
+        var searchAccount = function (acctNumber, uploadDataId) {
+            $.each(accountNumbers, function (i, v) {
+                if (v.AccountNumber == acctNumber) {
+                    $('acctName_' + full.Id).val(v.AccountName);
+                }
+            });
+        };
+
+        var openModal = function (uploadId) {
+            $.ajax({
+                type: 'POST',
+                data: { __RequestVerificationToken: helpers.getAntiForgeryToken(), UploadId: '' + uploadId + '' },
+                url: '/BranchOperator/GetUploadData',
+                success: function (data) {
+                    console.log(data);
+                    paymentData = data;                    
+                }
+            }).done(function () {
+                $("#UploadDataTable").dataTable().fnDestroy();
+                $("#UploadDataTable").dataTable({
+                    data: paymentData,
+                    columns: [
+                        { data: "Narration" },
+                        { data: "Amount" },
+                        {
+                            render: function (data, type, full, meta) {
+                                return '<select name="bank_account" id="bank_account" class="form-control"> <optgroup label="Select Bank"></optgroup> </select>'
+                            }
+                        },
+                        {
+                            render: function (data, type, full, meta) {
+                                return '<input type="text" placeholder="Account Number" class="form-control" name="acctNumber_' + full.Id + '" id="acctNumber_' + full.Id + '" onChange="searchAccount(this.value, \'' + full.Id + '\')"/>'
+                            }
+                        },
+                        {
+                            render: function (data, type, full, meta) {
+                                return '<input type="text" placeholder="Account Name" class="form-control" name="acctName_' + full.Id + '" id="acctName_' + full.Id + '"/>'
+                            }
+                        }
+                    ]
+                });
+            });
+            $('#uploaddata').modal();
+        };
+    </script>
+}
+
+

@@ -121,6 +121,18 @@ namespace AspNet.Identity.MySQL
             return Task.FromResult<object>(null);
         }
 
+        public Task<TBranch> GetUserBranchByUserId(string userId)
+        {
+            if (userId == null)
+            {
+                throw new ArgumentNullException("branch");
+            }
+
+            TBranch userbranch = userBranchTable.FindByUserId(userId) as TBranch;
+
+            return Task.FromResult<TBranch>(userbranch);
+        }
+
         public void Dispose()
         {
             if (Database != null)

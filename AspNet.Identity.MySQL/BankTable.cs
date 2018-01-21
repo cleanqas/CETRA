@@ -78,5 +78,27 @@ namespace AspNet.Identity.MySQL
 
             return _database.Execute(commandText, parameters);
         }
+
+        public List<IdentityBank> GetAllBanks()
+        {
+            List<IdentityBank> banks = new List<IdentityBank>();
+            string commandText = "Select Id, BankName from Banks";
+            Dictionary<string, object> parameters = new Dictionary<string, object>() { };
+
+            var result = _database.Query(commandText, parameters);
+            if (result != null)
+            {
+                foreach (var res in result)
+                {
+                    banks.Add(new IdentityBank()
+                    {
+                        Id = res["Id"],
+                        Name = res["BankName"]
+                    });
+                }
+            }
+
+            return banks;
+        }
     }
 }

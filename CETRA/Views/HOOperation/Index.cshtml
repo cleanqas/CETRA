@@ -1,0 +1,121 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+
+<style>
+    html, body, .container-table {
+        height: 100%;
+    }
+
+    .container-table {
+        margin-top: 10px;
+        display: table;
+        width: 80%;
+    }
+
+    .vertical-center-row {
+        display: table-cell;
+        vertical-align: middle;
+    }
+</style>
+
+<div class="container container-table">
+    <div class="row vertical-center-row">
+        <div class="col-md-6">
+            <div class="well form-horizontal">
+                <div class="form-group">
+                    <label class="control-label col-md-4">&nbsp;</label>
+                    <div class="col-md-8">
+                        <a class="btn btn-default" data-toggle="modal" href="#uploader">Upload Payment File &raquo;</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div>
+            <table id="UploadsTable" style="width: 100%">
+                <thead>
+                    <tr>
+                        <td>Uploader</td>
+                        <td>Status</td>
+                        <td>Download</td>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+
+@*Upload Modal*@
+<div class="row">
+    <div class="modal fade" id="uploader" tabindex="-1" role="dialog" aria-labelledby="UploaderLabel">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="close"><span aria-hidden="true">&times;</span></button>
+                    <h3 class="modal-title" id="UploaderLabel">Upload Payment File</h3>
+                </div>
+                <div class="modal-body">
+                    <form enctype="multipart/form-data" id="uploadForm">
+                        <div class="form-group">
+                            <label for="paymentfile" class="control-label">Payment File:</label>
+                            <input type="file" name="paymentfile" id="paymentfile" placeholder="Payment File" required class="form-control" />
+                        </div>
+                        <div class="form-group">
+                            <label for="branch_upload" class="control-label">Branch:</label>
+                            <select name="branch_upload" id="branch_upload" required class="form-control">
+                                <optgroup label="Select Branch"></optgroup>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <button class="btn btn-primary" type="button" id="uploadNewFile">Submit </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+    <script type="text/javascript">
+        $(function () {
+            helpers.getData("/SetUp/GetAllBranches", function (data) {
+                helpers.buildDropdown(data, $('#branch_upload'), 'Select Branch');
+            });
+
+            var filterValues = {};
+
+            $("#UploadsTable").dataTable();            
+        });
+
+        $('#uploadNewFile').click(function (e) {
+            console.log($('#file'));
+            var _data = new FormData();
+            _data.append("__RequestVerificationToken", helpers.getAntiForgeryToken());
+            _data.append("BranchId", $('#branch_upload').val());
+            _data.append("PaymentFile", $('#file').context.forms["uploadForm"][0].files[0])
+
+            console.log(_data);
+            $.ajax({
+                type: 'POST',
+                xhr: function () {
+                    var uXhr = $.ajaxSettings.xhr();
+                    if (uXhr.upload) {
+                        console.log(uXhr);
+                    }
+                    return uXhr;
+                },
+                data: _data,
+                contentType: false,
+                processData: false,
+                url: '/HOOPeration/Upload',
+                success: function (data) {
+                    console.log(data);
+                }
+            });
+        });
+    </script>
+}

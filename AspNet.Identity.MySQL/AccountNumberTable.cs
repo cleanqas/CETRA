@@ -88,5 +88,29 @@ namespace AspNet.Identity.MySQL
 
             return _database.Execute(commandText, parameters);
         }
+
+        /// <summary>
+        /// Returns a account Id, bankId and name of the account number
+        /// </summary>
+        /// <param name="accountnumber">The account number</param>
+        /// <returns>Bank name</returns>
+        public List<IdentityAccountNumber> GetAllAccount()
+        {
+            string commandText = "Select Id, BankId, AccountNumber, AccountName from AccountNumbers";
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            List<IdentityAccountNumber> accounts = new List<IdentityAccountNumber>();
+            var result = _database.Query(commandText, parameters);
+            foreach (var res in result)
+            {
+                accounts.Add(new IdentityAccountNumber()
+                {
+                    AccountName = res["AccountName"],
+                    AccountNumber = res["AccountNumber"],
+                    BankId = res["BankId"],
+                    Id = res["Id"]
+                });
+            }
+            return accounts;
+        }
     }
 }

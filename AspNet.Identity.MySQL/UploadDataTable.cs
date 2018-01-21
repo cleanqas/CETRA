@@ -26,8 +26,9 @@ namespace AspNet.Identity.MySQL
         /// <returns></returns>
         public int Insert(UploadDataEntity uploaddata)
         {
-            string commandText = "Insert into UploadsData (UploadId, Narration, Amount, AccountNumber) values (@uploadId, @narration, @amount, @accountNo)";
+            string commandText = "Insert into UploadsData (Id, UploadId, Narration, Amount, AccountNumber) values (@Id, @uploadId, @narration, @amount, @accountNo)";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("@Id", uploaddata.Id);
             parameters.Add("@uploadId", uploaddata.UploadId);
             parameters.Add("@narration", uploaddata.Narration);
             parameters.Add("@amount", uploaddata.Amount);
