@@ -49,5 +49,7 @@ namespace AspNet.Identity.MySQL
         public int Status { get; set; }
 
         public string UploadDate { get; set; }
+
+        public string OperatorId { get; set; }
     }
 }

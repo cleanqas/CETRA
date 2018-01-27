@@ -61,18 +61,19 @@ namespace CETRA.Controllers
 
         //POST: /BranchOperator/UpdateUploadData
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<JsonResult> UpdateUploadData(List<EditUploadData> model)
         {
-            if (ModelState.IsValid)
+            if (ModelState.IsValid & model != null)
             {
                 foreach(var data in model)
                 {
-                    var uploaddata = new UploadDataEntity(data.uploadDataId);
-                    uploaddata.AccountNumber = data.accountNumber;
+                    var uploaddata = new UploadDataEntity(data.UploadDataId);
+                    uploaddata.AccountNumber = data.AccountNumber;
+                    uploaddata.BankId = data.BankId;
                     var updatedata = await new UploadDataStore<UploadDataEntity>(new ApplicationDbContext()).UpdateUploadsDataAsync(uploaddata);
                 }
-                
+                UploadManager.UpdateUploadStatus(model[0].UploadId, 1);
+                UploadManager.UpdateUploadOperator(model[0].UploadId, User.Identity.GetUserId());
                 return Json(new { code = "00", message = "Successful" }, JsonRequestBehavior.AllowGet);
                 
             }

@@ -1,17 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
 
 namespace CETRA.Models
 {
-    public class BranchOperatorModel
-    {
-    }
-
+   
     public class EditUploadData
     {
-        public string uploadDataId { get; set; }
-        public string accountNumber { get; set; }
+        [Required]
+        public string UploadId { get; set; }
+        [Required]
+        public string UploadDataId { get; set; }
+        [Required]
+        public string AccountNumber { get; set; }
+        [Required]
+        public string BankId { get; set; }
     }
 }

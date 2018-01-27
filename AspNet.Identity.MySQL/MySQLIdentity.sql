@@ -158,4 +158,44 @@ ALTER TABLE `cetra`.`uploads`
 ADD COLUMN `UploadDate` DATETIME NULL DEFAULT CURRENT_TIMESTAMP AFTER `Status`;
 
 ALTER TABLE `cetra`.`uploadsdata` 
-CHANGE COLUMN `Id` `Id` VARCHAR(128) NOT NULL ;s
+CHANGE COLUMN `Id` `Id` VARCHAR(128) NOT NULL ;
+
+ALTER TABLE `cetra`.`uploadsdata` 
+ADD COLUMN `BankId` VARCHAR(128) NOT NULL AFTER `AccountNumber`;
+
+ALTER TABLE `cetra`.`uploadsdata` 
+ADD INDEX `Uploaddata_Bank_idx` (`BankId` ASC);
+ALTER TABLE `cetra`.`uploadsdata` 
+ADD CONSTRAINT `Uploaddata_Bank`
+  FOREIGN KEY (`BankId`)
+  REFERENCES `cetra`.`banks` (`Id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+  ALTER TABLE `cetra`.`uploadsdata` 
+DROP FOREIGN KEY `Uploaddata_Bank`;
+ALTER TABLE `cetra`.`uploadsdata` 
+CHANGE COLUMN `BankId` `BankId` VARCHAR(128) NULL ;
+ALTER TABLE `cetra`.`uploadsdata` 
+ADD CONSTRAINT `Uploaddata_Bank`
+  FOREIGN KEY (`BankId`)
+  REFERENCES `cetra`.`banks` (`Id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+  ALTER TABLE `cetra`.`uploads` 
+ADD COLUMN `OperatorId` VARCHAR(128) NULL AFTER `UploadDate`,
+ADD COLUMN `RejectReason` VARCHAR(500) NULL AFTER `OperatorId`;
+
+ALTER TABLE `cetra`.`uploads` 
+ADD INDEX `UploadOperator_User_idx` (`OperatorId` ASC);
+ALTER TABLE `cetra`.`uploads` 
+ADD CONSTRAINT `UploadOperator_User`
+  FOREIGN KEY (`OperatorId`)
+  REFERENCES `cetra`.`users` (`Id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+  ALTER TABLE `cetra`.`uploads` 
+ADD COLUMN `VerifierId` VARCHAR(128) NULL AFTER `RejectReason`;
+

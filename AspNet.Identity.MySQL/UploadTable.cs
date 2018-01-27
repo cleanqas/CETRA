@@ -117,6 +117,66 @@ namespace AspNet.Identity.MySQL
         }
 
         /// <summary>
+        /// Update an upload in the Uploads table
+        /// </summary>
+        /// <param name="uploadId">The Upload Id</param>
+        /// <returns></returns>
+        public int UpdateUploadStatus(string uploadId, int status)
+        {
+            string commandText = "Update Uploads  set status = @Status where Id = @id";
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("@id", uploadId);
+            parameters.Add("@Status", status);
+
+            return _database.Execute(commandText, parameters);
+        }
+
+        /// <summary>
+        /// Update an upload in the Uploads table
+        /// </summary>
+        /// <param name="uploadId">The Upload Id</param>
+        /// <returns></returns>
+        public int UpdateUploadOperator(string uploadId, string operatorId)
+        {
+            string commandText = "Update Uploads set OperatorId = @OperatorId where Id = @id";
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("@Id", uploadId);
+            parameters.Add("@OperatorId", operatorId);
+
+            return _database.Execute(commandText, parameters);
+        }
+
+        /// <summary>
+        /// Update an upload in the Uploads table
+        /// </summary>
+        /// <param name="uploadId">The Upload Id</param>
+        /// <returns></returns>
+        public int UpdateUploadVerifier(string uploadId, string verifierId)
+        {
+            string commandText = "Update Uploads set VerifierId = @VerifierId where Id = @id";
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("@Id", uploadId);
+            parameters.Add("@VerifierId", verifierId);
+
+            return _database.Execute(commandText, parameters);
+        }
+
+        /// <summary>
+        /// Update an upload in the Uploads table
+        /// </summary>
+        /// <param name="uploadId">The Upload Id</param>
+        /// <returns></returns>
+        public int UpdateUploadRejectReason(string uploadId, string rejectReason)
+        {
+            string commandText = "Update Uploads set RejectReason = @RejectReason where Id = @id";
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("@Id", uploadId);
+            parameters.Add("@RejectReason", rejectReason);
+
+            return _database.Execute(commandText, parameters);
+        }
+
+        /// <summary>
         /// Gets all uploads from the Uploads table by Status
         /// </summary>
         /// <param name="status">The upload status</param>
@@ -149,11 +209,12 @@ namespace AspNet.Identity.MySQL
         /// <param name="branchId">The Branch Id</param>
         /// <returns></returns>
         /// 
-        public List<UploadEntity> GetPendingUploadsByBranchID(string branchId)
+        public List<UploadEntity> GetUploadsByBranchAndStatus(string branchId, int status)
         {
-            string commandText = "Select Id, UploaderId, BranchId, Status, UploadDate from Uploads where BranchId = @branchId and Status = 0";
+            string commandText = "Select Id, UploaderId, BranchId, Status, UploadDate, OperatorId from Uploads where BranchId = @branchId and Status = @Status";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@branchId", branchId);
+            parameters.Add("@Status", status);
             List<UploadEntity> uploads = new List<UploadEntity>();
             var result = _database.Query(commandText, parameters);
             foreach (var res in result)
@@ -164,7 +225,8 @@ namespace AspNet.Identity.MySQL
                     Id = res["Id"],
                     Status = Convert.ToInt32(res["Status"]),
                     UploaderId = res["UploaderId"],
-                    UploadDate = Convert.ToDateTime(res["UploadDate"]).ToString("dd-MM-yyyy hh:mm:ss")
+                    UploadDate = Convert.ToDateTime(res["UploadDate"]).ToString("dd-MM-yyyy hh:mm:ss"),
+                    OperatorId = res["OperatorId"]
                 });
             }
             return uploads;

@@ -49,5 +49,16 @@ namespace AspNet.Identity.MySQL
         /// Account Number
         /// </summary>
         public string AccountNumber { get; set; }
+
+        /// <summary>
+        /// Bank Id
+        /// </summary>
+        public string BankId { get; set; }
+    }
+
+    public class UploadDataWithBankAndAccountDetails : UploadDataEntity
+    {
+        public string BankName { get; set; }
+        public string AccountName { get; set; }
     }
 }

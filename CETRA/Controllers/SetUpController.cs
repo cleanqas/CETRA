@@ -38,6 +38,7 @@ namespace CETRA.Controllers
             RoleManager = roleManager;
             BranchManager = branchManager;
             BankManager = bankManager;
+            AccountNumberManager = accountManager;
         }
 
         public ActionResult Index()

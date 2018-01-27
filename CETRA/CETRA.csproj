@@ -180,6 +180,7 @@
     <Compile Include="App_Start\SwaggerConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\BranchOperatorController.cs" />
+    <Compile Include="Controllers\BranchVerifierController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\HOOperationController.cs" />
     <Compile Include="Controllers\SetUpController.cs" />
@@ -188,6 +189,7 @@
     </Compile>
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\BranchOperatorModel.cs" />
+    <Compile Include="Models\BranchVerifierModel.cs" />
     <Compile Include="Models\HOOPerationModels.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\SetupModels.cs" />
@@ -480,6 +482,7 @@
     <Content Include="Views\SetUp\Index.cshtml" />
     <Content Include="Views\HOOperation\Index.cshtml" />
     <Content Include="Views\BranchOperator\Index.cshtml" />
+    <Content Include="Views\BranchVerifier\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

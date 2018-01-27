@@ -78,9 +78,41 @@ namespace AspNet.Identity.MySQL
 
         public Task<List<TUpload>> FindPendingUploadsByBranchIdAsync(string branchId)
         {
-            List<TUpload> result = uploadTable.GetPendingUploadsByBranchID(branchId) as List<TUpload>;
+            List<TUpload> result = uploadTable.GetUploadsByBranchAndStatus(branchId, 0) as List<TUpload>;
 
             return Task.FromResult<List<TUpload>>(result);
         }
+
+        public Task<List<TUpload>> FindPendingVerificationUploadsByBranchIdAsync(string branchId)
+        {
+            List<TUpload> result = uploadTable.GetUploadsByBranchAndStatus(branchId, 1) as List<TUpload>;
+
+            return Task.FromResult<List<TUpload>>(result);
+        }
+
+        public Task<int> UpdateUploadStatus(string uploadId, int status)
+        {
+            int result = uploadTable.UpdateUploadStatus(uploadId, status);
+            return Task.FromResult<int>(result);
+        }
+
+        public Task<int> UpdateUploadOperator(string uploadId, string operatorId)
+        {
+            int result = uploadTable.UpdateUploadOperator(uploadId, operatorId);
+            return Task.FromResult<int>(result);
+        }
+
+        public Task<int> UpdateUploadVerifier(string uploadId, string verifierId)
+        {
+            int result = uploadTable.UpdateUploadVerifier(uploadId, verifierId);
+            return Task.FromResult<int>(result);
+        }
+
+        public Task<int> UpdateUploadRejectReason(string uploadId, string rejectReason)
+        {
+            int result = uploadTable.UpdateUploadRejectReason(uploadId, rejectReason);
+            return Task.FromResult<int>(result);
+        }
+
     }
 }

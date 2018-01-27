@@ -54,7 +54,7 @@ namespace CETRA.Controllers
                     }
                     catch (Exception ex)
                     {
-                        await UploadManager.DeleteAsync(upload);
+                        UploadManager.DeleteAsync(upload);
                         return Json(new { code = "01", message = ex.Message }, JsonRequestBehavior.AllowGet);
                     }
 
@@ -66,14 +66,14 @@ namespace CETRA.Controllers
                         foreach (var data in PData)
                         {
                             uploaddata = new UploadDataEntity(upload.Id, data.Narration, data.Amount);
-                            await UploadDataManager.CreateAsync(uploaddata);
+                            UploadDataManager.CreateAsync(uploaddata);
                         }
                     }
                     catch (Exception ex)
                     {
                         //TODO: implement log
-                        await UploadDataManager.DeleteAsync(upload.Id);
-                        await UploadManager.DeleteAsync(upload);
+                        UploadDataManager.DeleteAsync(upload.Id);
+                        UploadManager.DeleteAsync(upload);
                         return Json(new { code = "02", message = "Upload failed" }, JsonRequestBehavior.AllowGet);
                     }
 

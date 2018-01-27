@@ -1,8 +1,6 @@
-﻿
-@{
+﻿@{
     ViewBag.Title = "Index";
 }
-
 <style>
     html, body, .container-table {
         height: 100%;
@@ -18,8 +16,11 @@
         display: table-cell;
         vertical-align: middle;
     }
-</style>
 
+    .modal-dialog {
+        width: 90%;
+    }
+</style>
 <div class="container container-table">
     <div class="row vertical-center-row">
         <div>
@@ -35,7 +36,6 @@
         </div>
     </div>
 </div>
-
 @*Upload Data Modal*@
 <div class="row">
     <div class="modal fade" id="uploaddata" tabindex="-1" role="dialog" aria-labelledby="UploadDataLabel">
@@ -59,24 +59,24 @@
                     </table>
                 </div>
                 <div class="modal-footer">
+                    <a href="#" class="btn btn-primary" id="updateUploadData">Submit</a>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
 @section scripts
 {
     <script type="text/javascript">
         var paymentData = {};
         var accountNumbers = {};
 
-        
+
         $(function () {
 
             $.ajax({
                 type: 'POST',
-                data: { __RequestVerificationToken: helpers.getAntiForgeryToken()},
+                data: { __RequestVerificationToken: helpers.getAntiForgeryToken() },
                 url: '/BranchOperator/GetAllAccounts',
                 success: function (data) {
                     accountNumbers = data;
@@ -89,7 +89,7 @@
                     { data: "UploadDate" },
                     {
                         render: function (data, type, full, meta) {
-                            return '<a class="btn btn-default" onClick="openModal(\''+ full.Id +'\')">Process</a>'
+                            return '<a class="btn btn-default" onClick="openModal(\'' + full.Id + '\')">Process</a>'
                         }
                     }
                 ],
@@ -102,10 +102,26 @@
         });
 
         var searchAccount = function (acctNumber, uploadDataId) {
+            console.log($('#bank_' + uploadDataId).val());
+            if ($('#bank_' + uploadDataId).val() == '') {
+                alert("Select Bank First");
+                return;
+            }
+            console.log(accountNumbers)
             $.each(accountNumbers, function (i, v) {
-                if (v.AccountNumber == acctNumber) {
-                    $('acctName_' + full.Id).val(v.AccountName);
+                if (v.AccountNumber == acctNumber & $('#bank_' + uploadDataId).val() == v.BankId) {
+                    $('#acctName_' + uploadDataId).val(v.AccountName);
+
+                    $.each(paymentData, function (i, v) {
+                        if (v.Id == uploadDataId) {
+                            v.AccountNumber = acctNumber;
+                            v.BankId = $('#bank_' + uploadDataId).val();
+                        }
+                    });
+                } else {
+                    $('#acctName_' + uploadDataId).val('');
                 }
+                console.log(paymentData);
             });
         };
 
@@ -116,7 +132,7 @@
                 url: '/BranchOperator/GetUploadData',
                 success: function (data) {
                     console.log(data);
-                    paymentData = data;                    
+                    paymentData = data;
                 }
             }).done(function () {
                 $("#UploadDataTable").dataTable().fnDestroy();
@@ -127,7 +143,7 @@
                         { data: "Amount" },
                         {
                             render: function (data, type, full, meta) {
-                                return '<select name="bank_account" id="bank_account" class="form-control"> <optgroup label="Select Bank"></optgroup> </select>'
+                                return '<select name="bank_' + full.Id + '" id="bank_' + full.Id + '" class="form-control bank_select"> <optgroup label="Select Bank"></optgroup> </select>'
                             }
                         },
                         {
@@ -140,12 +156,42 @@
                                 return '<input type="text" placeholder="Account Name" class="form-control" name="acctName_' + full.Id + '" id="acctName_' + full.Id + '"/>'
                             }
                         }
-                    ]
+                    ],
+                    fnDrawCallback: function (oSettings) {
+                        $.each($('.bank_select'), function (i, v) {
+                            console.log(v)
+                            helpers.getData("/SetUp/GetAllBanks", function (data) {
+                                helpers.buildDropdown(data, $('#' + v.name + ''), 'Select Bank');
+                            });
+                        });
+                    }
                 });
             });
             $('#uploaddata').modal();
         };
+
+        $('#updateUploadData').click(function () {
+
+            var updates = [];
+
+            $.each(paymentData, function (i, v) {
+                if (v.AccountNumber != null)
+                    updates.push({ UploadDataId: v.Id, AccountNumber: v.AccountNumber, UploadId: v.UploadId, BankId: v.BankId });
+            });
+
+            console.log(updates);
+            $('#confirmationModal').modal();
+            $.ajax({
+                type: 'POST',
+                url: '/BranchOperator/UpdateUploadData',
+                contentType: 'application/json; charset=utf-8',
+                datatype: "json",
+                data: JSON.stringify({ model: updates }),
+                success: function (data) {
+                    console.log(data);                    
+                }
+            });
+        });
     </script>
 }
-
 

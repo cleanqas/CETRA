@@ -68,5 +68,11 @@ namespace AspNet.Identity.MySQL
 
             return Task.FromResult<bool>(result);
         }
+
+        public Task<List<UploadDataWithBankAndAccountDetails>> GetUploadsDataWithAccountName(string uploadId)
+        {
+            List<UploadDataWithBankAndAccountDetails> result = uploadDataTable.GetUploadsDataWithAccountName(uploadId);
+            return Task.FromResult<List<UploadDataWithBankAndAccountDetails>>(result);
+        }
     }
 }

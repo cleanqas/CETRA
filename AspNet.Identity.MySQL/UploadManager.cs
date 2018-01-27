@@ -52,5 +52,15 @@ namespace AspNet.Identity.MySQL
         {
             return AsyncHelper.RunSync<List<TUpload>>(() => _store.FindPendingUploadsByBranchIdAsync(branchId));
         }
+
+        public int UpdateUploadStatus(string uploadId, int status)
+        {
+            return AsyncHelper.RunSync<int>(() => _store.UpdateUploadStatus(uploadId, status));
+        }
+
+        public int UpdateUploadOperator(string uploadId, string operatorId)
+        {
+            return AsyncHelper.RunSync<int>(() => _store.UpdateUploadOperator(uploadId, operatorId));
+        }
     }
 }

@@ -254,9 +254,9 @@
         $('#registerNewAccount').click(function (e) {
             var _data = {
                 __RequestVerificationToken: helpers.getAntiForgeryToken(),
-                BankId: $('bank_account').val(),
-                AccountNumber: $('accountnumber').val(),
-                AccountName: $('accountname').val()
+                BankId: $('#bank_account').val(),
+                AccountNumber: $('#accountnumber').val(),
+                AccountName: $('#accountname').val()
             };
             $.ajax({
                 type: 'POST',
