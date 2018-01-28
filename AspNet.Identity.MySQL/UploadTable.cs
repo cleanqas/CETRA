@@ -166,6 +166,21 @@ namespace AspNet.Identity.MySQL
         /// </summary>
         /// <param name="uploadId">The Upload Id</param>
         /// <returns></returns>
+        public int UpdateUploadHOProcessed(string uploadId, string hoProcessorId)
+        {
+            string commandText = "Update Uploads set HOProcessorId = @HOProcessorId where Id = @id";
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("@Id", uploadId);
+            parameters.Add("@HOProcessorId", hoProcessorId);
+
+            return _database.Execute(commandText, parameters);
+        }
+
+        /// <summary>
+        /// Update an upload in the Uploads table
+        /// </summary>
+        /// <param name="uploadId">The Upload Id</param>
+        /// <returns></returns>
         public int UpdateUploadRejectReason(string uploadId, string rejectReason)
         {
             string commandText = "Update Uploads set RejectReason = @RejectReason where Id = @id";

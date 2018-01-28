@@ -35,6 +35,35 @@ namespace CETRA.Controllers
             return View();
         }
 
+        //POST: /HOOperator/GetAllProcessedUploads
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<JsonResult> GetAllProcessedUploads(string branchId)
+        {
+            var branchUploads = await new UploadStore<UploadEntity>(new ApplicationDbContext()).FindUploadsByStatusAsync(2);
+            return Json(new { data = branchUploads }, JsonRequestBehavior.AllowGet);
+        }
+
+        //POST: /HOOperator/GetAllUploadDataDetail
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<JsonResult> GetAllUploadDataDetail(string UploadId)
+        {
+            var uploadData = await new UploadDataStore<UploadDataEntity>(new ApplicationDbContext()).GetUploadsDataWithAccountName(UploadId);
+            return Json(uploadData, JsonRequestBehavior.AllowGet);
+        }
+
+        //POST: /HOOperator/MarkUploadAsProcessed
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<JsonResult> MarkUploadAsProcessed(string UploadId)
+        {
+            var uploadStore = new UploadStore<UploadEntity>(new ApplicationDbContext());
+            await uploadStore.UpdateUploadStatus(UploadId, 3);
+            await uploadStore.UpdateUploadHOProcessor(UploadId, User.Identity.GetUserId());
+            return Json(new { code = "00", message = "Successful" }, JsonRequestBehavior.AllowGet);
+        }
+
         //
         // POST: /HOOPeration/Upload
         [HttpPost]

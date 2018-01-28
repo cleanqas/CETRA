@@ -22,7 +22,16 @@
     .modal-dialog {
         width: 90%;
     }
+
+    .modal-footer-left{
+        text-align: left;
+    }
+
+    .wide-input{
+        max-width: 100%
+    }
 </style>
+
 <div class="container container-table">
     <div class="row vertical-center-row">
         <div>
@@ -42,6 +51,7 @@
         </div>
     </div>
 </div>
+
 @*Upload Data Modal*@
 <div class="row">
     <div class="modal fade" id="uploaddata" tabindex="-1" role="dialog" aria-labelledby="UploadDataLabel">
@@ -73,20 +83,21 @@
                             <a href="#" class="btn btn-primary" id="approveUpload">Approve</a>
                         </div>
                     </div>
-                    <div class="row" id="rejectReasonDiv">
+                    <div class="row modal-footer-left" id="rejectReasonDiv">
                         <div class="form-group">
                             <label for="rejectReason" class="control-label">Reason for Reject:</label>
-                            <textarea rows="2" name="rejectreason" id="rejectreason" class="form-control" />
+                            <input type="text" name="rejectreason" id="rejectreason" class="form-control wide-input" />
                         </div>
                         <div class="form-group">
                             <a href="#" class="btn btn-danger" id="submitReject">Submit Reject</a>
                         </div>
-                    </div>                    
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
 @section scripts
 {
     <script type="text/javascript">
@@ -94,7 +105,11 @@
 
         $(function () {
 
+            console.log("1")
+
             $("#rejectReasonDiv").hide();
+
+            console.log("starting")
 
             $("#UploadsTable").dataTable({
                 columns: [
@@ -132,7 +147,7 @@
                     columns: [
                         { data: "Narration" },
                         { data: "Amount" },
-                        { data: "Bank" },
+                        { data: "BankName" },
                         { data: "AccountNumber" },
                         { data: "AccountName" }
                     ]
@@ -177,6 +192,10 @@
             })
         });
 
+        $('#uploaddata').on('hidden.bs.modal', function (e) {
+            console.log('closing modal');
+            $("#approveRejectDiv").show();
+            $("#rejectReasonDiv").hide();
+        });
     </script>
 }
-

@@ -199,3 +199,32 @@ ADD CONSTRAINT `UploadOperator_User`
   ALTER TABLE `cetra`.`uploads` 
 ADD COLUMN `VerifierId` VARCHAR(128) NULL AFTER `RejectReason`;
 
+ALTER TABLE `cetra`.`uploads` 
+ADD COLUMN `HOProcessorId` VARCHAR(128) NULL AFTER `VerifierId`;
+
+ALTER TABLE `cetra`.`uploads` 
+ADD INDEX `UploadVerifier_User_idx` (`VerifierId` ASC);
+ALTER TABLE `cetra`.`uploads` 
+ADD CONSTRAINT `UploadVerifier_User`
+  FOREIGN KEY (`VerifierId`)
+  REFERENCES `cetra`.`users` (`Id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+  
+
+  ALTER TABLE `cetra`.`uploads` 
+ADD INDEX `UploadHOProcessor_User_idx` (`HOProcessorId` ASC);
+ALTER TABLE `cetra`.`uploads` 
+ADD CONSTRAINT `UploadHOProcessor_User`
+  FOREIGN KEY (`HOProcessorId`)
+  REFERENCES `cetra`.`users` (`Id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+
+  UPDATE `cetra`.`uploadstatus` SET `Descr`='Operated' WHERE `Id`='1';
+INSERT INTO `cetra`.`uploadstatus` (`Id`, `Descr`) VALUES ('2', 'Verified');
+INSERT INTO `cetra`.`uploadstatus` (`Id`, `Descr`) VALUES ('3', 'Processed');
+INSERT INTO `cetra`.`uploadstatus` (`Id`, `Descr`) VALUES ('-1', 'Rejected');
+
+

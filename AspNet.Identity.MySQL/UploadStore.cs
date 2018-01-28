@@ -108,6 +108,12 @@ namespace AspNet.Identity.MySQL
             return Task.FromResult<int>(result);
         }
 
+        public Task<int> UpdateUploadHOProcessor(string uploadId, string hoProcessorId)
+        {
+            int result = uploadTable.UpdateUploadHOProcessed(uploadId, hoProcessorId);
+            return Task.FromResult<int>(result);
+        }
+
         public Task<int> UpdateUploadRejectReason(string uploadId, string rejectReason)
         {
             int result = uploadTable.UpdateUploadRejectReason(uploadId, rejectReason);
