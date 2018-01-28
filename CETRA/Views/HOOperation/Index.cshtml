@@ -21,6 +21,11 @@
     .modal-dialog {
         width: 90%;
     }
+
+    .dataTables_length, .dataTables_filter{
+        display: none;
+    }
+
 </style>
 
 <div class="container container-table">
@@ -36,7 +41,7 @@
             </div>
         </div>
         <div>
-            <table id="UploadsTable" style="width: 100%">
+            <table id="UploadsTable" class="display"  style="width: 100%">
                 <thead>
                     <tr>
                         <td>Id</td>
@@ -51,7 +56,7 @@
 
 @*Upload Modal*@
 <div class="row">
-    <div class="modal fade" id="uploader" tabindex="-1" role="dialog" aria-labelledby="UploaderLabel">
+    <div class="modal fade" id="uploader" tabindex="-1" role="dialog" aria-labelledby="UploaderLabel" data-backdrop="static" data-keyboard="false">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -71,7 +76,7 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <button class="btn btn-primary" type="button" id="uploadNewFile">Submit </button>
+                            <button class="btn btn-primary" type="button" id="uploadNewFile" data-loading-text="<i class='fa fa-spinner fa-spin '></i> Processing File">Upload File </button>
                         </div>
                     </form>
                 </div>
@@ -84,7 +89,7 @@
 
 @*Upload Data Modal*@
 <div class="row">
-    <div class="modal fade" id="uploaddata" tabindex="-1" role="dialog" aria-labelledby="UploadDataLabel">
+    <div class="modal fade" id="uploaddata" tabindex="-1" role="dialog" aria-labelledby="UploadDataLabel" data-backdrop="static" data-keyboard="false">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -105,7 +110,7 @@
                     </table>
                 </div>
                 <div class="modal-footer">
-                    <a href="#" class="btn btn-primary" id="markAsProcesed">Mark As Processed</a>                    
+                    <a href="#" class="btn btn-primary" id="markAsProcesed" data-loading-text="<i class='fa fa-spinner fa-spin '></i> Processing...">Mark As Processed</a>                    
                 </div>
             </div>
         </div>
@@ -178,18 +183,28 @@
         };
 
         $('#markAsProcesed').click(function (e) {
+            $(this).button('loading');
             $.ajax({
                 type: 'POST',
                 data: { __RequestVerificationToken: helpers.getAntiForgeryToken(), UploadId: '' + paymentData[0].UploadId + '' },
                 url: '/HOOperation/MarkUploadAsProcessed',
                 success: function (data) {
                     console.log(data);
+                    $('#markAsProcesed').button('reset');
+                    $('#uploaddata').modal('hide');
+                    $('#confirmationModal').modal();
+                    $('#notification').text('Upload Marked As Processed');
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    alert('Error Occured, Check Data Input');
                 }
             });
         });
 
         $('#uploadNewFile').click(function (e) {
-            console.log($('#file'));
+            
+            $(this).button('loading');
+
             var _data = new FormData();
             _data.append("__RequestVerificationToken", helpers.getAntiForgeryToken());
             _data.append("BranchId", $('#branch_upload').val());
@@ -210,9 +225,21 @@
                 processData: false,
                 url: '/HOOPeration/Upload',
                 success: function (data) {
-                    console.log(data);
+                    //console.log(data);
+                    $('#uploadNewFile').button('reset');
+                    $('#uploader').modal('hide');
+                    $('#confirmationModal').modal();
+                    $('#notification').text('File Upload Succesfully');
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    alert('Error Occured, Check Data Input');
                 }
             });
+        });
+
+        $('#confirmationModal').on('hide.bs.modal', function (e) {
+            console.log('closing notify');
+            location.reload();
         });
     </script>
 }

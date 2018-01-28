@@ -44,7 +44,7 @@
 
     @*Manage Users Modal*@
     <div class="row">
-        <div class="modal fade" id="manageUser" tabindex="-1" role="dialog" aria-labelledby="ManageUserLabel">
+        <div class="modal fade" id="manageUser" tabindex="-1" role="dialog" aria-labelledby="ManageUserLabel" data-backdrop="static" data-keyboard="false">
             <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -70,9 +70,9 @@
                                 <select name="role" id="role" required class="form-control">
                                     <optgroup label="Select Role">
                                         <option value="9263d72f-f46c-434a-aaf3-cbe9caa4a01d" selected>Administrator</option>
-                                        <option value="hocontrol">Head Office Control</option>
-                                        <option value="branchcso">Branch CSO</option>
-                                        <option value="branchcontrol">Branch Control</option>
+                                        <option value="d3391fbe-3bde-4ee8-a5a8-bad0c750ebfa">Head Office Operator</option>
+                                        <option value="d8568c9b-5b4f-4f14-9a58-fe7ed1d5ed3f">Branch Operator</option>
+                                        <option value="29b04043-710e-49c0-b629-52f75d318917">Branch Verifier</option>
                                     </optgroup>
                                 </select>
                             </div>
@@ -83,12 +83,12 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                <button class="btn btn-primary" type="button" id="registerNewUser">Submit </button>
+                                <button class="btn btn-primary" type="button" id="registerNewUser" data-loading-text="<i class='fa fa-spinner fa-spin '></i> Registering New User ...">Submit </button>
                             </div>
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <a href="#" class="btn btn-primary">Remove User</a>
+                        @*<a href="#" class="btn btn-primary">Remove User</a>*@
                     </div>
                 </div>
             </div>
@@ -97,7 +97,7 @@
 
     @*Bank*@
     <div class="row">
-        <div class="modal fade" id="manageBank" tabindex="-1" role="dialog" aria-labelledby="ManageBankLabel">
+        <div class="modal fade" id="manageBank" tabindex="-1" role="dialog" aria-labelledby="ManageBankLabel" data-backdrop="static" data-keyboard="false">
             <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -111,7 +111,7 @@
                                 <input type="text" name="bankname" id="bankname" placeholder="Bank Name" autofocus required class="form-control" />
                             </div>
                             <div class="form-group">
-                                <button class="btn btn-primary" type="button" id="registerNewBank">Submit </button>
+                                <button class="btn btn-primary" type="button" id="registerNewBank" data-loading-text="<i class='fa fa-spinner fa-spin '></i> Registering New Bank ...">Submit </button>
                             </div>
                         </form>
                     </div>
@@ -124,7 +124,7 @@
 
     @*Account*@
     <div class="row">
-        <div class="modal fade" id="manageAccount" tabindex="-1" role="dialog" aria-labelledby="ManageAccountLabel">
+        <div class="modal fade" id="manageAccount" tabindex="-1" role="dialog" aria-labelledby="ManageAccountLabel" data-backdrop="static" data-keyboard="false">
             <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -148,7 +148,7 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                <button class="btn btn-primary" type="button" id="registerNewAccount">Submit </button>
+                                <button class="btn btn-primary" type="button" id="registerNewAccount" data-loading-text="<i class='fa fa-spinner fa-spin '></i> Registering New Account">Submit </button>
                             </div>
                         </form>
                     </div>
@@ -161,7 +161,7 @@
 
     @*Branch*@
     <div class="row">
-        <div class="modal fade" id="manageBranch" tabindex="-1" role="dialog" aria-labelledby="ManageBranchLabel">
+        <div class="modal fade" id="manageBranch" tabindex="-1" role="dialog" aria-labelledby="ManageBranchLabel" data-backdrop="static" data-keyboard="false">
             <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -185,7 +185,7 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                <button class="btn btn-primary" type="button" id="registerNewBranch">Submit </button>
+                                <button class="btn btn-primary" type="button" id="registerNewBranch" data-loading-text="<i class='fa fa-spinner fa-spin '></i> Registering New Branch ...">Submit </button>
                             </div>
                         </form>
                     </div>
@@ -213,8 +213,11 @@
         });
 
         $('#registerNewUser').click(function (e) {
+            $(this).button('loading');
+
             if (!helpers.checkEquality($('#password').val(), $('#confirm_password').val())) {
                 alert('Password strings does not match');
+                $('#registerNewUser').button('reset');
                 return false;
             }
 
@@ -234,24 +237,46 @@
                 url: '/SetUp/RegisterNewUser',
                 data: _data,
                 success: function (data) {
-                    console.log(data);
+                    $('#manageUser').modal('hide');
+                    $('#confirmationModal').modal();
+                    $('#notification').text('New User Registered');
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    alert('Error Occured, Check Data Input');
+                },
+                complete: function () {
+                    $('#registerNewUser').button('reset');
                 }
             });
         });
 
         $('#registerNewBank').click(function (e) {
+
+            $(this).button('loading');
+
             $.ajax({
                 type: 'POST',
                 contentType: 'application/x-www-form-urlencoded',
                 data: { __RequestVerificationToken: helpers.getAntiForgeryToken(), BankName: $('bankname').val() },
                 url: '/SetUp/RegisterNewBank',
                 success: function (data) {
-                    console.log(data);
+                    $('#manageBank').modal('hide');
+                    $('#confirmationModal').modal();
+                    $('#notification').text('New Bank Registered');
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    alert('Error Occured, Check Data Input');                    
+                },
+                complete: function () {
+                    $('#registerNewBank').button('reset');
                 }
             });
         });
 
         $('#registerNewAccount').click(function (e) {
+
+            $(this).button('loading');
+
             var _data = {
                 __RequestVerificationToken: helpers.getAntiForgeryToken(),
                 BankId: $('#bank_account').val(),
@@ -264,12 +289,23 @@
                 data: _data,
                 url: '/SetUp/RegisterNewAccount',
                 success: function (data) {
-                    console.log(data);
+                    $('#manageAccount').modal('hide');
+                    $('#confirmationModal').modal();
+                    $('#notification').text('New Customer Account Registered');
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    alert('Error Occured, Check Data Input');
+                },
+                complete: function () {
+                    $('#registerNewAccount').button('reset');
                 }
             });
         });
 
         $('#registerNewBranch').click(function (e) {
+
+            $(this).button('loading');
+
             var _data = {
                 __RequestVerificationToken: helpers.getAntiForgeryToken(),
                 BankId: $('bank_branch').val(),
@@ -282,9 +318,21 @@
                 data: _data,
                 url: '/SetUp/RegisterNewBranch',
                 success: function (data) {
-                    console.log(data);
+                    $('#manageBranch').modal('hide');
+                    $('#confirmationModal').modal();
+                    $('#notification').text('New Branch Registered');
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    alert('Error Occured, Check Data Input');
+                },
+                complete: function () {
+                    $('#registerNewBranch').button('reset');
                 }
             });
+        });
+
+        $('#confirmationModal').on('hide.bs.modal', function (e) {
+            location.reload();
         });
     </script>
 }

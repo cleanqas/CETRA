@@ -33,7 +33,7 @@ namespace CETRA.Controllers
         }
 
         // GET: BranchVerifier
-        [Authorize]
+        [Authorize(Roles = "BranchVerifier")]
         public ActionResult Index()
         {
             var userbranch = BranchManager.GetUserBranchByUserId(User.Identity.GetUserId());
@@ -83,7 +83,7 @@ namespace CETRA.Controllers
                 await uploadStore.UpdateUploadRejectReason(model.UploadId, model.RejectReason);
                 return Json(new { code = "00", message = "Successful" }, JsonRequestBehavior.AllowGet);
             }
-            return Json(new { code = "02", message = "Invalid Data Submitted" }, JsonRequestBehavior.AllowGet);
+            throw new HttpException(400, "Invalid Data Submitted");
         }
     }
 }

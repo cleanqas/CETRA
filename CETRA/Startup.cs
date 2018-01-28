@@ -46,6 +46,27 @@ namespace CETRA
                 }
             }
 
+            if (!roleManager.RoleExists("BranchOperator"))
+            {
+                var role = new AspNet.Identity.MySQL.IdentityRole();
+                role.Name = "BranchOperator";
+                roleManager.Create(role);                
+            }
+
+            if (!roleManager.RoleExists("BranchVerifier"))
+            {
+                var role = new AspNet.Identity.MySQL.IdentityRole();
+                role.Name = "BranchVerifier";
+                roleManager.Create(role);
+            }
+
+            if (!roleManager.RoleExists("HeadOfficeOperator"))
+            {
+                var role = new AspNet.Identity.MySQL.IdentityRole();
+                role.Name = "HeadOfficeOperator";
+                roleManager.Create(role);
+            }
+
             if (!branchManager.BranchExists("Head Office"))
             {
                 user = UserManager.FindByName("administrator");

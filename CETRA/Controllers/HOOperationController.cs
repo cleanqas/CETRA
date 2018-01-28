@@ -29,7 +29,7 @@ namespace CETRA.Controllers
             UploadDataManager = uploadDataManager;
         }
 
-        [Authorize]
+        [Authorize(Roles = "HeadOfficeOperator")]
         public ActionResult Index()
         {
             return View();
@@ -84,7 +84,7 @@ namespace CETRA.Controllers
                     catch (Exception ex)
                     {
                         UploadManager.DeleteAsync(upload);
-                        return Json(new { code = "01", message = ex.Message }, JsonRequestBehavior.AllowGet);
+                        throw new HttpException(400, ex.Message);
                     }
 
                     UploadDataEntity uploaddata = null;
@@ -103,17 +103,17 @@ namespace CETRA.Controllers
                         //TODO: implement log
                         UploadDataManager.DeleteAsync(upload.Id);
                         UploadManager.DeleteAsync(upload);
-                        return Json(new { code = "02", message = "Upload failed" }, JsonRequestBehavior.AllowGet);
+                        throw new HttpException(400, "Upload failed");
                     }
 
                     return Json(new { code = "00", message = "Sucessfull" }, JsonRequestBehavior.AllowGet);
                 }
                 else
                 {
-                    return Json(new { code = "03", message = "Upload creation failed" }, JsonRequestBehavior.AllowGet);
+                    throw new HttpException(400, "Upload creation failed");
                 }
             }
-            return Json(new { code = "04", message = "Invalid Data Submitted" }, JsonRequestBehavior.AllowGet);
+            throw new HttpException(400, "Invalid Data Submitted");
         }
 
         private List<PDataModel> getPaymentDataFromCSV(HttpPostedFileBase postedFile)

@@ -4,6 +4,7 @@ using Microsoft.AspNet.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
@@ -41,6 +42,7 @@ namespace CETRA.Controllers
             AccountNumberManager = accountManager;
         }
 
+        [Authorize(Roles = "Admin")]
         public ActionResult Index()
         {
             return View();
@@ -70,12 +72,11 @@ namespace CETRA.Controllers
                 }
                 else
                 {
-                    return Json(new { code = "01", message = result }, JsonRequestBehavior.AllowGet);
+                    throw new HttpException(400, "Cannot Create User");
                 }
             }
 
-            // If we got this far, something failed, redisplay form
-            return Json(new { code = "02", message = "Invalid Data Submitted" }, JsonRequestBehavior.AllowGet);
+            throw new HttpException(400, "Invalid Data");
         }
 
         //
@@ -94,10 +95,10 @@ namespace CETRA.Controllers
                 }
                 else
                 {
-                    return Json(new { code = "01", message = "Branch creation failed" }, JsonRequestBehavior.AllowGet);
+                    throw new HttpException(400, "Branch creation failed");
                 }
             }
-            return Json(new { code = "02", message = "Invalid Data Submitted" }, JsonRequestBehavior.AllowGet);
+            throw new HttpException(400, "Invalid Data Submitted");
         }
 
         //
@@ -116,10 +117,10 @@ namespace CETRA.Controllers
                 }
                 else
                 {
-                    return Json(new { code = "01", message = "Bank creation failed" }, JsonRequestBehavior.AllowGet);
+                    throw new HttpException(400, "Bank creation failed");
                 }
             }
-            return Json(new { code = "02", message = "Invalid Data Submitted" }, JsonRequestBehavior.AllowGet);
+            throw new HttpException(400, "Invalid Data Submitted");
         }
 
         //
@@ -138,10 +139,10 @@ namespace CETRA.Controllers
                 }
                 else
                 {
-                    return Json(new { code = "01", message = "Bank creation failed" }, JsonRequestBehavior.AllowGet);
+                    throw new HttpException(400, "New Account creation failed");
                 }
             }
-            return Json(new { code = "02", message = "Invalid Data Submitted" }, JsonRequestBehavior.AllowGet);
+            throw new HttpException(400, "Invalid Data Submitted");
         }
 
         //

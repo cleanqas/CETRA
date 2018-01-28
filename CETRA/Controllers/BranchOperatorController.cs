@@ -33,7 +33,7 @@ namespace CETRA.Controllers
         }
 
         // GET: BranchOperator
-        [Authorize]
+        [Authorize(Roles = "BranchOperator")]
         public ActionResult Index()
         {
             var userbranch = BranchManager.GetUserBranchByUserId(User.Identity.GetUserId());
@@ -77,7 +77,7 @@ namespace CETRA.Controllers
                 return Json(new { code = "00", message = "Successful" }, JsonRequestBehavior.AllowGet);
                 
             }
-            return Json(new { code = "02", message = "Invalid Data Submitted" }, JsonRequestBehavior.AllowGet);
+            throw new HttpException(400, "Invalid Data Submitted");
         }
 
         //POST: /BranchOperator/GetUploadData

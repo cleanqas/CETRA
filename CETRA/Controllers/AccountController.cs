@@ -52,10 +52,26 @@ namespace CETRA.Controllers
             if (ModelState.IsValid)
             {
                 var user = await UserManager.FindAsync(model.UserName, model.Password);
+                
                 if (user != null)
                 {
                     await SignInAsync(user, model.RememberMe);
-                    return RedirectToLocal(returnUrl);
+
+                    var role = await UserManager.GetRolesAsync(user.Id);
+
+                    switch (role[0].ToLower())
+                    {
+                        case "admin":
+                            return RedirectToLocal("/SetUp/Index");
+                        case "branchoperator":
+                            return RedirectToLocal("/BranchOperator/Index");
+                        case "branchverifier":
+                            return RedirectToLocal("/BranchVerifier/Index");
+                        case "headofficeoperator":
+                            return RedirectToLocal("/HOOperation/Index");
+                        default:
+                            return RedirectToLocal("/BranchOperator/Index");
+                    }
                 }
                 else
                 {

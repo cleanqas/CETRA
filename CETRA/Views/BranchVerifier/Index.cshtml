@@ -30,6 +30,11 @@
     .wide-input{
         max-width: 100%
     }
+
+    .dataTables_length, .dataTables_filter{
+        display: none;
+    }
+
 </style>
 
 <div class="container container-table">
@@ -39,7 +44,7 @@
                 <input type="hidden" id="uploadOperatorId"/>
                 <input type="hidden" id="uploadUploaderId" />
             </div>
-            <table id="UploadsTable" style="width: 100%">
+            <table id="UploadsTable" class="display"  style="width: 100%">
                 <thead>
                     <tr>
                         <th>Upload ID</th>
@@ -54,7 +59,7 @@
 
 @*Upload Data Modal*@
 <div class="row">
-    <div class="modal fade" id="uploaddata" tabindex="-1" role="dialog" aria-labelledby="UploadDataLabel">
+    <div class="modal fade" id="uploaddata" tabindex="-1" role="dialog" aria-labelledby="UploadDataLabel" data-backdrop="static" data-keyboard="false">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -62,7 +67,7 @@
                     <h3 class="modal-title" id="UploadDataLabel">Process Upload</h3>
                 </div>
                 <div class="modal-body">
-                    <table id="UploadDataTable" style="width: 100%">
+                    <table id="UploadDataTable" class="display"  style="width: 100%">
                         <thead>
                             <tr>
                                 <th>Narration</th>
@@ -80,7 +85,7 @@
                             <a href="#" class="btn btn-danger" id="cancelApproveUpload">Reject</a>
                         </div>
                         <div class="col-md-6">
-                            <a href="#" class="btn btn-primary" id="approveUpload">Approve</a>
+                            <a href="#" class="btn btn-primary" id="approveUpload" data-loading-text="<i class='fa fa-spinner fa-spin '></i> Approving ... ">Approve</a>
                         </div>
                     </div>
                     <div class="row modal-footer-left" id="rejectReasonDiv">
@@ -89,7 +94,7 @@
                             <input type="text" name="rejectreason" id="rejectreason" class="form-control wide-input" />
                         </div>
                         <div class="form-group">
-                            <a href="#" class="btn btn-danger" id="submitReject">Submit Reject</a>
+                            <a href="#" class="btn btn-danger" id="submitReject" data-loading-text="<i class='fa fa-spinner fa-spin '></i> Rejecting ...">Submit Reject</a>
                         </div>
                     </div>
                 </div>
@@ -157,13 +162,19 @@
         };
 
         $("#approveUpload").click(function (e) {
+            $(this).button('loading');
             $.ajax({
                 type: 'POST',
                 data: { __RequestVerificationToken: helpers.getAntiForgeryToken(), UploadId: '' + paymentData[0].UploadId + '' },
                 url: '/BranchVerifier/ApproveUpload',
                 success: function (data) {
-                    console.log(data);
-                    paymentData = data;
+                    $('#submitReject').button('reset');
+                    $('#uploaddata').modal('hide');
+                    $('#confirmationModal').modal();
+                    $('#notification').text('Payment Data Approved');
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    alert('Error Occured, Check Data Input');
                 }
             })
         });
@@ -174,6 +185,7 @@
         });
 
         $("submitReject").click(function (e) {
+            $(this).button('loading');
             var _data = {
                 __RequestVerificationToken: helpers.getAntiForgeryToken(),
                 UploadId: paymentData[0].UploadId,
@@ -186,8 +198,13 @@
                 data: _data,
                 url: '/BranchVerifier/RejectUpload',
                 success: function (data) {
-                    console.log(data);
-                    paymentData = data;
+                    $('#uploadNewFile').button('reset');
+                    $('#uploaddata').modal('hide');
+                    $('#confirmationModal').modal();
+                    $('#notification').text('Payment Data Rejected');
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    alert('Error Occured, Check Data Input');
                 }
             })
         });
@@ -197,5 +214,10 @@
             $("#approveRejectDiv").show();
             $("#rejectReasonDiv").hide();
         });
+
+        $('#confirmationModal').on('hide.bs.modal', function (e) {
+            location.reload();
+        });
+        
     </script>
 }

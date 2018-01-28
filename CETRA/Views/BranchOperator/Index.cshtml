@@ -20,11 +20,16 @@
     .modal-dialog {
         width: 90%;
     }
+
+    .dataTables_length, .dataTables_filter{
+        display: none;
+    }
+
 </style>
 <div class="container container-table">
     <div class="row vertical-center-row">
         <div>
-            <table id="UploadsTable" style="width: 100%">
+            <table id="UploadsTable" class="display"  style="width: 100%">
                 <thead>
                     <tr>
                         <th>Upload ID</th>
@@ -38,7 +43,7 @@
 </div>
 @*Upload Data Modal*@
 <div class="row">
-    <div class="modal fade" id="uploaddata" tabindex="-1" role="dialog" aria-labelledby="UploadDataLabel">
+    <div class="modal fade" id="uploaddata" tabindex="-1" role="dialog" aria-labelledby="UploadDataLabel" data-backdrop="static" data-keyboard="false">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -46,7 +51,7 @@
                     <h3 class="modal-title" id="UploadDataLabel">Process Upload</h3>
                 </div>
                 <div class="modal-body">
-                    <table id="UploadDataTable" style="width: 100%">
+                    <table id="UploadDataTable" class="display" style="width: 100%">
                         <thead>
                             <tr>
                                 <th>Narration</th>
@@ -59,7 +64,7 @@
                     </table>
                 </div>
                 <div class="modal-footer">
-                    <a href="#" class="btn btn-primary" id="updateUploadData">Submit</a>
+                    <a href="#" class="btn btn-primary" id="updateUploadData" data-loading-text="<i class='fa fa-spinner fa-spin '></i> Processing ...">Submit</a>
                 </div>
             </div>
         </div>
@@ -173,6 +178,8 @@
 
         $('#updateUploadData').click(function () {
 
+            $(this).button('loading');
+
             var updates = [];
 
             $.each(paymentData, function (i, v) {
@@ -189,9 +196,20 @@
                 datatype: "json",
                 data: JSON.stringify({ model: updates }),
                 success: function (data) {
-                    console.log(data);                    
+                    console.log(data);
+                    $('#updateUploadData').button('reset');
+                    $('#uploaddata').modal('hide');
+                    $('#confirmationModal').modal();
+                    $('#notification').text('Payment Data Updated');
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    alert('Error Occured, Check Data Input');
                 }
             });
+        });
+
+        $('#confirmationModal').on('hide.bs.modal', function (e) {
+            location.reload();
         });
     </script>
 }

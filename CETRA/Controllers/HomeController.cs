@@ -8,18 +8,19 @@ namespace CETRA.Controllers
 {
     public class HomeController : Controller
     {
+        [Authorize(Roles = "")]
         public ActionResult Index()
         {
             return View();
         }
-
+        [Authorize(Roles = "")]
         public ActionResult About()
         {
             ViewBag.Message = "Your application description page.";
 
             return View();
         }
-
+        [Authorize(Roles = "")]
         public ActionResult Contact()
         {
             ViewBag.Message = "Your contact page.";

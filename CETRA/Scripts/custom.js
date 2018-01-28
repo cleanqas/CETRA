@@ -10,6 +10,11 @@
                     }
                 },
 
+                notify: function (msg) {
+                    $('#confirmationModal').modal();
+                    $('#notification').text(msg);
+                },
+
                 checkEquality: function (f, s) {
                     return f == s;
                 },
@@ -32,4 +37,4 @@
                     console.log(token);
                     return token;
                 }
-            }
+            };
