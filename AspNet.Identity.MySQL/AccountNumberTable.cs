@@ -20,13 +20,13 @@ namespace AspNet.Identity.MySQL
         }
 
         /// <summary>
-        /// Inserts a new Account Number in the AccountNumbers table
+        /// Inserts a new Account Number in the accountnumbers table
         /// </summary>
         /// <param name="AccountNumber">The account's detail</param>
         /// <returns></returns>
         public int Insert(IdentityAccountNumber accountno)
         {
-            string commandText = "Insert into AccountNumbers (Id, BankId, AccountNumber, AccountName) values (@id, @bankId, @accountNumber, @accountname)";
+            string commandText = "Insert into accountnumbers (Id, BankId, AccountNumber, AccountName) values (@id, @bankId, @accountNumber, @accountname)";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@id", accountno.Id);
             parameters.Add("@bankId", accountno.BankId);
@@ -61,7 +61,7 @@ namespace AspNet.Identity.MySQL
         /// <returns>Bank name</returns>
         public Dictionary<string, string> GetAccountDetail(string accountNumber)
         {
-            string commandText = "Select Id, BankId, AccountName from AccountNumbers where AccountNumber = @accountno";
+            string commandText = "Select Id, BankId, AccountName from accountnumbers where AccountNumber = @accountno";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@accountno", accountNumber);
             Dictionary<string, string> accountdetail = new Dictionary<string, string>();
@@ -76,13 +76,13 @@ namespace AspNet.Identity.MySQL
         }
 
         /// <summary>
-        /// Deltes an account number from the AccountNumbers table
+        /// Deltes an account number from the accountnumbers table
         /// </summary>
         /// <param name="accountnumber">The Account Number</param>
         /// <returns></returns>
         public int Delete(string accountNumber)
         {
-            string commandText = "Delete from AccountNumbers where AccountNumber = @accountno";
+            string commandText = "Delete from accountnumbers where AccountNumber = @accountno";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@accountno", accountNumber);
 
@@ -96,7 +96,7 @@ namespace AspNet.Identity.MySQL
         /// <returns>Bank name</returns>
         public List<IdentityAccountNumber> GetAllAccount()
         {
-            string commandText = "Select Id, BankId, AccountNumber, AccountName from AccountNumbers";
+            string commandText = "Select Id, BankId, AccountNumber, AccountName from accountnumbers";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             List<IdentityAccountNumber> accounts = new List<IdentityAccountNumber>();
             var result = _database.Query(commandText, parameters);

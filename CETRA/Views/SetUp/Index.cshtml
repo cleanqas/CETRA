@@ -69,10 +69,10 @@
                                 <label for="role" class="control-label">Role:</label>
                                 <select name="role" id="role" required class="form-control">
                                     <optgroup label="Select Role">
-                                        <option value="9263d72f-f46c-434a-aaf3-cbe9caa4a01d" selected>Administrator</option>
-                                        <option value="d3391fbe-3bde-4ee8-a5a8-bad0c750ebfa">Head Office Operator</option>
-                                        <option value="d8568c9b-5b4f-4f14-9a58-fe7ed1d5ed3f">Branch Operator</option>
-                                        <option value="29b04043-710e-49c0-b629-52f75d318917">Branch Verifier</option>
+                                        <option value="62a9d8b0-5a61-4de9-9f32-e4e3d4f303dc" selected>Administrator</option>
+                                        <option value="fddf3310-e645-4fe7-b3a4-ba493889f304">Head Office Operator</option>
+                                        <option value="fb0b498b-4ecb-46c6-8dd2-def87ad6f2d0">Branch Operator</option>
+                                        <option value="e4d99ca7-2384-4af2-a3bb-fb7db5e84c38">Branch Verifier</option>
                                     </optgroup>
                                 </select>
                             </div>
@@ -215,6 +215,14 @@
         $('#registerNewUser').click(function (e) {
             $(this).button('loading');
 
+            var username = $('#username').val();
+
+            if (!username.match(/^\S*$/)) {
+                alert("Username cannot contain space");
+                $('#registerNewUser').button('reset');
+                return false;
+            }
+
             if (!helpers.checkEquality($('#password').val(), $('#confirm_password').val())) {
                 alert('Password strings does not match');
                 $('#registerNewUser').button('reset');
@@ -257,7 +265,7 @@
             $.ajax({
                 type: 'POST',
                 contentType: 'application/x-www-form-urlencoded',
-                data: { __RequestVerificationToken: helpers.getAntiForgeryToken(), BankName: $('bankname').val() },
+                data: { __RequestVerificationToken: helpers.getAntiForgeryToken(), BankName: $('#bankname').val() },
                 url: '/SetUp/RegisterNewBank',
                 success: function (data) {
                     $('#manageBank').modal('hide');
@@ -308,9 +316,9 @@
 
             var _data = {
                 __RequestVerificationToken: helpers.getAntiForgeryToken(),
-                BankId: $('bank_branch').val(),
-                BranchName: $('branchname').val(),
-                GLAccount: $('glaccount').val()
+                BankId: $('#bank_branch').val(),
+                BranchName: $('#branchname').val(),
+                GLAccount: $('#glaccount').val()
             };
             $.ajax({
                 type: 'POST',

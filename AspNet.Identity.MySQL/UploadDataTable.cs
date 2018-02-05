@@ -26,7 +26,7 @@ namespace AspNet.Identity.MySQL
         /// <returns></returns>
         public int Insert(UploadDataEntity uploaddata)
         {
-            string commandText = "Insert into UploadsData (Id, UploadId, Narration, Amount, AccountNumber) values (@Id, @uploadId, @narration, @amount, @accountNo)";
+            string commandText = "Insert into uploadsdata (Id, UploadId, Narration, Amount, AccountNumber) values (@Id, @uploadId, @narration, @amount, @accountNo)";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@Id", uploaddata.Id);
             parameters.Add("@uploadId", uploaddata.UploadId);
@@ -44,7 +44,7 @@ namespace AspNet.Identity.MySQL
         /// <returns></returns>
         public int Delete(string uploadId)
         {
-            string commandText = "Delete from UploadsData where UploadId = @uploadId";
+            string commandText = "Delete from uploadsdata where UploadId = @uploadId";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@uploadId", uploadId);
 
@@ -52,14 +52,14 @@ namespace AspNet.Identity.MySQL
         }
 
         /// <summary>
-        /// Gets all upload data from the UploadsData table by Upload ID
+        /// Gets all upload data from the uploadsdata table by Upload ID
         /// </summary>
         /// <param name="uploadId">The Branch Id</param>
         /// <returns></returns>
         /// 
         public List<UploadDataEntity> GetUploadsData(string uploadId)
         {
-            string commandText = "Select Id, UploadId, Narration, Amount, AccountNumber from Uploadsdata where UploadId = @uploadId";
+            string commandText = "Select Id, UploadId, Narration, Amount, AccountNumber from uploadsdata where UploadId = @uploadId";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@uploadId", uploadId);
             List<UploadDataEntity> uploaddata = new List<UploadDataEntity>();
@@ -79,14 +79,14 @@ namespace AspNet.Identity.MySQL
         }
 
         /// <summary>
-        /// Gets all upload data with account name from the UploadsData table by Upload ID join account name table
+        /// Gets all upload data with account name from the uploadsdata table by Upload ID join account name table
         /// </summary>
         /// <param name="uploadId">The Branch Id</param>
         /// <returns></returns>
         /// 
         public List<UploadDataWithBankAndAccountDetails> GetUploadsDataWithAccountName(string uploadId)
         {
-            string commandText = "Select u.Id, UploadId, Narration, Amount, (select BankName from banks where Id = u.BankId) BankName, u.AccountNumber, a.AccountName from Uploadsdata u left join AccountNumbers a on a.BankId = u.BankId and a.AccountNumber = u.AccountNumber where u.UploadId = @uploadId";
+            string commandText = "Select u.Id, UploadId, Narration, Amount, (select BankName from banks where Id = u.BankId) BankName, u.AccountNumber, a.AccountName from uploadsdata u left join accountnumbers a on a.BankId = u.BankId and a.AccountNumber = u.AccountNumber where u.UploadId = @uploadId";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@uploadId", uploadId);
             List<UploadDataWithBankAndAccountDetails> uploaddata = new List<UploadDataWithBankAndAccountDetails>();
@@ -108,14 +108,14 @@ namespace AspNet.Identity.MySQL
         }
 
         /// <summary>
-        /// Update an uploaded data in the UploadsData table
+        /// Update an uploaded data in the uploadsdata table
         /// </summary>
         /// <param name="uploaddata">The uploaded data</param>
         /// <returns></returns>
         /// 
         public bool UpdateUploadsData(UploadDataEntity uploadData)
         {
-            string commandText = "Update Uploadsdata set AccountNumber = @accountNo, BankId = @bankId where Id = @Id ";
+            string commandText = "Update uploadsdata set AccountNumber = @accountNo, BankId = @bankId where Id = @Id ";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@Id", uploadData.Id);            
             parameters.Add("@accountNo", uploadData.AccountNumber);

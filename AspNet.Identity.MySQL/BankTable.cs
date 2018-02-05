@@ -26,7 +26,7 @@ namespace AspNet.Identity.MySQL
         /// <returns></returns>
         public int Insert(IdentityBank bank)
         {
-            string commandText = "Insert into Banks (Id, BankName) values (@id, @name)";
+            string commandText = "Insert into banks (Id, BankName) values (@id, @name)";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@name", bank.Name);
             parameters.Add("@id", bank.Id);
@@ -59,20 +59,20 @@ namespace AspNet.Identity.MySQL
         /// <returns>Bank name</returns>
         public string GetBankName(string bankId)
         {
-            string commandText = "Select BankName from Banks where Id = @id";
+            string commandText = "Select BankName from banks where Id = @id";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@id", bankId);
             return _database.GetStrValue(commandText, parameters);
         }
 
         /// <summary>
-        /// Deltes a bank from the Banks table
+        /// Deltes a bank from the banks table
         /// </summary>
         /// <param name="bankId">The bank Id</param>
         /// <returns></returns>
         public int Delete(string branchId)
         {
-            string commandText = "Delete from Bank where Id = @id";
+            string commandText = "Delete from banks where Id = @id";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@id", branchId);
 
@@ -82,7 +82,7 @@ namespace AspNet.Identity.MySQL
         public List<IdentityBank> GetAllBanks()
         {
             List<IdentityBank> banks = new List<IdentityBank>();
-            string commandText = "Select Id, BankName from Banks";
+            string commandText = "Select Id, BankName from banks";
             Dictionary<string, object> parameters = new Dictionary<string, object>() { };
 
             var result = _database.Query(commandText, parameters);

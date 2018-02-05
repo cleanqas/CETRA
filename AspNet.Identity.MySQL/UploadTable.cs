@@ -20,13 +20,13 @@ namespace AspNet.Identity.MySQL
         }
 
         /// <summary>
-        /// Inserts a upload record in the Uploads table
+        /// Inserts a upload record in the uploads table
         /// </summary>
         /// <param name="upload">The upload record</param>
         /// <returns></returns>
         public int Insert(UploadEntity upload)
         {
-            string commandText = "Insert into Uploads (Id, UploaderId, BranchId, Status) values (@id, @uploaderId, @branchId, @status)";
+            string commandText = "Insert into uploads (Id, UploaderId, BranchId, Status) values (@id, @uploaderId, @branchId, @status)";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@id", upload.Id);
             parameters.Add("@uploaderId", upload.UploaderId);
@@ -61,7 +61,7 @@ namespace AspNet.Identity.MySQL
         /// <returns>Bank name</returns>
         public Dictionary<string, string> GetUploadDetail(string uploadId)
         {
-            string commandText = "Select UploaderId, BranchId, Status from Uploads where Id = @id";
+            string commandText = "Select UploaderId, BranchId, Status from uploads where Id = @id";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@id", uploadId);
             Dictionary<string, string> uploaddetail = new Dictionary<string, string>();
@@ -76,13 +76,13 @@ namespace AspNet.Identity.MySQL
         }
 
         /// <summary>
-        /// Deletes an upload from the Uploads table
+        /// Deletes an upload from the uploads table
         /// </summary>
         /// <param name="uploadId">The Upload Id</param>
         /// <returns></returns>
         public int Delete(string uploadId)
         {
-            string commandText = "Delete from Uploads where Id = @id";
+            string commandText = "Delete from uploads where Id = @id";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@id", uploadId);
 
@@ -90,14 +90,14 @@ namespace AspNet.Identity.MySQL
         }
 
         /// <summary>
-        /// Gets all uploads from the Uploads table by Branch ID
+        /// Gets all uploads from the uploads table by Branch ID
         /// </summary>
         /// <param name="branchId">The Branch Id</param>
         /// <returns></returns>
         /// 
         public List<UploadEntity> GetUploadsByBranchID(string branchId)
         {
-            string commandText = "Select Id, UploaderId, BranchId, Status, UploadDate from Uploads where BranchId = @branchId";
+            string commandText = "Select Id, UploaderId, BranchId, Status, UploadDate from uploads where BranchId = @branchId";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@branchId", branchId);
             List<UploadEntity> uploads = new List<UploadEntity>();
@@ -117,13 +117,13 @@ namespace AspNet.Identity.MySQL
         }
 
         /// <summary>
-        /// Update an upload in the Uploads table
+        /// Update an upload in the uploads table
         /// </summary>
         /// <param name="uploadId">The Upload Id</param>
         /// <returns></returns>
         public int UpdateUploadStatus(string uploadId, int status)
         {
-            string commandText = "Update Uploads  set status = @Status where Id = @id";
+            string commandText = "Update uploads  set status = @Status where Id = @id";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@id", uploadId);
             parameters.Add("@Status", status);
@@ -132,13 +132,13 @@ namespace AspNet.Identity.MySQL
         }
 
         /// <summary>
-        /// Update an upload in the Uploads table
+        /// Update an upload in the uploads table
         /// </summary>
         /// <param name="uploadId">The Upload Id</param>
         /// <returns></returns>
         public int UpdateUploadOperator(string uploadId, string operatorId)
         {
-            string commandText = "Update Uploads set OperatorId = @OperatorId where Id = @id";
+            string commandText = "Update uploads set OperatorId = @OperatorId where Id = @id";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@Id", uploadId);
             parameters.Add("@OperatorId", operatorId);
@@ -147,13 +147,13 @@ namespace AspNet.Identity.MySQL
         }
 
         /// <summary>
-        /// Update an upload in the Uploads table
+        /// Update an upload in the uploads table
         /// </summary>
         /// <param name="uploadId">The Upload Id</param>
         /// <returns></returns>
         public int UpdateUploadVerifier(string uploadId, string verifierId)
         {
-            string commandText = "Update Uploads set VerifierId = @VerifierId where Id = @id";
+            string commandText = "Update uploads set VerifierId = @VerifierId where Id = @id";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@Id", uploadId);
             parameters.Add("@VerifierId", verifierId);
@@ -162,13 +162,13 @@ namespace AspNet.Identity.MySQL
         }
 
         /// <summary>
-        /// Update an upload in the Uploads table
+        /// Update an upload in the uploads table
         /// </summary>
         /// <param name="uploadId">The Upload Id</param>
         /// <returns></returns>
         public int UpdateUploadHOProcessed(string uploadId, string hoProcessorId)
         {
-            string commandText = "Update Uploads set HOProcessorId = @HOProcessorId where Id = @id";
+            string commandText = "Update uploads set HOProcessorId = @HOProcessorId where Id = @id";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@Id", uploadId);
             parameters.Add("@HOProcessorId", hoProcessorId);
@@ -177,13 +177,13 @@ namespace AspNet.Identity.MySQL
         }
 
         /// <summary>
-        /// Update an upload in the Uploads table
+        /// Update an upload in the uploads table
         /// </summary>
         /// <param name="uploadId">The Upload Id</param>
         /// <returns></returns>
         public int UpdateUploadRejectReason(string uploadId, string rejectReason)
         {
-            string commandText = "Update Uploads set RejectReason = @RejectReason where Id = @id";
+            string commandText = "Update uploads set RejectReason = @RejectReason where Id = @id";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@Id", uploadId);
             parameters.Add("@RejectReason", rejectReason);
@@ -192,14 +192,14 @@ namespace AspNet.Identity.MySQL
         }
 
         /// <summary>
-        /// Gets all uploads from the Uploads table by Status
+        /// Gets all uploads from the uploads table by Status
         /// </summary>
         /// <param name="status">The upload status</param>
         /// <returns></returns>
         /// 
         public List<UploadEntity> GetUploadsByStatus(int status)
         {
-            string commandText = "Select Id, UploaderId, BranchId, Status, UploadDate from Uploads where Status = @status";
+            string commandText = "Select Id, UploaderId, BranchId, Status, UploadDate from uploads where Status = @status";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@status", status);
             List<UploadEntity> uploads = new List<UploadEntity>();
@@ -219,14 +219,14 @@ namespace AspNet.Identity.MySQL
         }
 
         /// <summary>
-        /// Gets all uploads from the Uploads table by Branch ID
+        /// Gets all uploads from the uploads table by Branch ID
         /// </summary>
         /// <param name="branchId">The Branch Id</param>
         /// <returns></returns>
         /// 
         public List<UploadEntity> GetUploadsByBranchAndStatus(string branchId, int status)
         {
-            string commandText = "Select Id, UploaderId, BranchId, Status, UploadDate, OperatorId from Uploads where BranchId = @branchId and Status = @Status";
+            string commandText = "Select Id, UploaderId, BranchId, Status, UploadDate, OperatorId from uploads where BranchId = @branchId and Status = @Status";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@branchId", branchId);
             parameters.Add("@Status", status);

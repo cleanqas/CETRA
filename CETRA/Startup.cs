@@ -26,7 +26,7 @@ namespace CETRA
             var bankManager = new BankManager<IdentityBank>(new BankStore<IdentityBank>(context));
 
             var user = new ApplicationUser();
-
+            //branchManager.CreateUploadStatus();
             if (!roleManager.RoleExists("Admin"))
             {
 
@@ -81,7 +81,7 @@ namespace CETRA
                 branch.GLAccount = ConfigurationManager.AppSettings["DefaultGLAccount"];
                 branchManager.Create(branch);
                 branchManager.AddUserToBranch(user.Id, branch.Id);
-                
+                branchManager.CreateUploadStatus();                
             } 
         }
     }

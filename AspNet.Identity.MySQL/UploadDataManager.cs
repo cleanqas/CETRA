@@ -47,5 +47,19 @@ namespace AspNet.Identity.MySQL
                 return false;
             }
         }
+
+        public bool Delete(string uploadId)
+        {
+            try
+            {
+                AsyncHelper.RunSync(() => _store.DeleteAsync(uploadId));
+                return true;
+            }
+            catch (Exception ex)
+            {
+                //TODO: Log the exception
+                return false;
+            }
+        }
     }
 }

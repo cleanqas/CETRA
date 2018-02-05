@@ -27,7 +27,7 @@ namespace AspNet.Identity.MySQL
         public IdentityBranch FindByUserId(string userId)
         {
             IdentityBranch branch = new IdentityBranch();
-            string commandText = "Select Branches.Id, Branches.BranchName from userbranches, Branches where userbranches.UserId = @userId and userbranches.BranchId = Branches.Id";
+            string commandText = "Select branches.Id, branches.BranchName from userbranches, branches where userbranches.UserId = @userId and userbranches.BranchId = branches.Id";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@userId", userId);
 

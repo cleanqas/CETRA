@@ -133,6 +133,11 @@ namespace AspNet.Identity.MySQL
             return Task.FromResult<TBranch>(userbranch);
         }
 
+        public void CreateUploadStatus()
+        {            
+            branchTable.CreateUploadStatus();
+        }
+
         public void Dispose()
         {
             if (Database != null)

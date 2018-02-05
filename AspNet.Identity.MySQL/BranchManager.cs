@@ -53,5 +53,10 @@ namespace AspNet.Identity.MySQL
         {
            return AsyncHelper.RunSync(() => _store.GetUserBranchByUserId(userId));            
         }
+
+        public void CreateUploadStatus()
+        {
+            _store.CreateUploadStatus();
+        }
     }
 }

@@ -20,13 +20,13 @@ namespace AspNet.Identity.MySQL
         }
 
         /// <summary>
-        /// Check a branch exists in the Branches table
+        /// Check a branch exists in the branches table
         /// </summary>
         /// <param name="branchId">The Branch Id</param>
         /// <returns></returns>
         public bool BranchExists(string branchName)
         {
-            string commandText = "Select count(*) as count from Branches where BranchName = @name";
+            string commandText = "Select count(*) as count from branches where BranchName = @name";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@name", branchName);
             Int64 exst = (Int64)_database.QueryValue(commandText, parameters);
@@ -34,13 +34,13 @@ namespace AspNet.Identity.MySQL
         }
 
         /// <summary>
-        /// Deltes a branch from the Branches table
+        /// Deltes a branch from the branches table
         /// </summary>
         /// <param name="branchId">The branch Id</param>
         /// <returns></returns>
         public int Delete(string branchId)
         {
-            string commandText = "Delete from Branches where Id = @id";
+            string commandText = "Delete from branches where Id = @id";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@id", branchId);
 
@@ -54,7 +54,7 @@ namespace AspNet.Identity.MySQL
         /// <returns></returns>
         public int Insert(IdentityBranch branch)
         {
-            string commandText = "Insert into Branches (Id, BranchName, BankId, GLAccount) values (@id, @name, @bankId, @glAccount)";
+            string commandText = "Insert into branches (Id, BranchName, BankId, GLAccount) values (@id, @name, @bankId, @glAccount)";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@name", branch.Name);
             parameters.Add("@id", branch.Id);
@@ -71,7 +71,7 @@ namespace AspNet.Identity.MySQL
         /// <returns>branch name</returns>
         public Dictionary<string, string> GetBranchDetail(string branchId)
         {
-            string commandText = "Select BranchName, BankId, GLAccount from Branches where Id = @id";
+            string commandText = "Select BranchName, BankId, GLAccount from branches where Id = @id";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@id", branchId);
             Dictionary<string, string> branchdetail = new Dictionary<string, string>();
@@ -92,7 +92,7 @@ namespace AspNet.Identity.MySQL
         /// <returns>branch's Id</returns>
         public Dictionary<string, string> GetBranchId(string branchName)
         {
-            string commandText = "Select Id, BankId, GLAccount from Branches where BranchName = @name";
+            string commandText = "Select Id, BankId, GLAccount from branches where BranchName = @name";
             Dictionary<string, object> parameters = new Dictionary<string, object>() { { "@name", branchName } };
 
             Dictionary<string, string> branchdetail = new Dictionary<string, string>();
@@ -145,7 +145,7 @@ namespace AspNet.Identity.MySQL
         public List<IdentityBranch> GetAllBranches()
         {
             List<IdentityBranch> branches = new List<IdentityBranch>();
-            string commandText = "Select Id, BranchName, BankId, GLAccount from Branches";
+            string commandText = "Select Id, BranchName, BankId, GLAccount from branches";
             Dictionary<string, object> parameters = new Dictionary<string, object>() { };
 
             var result = _database.Query(commandText, parameters);
@@ -168,11 +168,18 @@ namespace AspNet.Identity.MySQL
 
         public int Update(IdentityBranch branch)
         {
-            string commandText = "Update Branches set BranchName = @name where Id = @id";
+            string commandText = "Update branches set BranchName = @name where Id = @id";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@id", branch.Id);
 
             return _database.Execute(commandText, parameters);
+        }
+
+        public void CreateUploadStatus()
+        {
+            string commandText = "INSERT INTO uploadstatus (Id, Descr) VALUES ('0', 'Pending'); INSERT INTO uploadstatus (Id, Descr) VALUES ('1', 'Processed at Branch'); INSERT INTO uploadstatus (Id, Descr) VALUES ('2', 'Approved'); INSERT INTO uploadstatus (Id, Descr) VALUES ('3', 'Downloaded'); INSERT INTO uploadstatus (Id, Descr) VALUES ('-1', 'Rejected');";
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            _database.Execute(commandText, parameters);
         }
     }
 }

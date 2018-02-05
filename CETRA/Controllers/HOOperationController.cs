@@ -73,7 +73,15 @@ namespace CETRA.Controllers
             if (ModelState.IsValid)
             {
                 var upload = new UploadEntity(User.Identity.GetUserId(), model.BranchId, 0);
-                var result = await UploadManager.CreateAsync(upload);
+                bool result = false;
+                try
+                {
+                    result = await UploadManager.CreateAsync(upload);
+                }
+                catch (Exception ex)
+                {
+                    throw new HttpException(400, ex.Message);
+                }
                 if (result)
                 {
                     List<PDataModel> PData = null;
@@ -83,7 +91,7 @@ namespace CETRA.Controllers
                     }
                     catch (Exception ex)
                     {
-                        UploadManager.DeleteAsync(upload);
+                        UploadManager.Delete(upload);
                         throw new HttpException(400, ex.Message);
                     }
 
@@ -95,14 +103,14 @@ namespace CETRA.Controllers
                         foreach (var data in PData)
                         {
                             uploaddata = new UploadDataEntity(upload.Id, data.Narration, data.Amount);
-                            UploadDataManager.CreateAsync(uploaddata);
+                            UploadDataManager.Create(uploaddata);
                         }
                     }
                     catch (Exception ex)
                     {
                         //TODO: implement log
-                        UploadDataManager.DeleteAsync(upload.Id);
-                        UploadManager.DeleteAsync(upload);
+                        UploadDataManager.Delete(upload.Id);
+                        UploadManager.Delete(upload);
                         throw new HttpException(400, "Upload failed");
                     }
 

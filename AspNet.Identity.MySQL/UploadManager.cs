@@ -22,9 +22,25 @@ namespace AspNet.Identity.MySQL
 
         public async Task<bool> CreateAsync(TUpload upload)
         {
+            await _store.CreateAsync(upload);
+            return true;
+            //try
+            //{
+            //    await _store.CreateAsync(upload);
+            //    return true;
+            //}
+            //catch (Exception ex)
+            //{
+            //    //TODO: Log the exception
+            //    return false;
+            //}
+        }
+
+        public async Task<bool> DeleteAsync(TUpload upload)
+        {
             try
             {
-                await _store.CreateAsync(upload);
+                await _store.DeleteAsync(upload);
                 return true;
             }
             catch (Exception ex)
@@ -34,11 +50,12 @@ namespace AspNet.Identity.MySQL
             }
         }
 
-        public async Task<bool> DeleteAsync(TUpload upload)
+        public bool Delete(TUpload upload)
         {
+            
             try
             {
-                await _store.DeleteAsync(upload);
+                AsyncHelper.RunSync(() => _store.DeleteAsync(upload));
                 return true;
             }
             catch (Exception ex)
