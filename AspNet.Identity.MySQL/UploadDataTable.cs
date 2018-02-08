@@ -26,13 +26,15 @@ namespace AspNet.Identity.MySQL
         /// <returns></returns>
         public int Insert(UploadDataEntity uploaddata)
         {
-            string commandText = "Insert into uploadsdata (Id, UploadId, Narration, Amount, AccountNumber) values (@Id, @uploadId, @narration, @amount, @accountNo)";
+            string commandText = "Insert into uploadsdata (Id, UploadId, Narration, Amount, AccountNumber, DebitOrCredit, PostingCode) values (@Id, @uploadId, @narration, @amount, @accountNo, @debitcredit, @postingCode)";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@Id", uploaddata.Id);
             parameters.Add("@uploadId", uploaddata.UploadId);
             parameters.Add("@narration", uploaddata.Narration);
             parameters.Add("@amount", uploaddata.Amount);
             parameters.Add("@accountNo", uploaddata.AccountNumber);
+            parameters.Add("@debitcredit", uploaddata.Debit1Credit0);
+            parameters.Add("@postingCode", uploaddata.PostingCode);
 
             return _database.Execute(commandText, parameters);
         }
@@ -59,7 +61,7 @@ namespace AspNet.Identity.MySQL
         /// 
         public List<UploadDataEntity> GetUploadsData(string uploadId)
         {
-            string commandText = "Select Id, UploadId, Narration, Amount, AccountNumber from uploadsdata where UploadId = @uploadId";
+            string commandText = "Select Id, UploadId, Narration, Amount, AccountNumber, DebitOrCredit, PostingCode from uploadsdata where UploadId = @uploadId";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@uploadId", uploadId);
             List<UploadDataEntity> uploaddata = new List<UploadDataEntity>();
@@ -72,7 +74,9 @@ namespace AspNet.Identity.MySQL
                     AccountNumber = res["AccountNumber"],
                     Amount = Convert.ToDecimal(res["Amount"]),
                     Narration = res["Amount"],
-                    UploadId = res["UploadId"]
+                    UploadId = res["UploadId"],
+                    PostingCode = res["PostingCode"],
+                    Debit1Credit0 = Convert.ToBoolean(res["DebitOrCredit"])
                 });
             }
             return uploaddata;
@@ -86,7 +90,7 @@ namespace AspNet.Identity.MySQL
         /// 
         public List<UploadDataWithBankAndAccountDetails> GetUploadsDataWithAccountName(string uploadId)
         {
-            string commandText = "Select u.Id, UploadId, Narration, Amount, (select BankName from banks where Id = u.BankId) BankName, u.AccountNumber, a.AccountName from uploadsdata u left join accountnumbers a on a.BankId = u.BankId and a.AccountNumber = u.AccountNumber where u.UploadId = @uploadId";
+            string commandText = "Select u.Id, u.UploadId, u.Narration, u.Amount, u.DebitOrCredit, u.PostingCode, (select BankName from banks where Id = up.BankId) BankName, (select BranchCode from branches where Id = up.BranchId)  BranchCode, u.AccountNumber, a.AccountName from uploadsdata u join uploads up on u.UploadId = up.Id left join accountnumbers a on a.AccountNumber = u.AccountNumber and a.BankId = up.BankId where u.UploadId = @uploadId";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@uploadId", uploadId);
             List<UploadDataWithBankAndAccountDetails> uploaddata = new List<UploadDataWithBankAndAccountDetails>();
@@ -98,10 +102,13 @@ namespace AspNet.Identity.MySQL
                     Id = res["Id"],
                     AccountNumber = res["AccountNumber"],
                     Amount = Convert.ToDecimal(res["Amount"]),
-                    Narration = res["Amount"],
+                    Narration = res["Narration"],
                     UploadId = res["UploadId"],
                     AccountName = res["AccountName"],
-                    BankName = res["BankName"]
+                    BankName = res["BankName"],
+                    PostingCode = res["PostingCode"],
+                    Debit1Credit0 = Convert.ToBoolean(res["DebitOrCredit"]),
+                    BranchCode = res["BranchCode"]
                 });
             }
             return uploaddata;
@@ -115,11 +122,10 @@ namespace AspNet.Identity.MySQL
         /// 
         public bool UpdateUploadsData(UploadDataEntity uploadData)
         {
-            string commandText = "Update uploadsdata set AccountNumber = @accountNo, BankId = @bankId where Id = @Id ";
+            string commandText = "Update uploadsdata set AccountNumber = @accountNo where Id = @Id ";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
-            parameters.Add("@Id", uploadData.Id);            
+            parameters.Add("@Id", uploadData.Id);
             parameters.Add("@accountNo", uploadData.AccountNumber);
-            parameters.Add("@bankId", uploadData.BankId);
 
             return _database.Execute(commandText, parameters) > 0;
         }

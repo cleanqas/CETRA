@@ -20,8 +20,9 @@ namespace AspNet.Identity.MySQL
         /// Constructor that takes names as argument 
         /// </summary>
         /// <param name="name"></param>
-        public IdentityBank(string name) : this()
-            {
+        public IdentityBank(string name)
+            : this()
+        {
             Name = name;
         }
 

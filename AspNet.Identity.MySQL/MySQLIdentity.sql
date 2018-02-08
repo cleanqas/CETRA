@@ -228,3 +228,33 @@ INSERT INTO `cetra`.`uploadstatus` (`Id`, `Descr`) VALUES ('3', 'Processed');
 INSERT INTO `cetra`.`uploadstatus` (`Id`, `Descr`) VALUES ('-1', 'Rejected');
 
 
+==============================Modifications after beta version
+ALTER TABLE `cetra`.`branches` 
+DROP FOREIGN KEY `Branch_Bank`;
+ALTER TABLE `cetra`.`branches` 
+DROP COLUMN `BankId`,
+DROP INDEX `Branch_Bank_idx` ;
+
+ALTER TABLE `cetra`.`uploads` 
+ADD COLUMN `BankId` VARCHAR(128) NOT NULL AFTER `UploaderId`;
+
+ALTER TABLE `cetra`.`uploads` 
+ADD CONSTRAINT `Upload_Bank`
+  FOREIGN KEY (`BankId`)
+  REFERENCES `cetra`.`banks` (`Id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+ALTER TABLE `cetra`.`branches` 
+ADD COLUMN `BranchCode` VARCHAR(45) NOT NULL AFTER `GLAccount`;
+
+
+UPDATE `cetra`.`branches` SET `BranchCode`='ADENIJI01' WHERE `Id`='04878a8c-3c27-4d48-9ed8-c354b68b17b5';
+UPDATE `cetra`.`branches` SET `BranchCode`='HO001' WHERE `Id`='5a898810-3180-493d-9901-2dba066a74d1';
+
+ALTER TABLE `cetra`.`uploadsdata` 
+ADD COLUMN `Debit1Credit0` TINYINT(1) NULL AFTER `AccountNumber`,
+ADD COLUMN `PostingCode` VARCHAR(45) NULL AFTER `Debit1Credit0`;
+
+ALTER TABLE `cetra`.`uploadsdata` 
+CHANGE COLUMN `Debit1Credit0` `DebitOrCredit` TINYINT(1) NULL DEFAULT NULL ;

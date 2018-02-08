@@ -13,11 +13,14 @@ namespace AspNet.Identity.MySQL
             Id = Guid.NewGuid().ToString();
         }
 
-        public UploadDataEntity(string uploadId, string narration, decimal amount) : this()
+        public UploadDataEntity(string uploadId, string narration, decimal amount, string accountNumber, bool debitOrCredit, string postingCode) : this()
         {
             UploadId = uploadId;
             Narration = narration;
             Amount = amount;
+            AccountNumber = accountNumber;
+            Debit1Credit0 = debitOrCredit;
+            PostingCode = postingCode;
         }
 
         public UploadDataEntity(string id)
@@ -51,14 +54,20 @@ namespace AspNet.Identity.MySQL
         public string AccountNumber { get; set; }
 
         /// <summary>
-        /// Bank Id
+        /// Debit or Credit. Debit = 1 and Credit = 0
         /// </summary>
-        public string BankId { get; set; }
+        public bool Debit1Credit0 { get; set; }
+
+        /// <summary>
+        /// Posting Code
+        /// </summary>
+        public string PostingCode { get; set; }
     }
 
     public class UploadDataWithBankAndAccountDetails : UploadDataEntity
     {
         public string BankName { get; set; }
         public string AccountName { get; set; }
+        public string BranchCode { get; set; }
     }
 }

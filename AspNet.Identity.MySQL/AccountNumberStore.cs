@@ -68,5 +68,12 @@ namespace AspNet.Identity.MySQL
 
             return Task.FromResult<List<TAccountNo>>(result);
         }
+
+        public Task<List<TAccountNo>> GetBankAccountNumbers(string bankId)
+        {
+            List<TAccountNo> result = accountNoTable.GetBankAccounts(bankId) as List<TAccountNo>;
+
+            return Task.FromResult<List<TAccountNo>>(result);
+        }
     }
 }

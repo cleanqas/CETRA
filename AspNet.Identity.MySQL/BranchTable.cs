@@ -54,12 +54,12 @@ namespace AspNet.Identity.MySQL
         /// <returns></returns>
         public int Insert(IdentityBranch branch)
         {
-            string commandText = "Insert into branches (Id, BranchName, BankId, GLAccount) values (@id, @name, @bankId, @glAccount)";
+            string commandText = "Insert into branches (Id, BranchName, GLAccount, BranchCode) values (@id, @name, @glAccount, @branchCode)";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@name", branch.Name);
             parameters.Add("@id", branch.Id);
-            parameters.Add("@bankId", branch.BankId);
             parameters.Add("@glAccount", branch.GLAccount);
+            parameters.Add("@branchCode", branch.BranchCode);
 
             return _database.Execute(commandText, parameters);
         }
@@ -71,7 +71,7 @@ namespace AspNet.Identity.MySQL
         /// <returns>branch name</returns>
         public Dictionary<string, string> GetBranchDetail(string branchId)
         {
-            string commandText = "Select BranchName, BankId, GLAccount from branches where Id = @id";
+            string commandText = "Select BranchName, GLAccount, BranchCode from branches where Id = @id";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@id", branchId);
             Dictionary<string, string> branchdetail = new Dictionary<string, string>();
@@ -79,8 +79,8 @@ namespace AspNet.Identity.MySQL
             foreach (var res in result)
             {
                 branchdetail["BranchName"] = res["BranchName"];
-                branchdetail["BankId"] = res["BankId"];
                 branchdetail["GLAccount"] = res["GLAccount"];
+                branchdetail["BranchCode"] = res["BranchCode"];
             }
             return branchdetail;
         }
@@ -92,7 +92,7 @@ namespace AspNet.Identity.MySQL
         /// <returns>branch's Id</returns>
         public Dictionary<string, string> GetBranchId(string branchName)
         {
-            string commandText = "Select Id, BankId, GLAccount from branches where BranchName = @name";
+            string commandText = "Select Id, GLAccount, BranchCode from branches where BranchName = @name";
             Dictionary<string, object> parameters = new Dictionary<string, object>() { { "@name", branchName } };
 
             Dictionary<string, string> branchdetail = new Dictionary<string, string>();
@@ -100,8 +100,8 @@ namespace AspNet.Identity.MySQL
             foreach (var res in result)
             {
                 branchdetail["Id"] = res["Id"];
-                branchdetail["BankId"] = res["BankId"];
                 branchdetail["GLAccount"] = res["GLAccount"];
+                branchdetail["BranchCode"] = res["BranchCode"];
             }
             return branchdetail;
         }
@@ -118,7 +118,7 @@ namespace AspNet.Identity.MySQL
 
             if (branchDetail != null)
             {
-                branch = new IdentityBranch(branchDetail["BranchName"], branchId, branchDetail["BankId"], branchDetail["GLAccount"]);
+                branch = new IdentityBranch(branchDetail["BranchName"], branchId, branchDetail["GLAccount"], branchDetail["BranchCode"]);
             }
 
             return branch;
@@ -136,7 +136,7 @@ namespace AspNet.Identity.MySQL
 
             if (branchDetail != null)
             {
-                branch = new IdentityBranch(branchName, branchDetail["Id"], branchDetail["BankId"], branchDetail["GLAccount"]);
+                branch = new IdentityBranch(branchName, branchDetail["Id"], branchDetail["GLAccount"], branchDetail["BranchCode"]);
             }
 
             return branch;
@@ -145,7 +145,7 @@ namespace AspNet.Identity.MySQL
         public List<IdentityBranch> GetAllBranches()
         {
             List<IdentityBranch> branches = new List<IdentityBranch>();
-            string commandText = "Select Id, BranchName, BankId, GLAccount from branches";
+            string commandText = "Select Id, BranchName, GLAccount, BranchCode from branches";
             Dictionary<string, object> parameters = new Dictionary<string, object>() { };
 
             var result = _database.Query(commandText, parameters);
@@ -157,8 +157,8 @@ namespace AspNet.Identity.MySQL
                     {
                         Id = res["Id"],
                         Name = res["BranchName"],
-                        BankId = res["BankId"],
-                        GLAccount = res["GLAccount"]
+                        GLAccount = res["GLAccount"],
+                        BranchCode = res["BranchCode"]
                     });
                 }
             }
@@ -168,16 +168,18 @@ namespace AspNet.Identity.MySQL
 
         public int Update(IdentityBranch branch)
         {
-            string commandText = "Update branches set BranchName = @name where Id = @id";
+            string commandText = "Update branches set BranchName = @name, BranchCode = @code where Id = @id";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@id", branch.Id);
+            parameters.Add("@name", branch.Name);
+            parameters.Add("@code", branch.BranchCode);
 
             return _database.Execute(commandText, parameters);
         }
 
         public void CreateUploadStatus()
         {
-            string commandText = "INSERT INTO uploadstatus (Id, Descr) VALUES ('0', 'Pending'); INSERT INTO uploadstatus (Id, Descr) VALUES ('1', 'Processed at Branch'); INSERT INTO uploadstatus (Id, Descr) VALUES ('2', 'Approved'); INSERT INTO uploadstatus (Id, Descr) VALUES ('3', 'Downloaded'); INSERT INTO uploadstatus (Id, Descr) VALUES ('-1', 'Rejected');";
+            string commandText = "ALTER TABLE uploadsdata DROP COLUMN BankId; ALTER TABLE uploadsdata DROP FOREIGN KEY Uploadsdata_Bank; ALTER TABLE uploadsdata DROP INDEX Uploadsdata_Bank_idx ; ALTER TABLE branches DROP FOREIGN KEY Branch_Bank; ALTER TABLE branches DROP COLUMN BankId, DROP INDEX Branch_Bank_idx ;  ALTER TABLE uploads ADD COLUMN BankId VARCHAR(128) NOT NULL AFTER UploaderId;  ALTER TABLE uploads ADD CONSTRAINT Upload_Bank FOREIGN KEY (BankId) REFERENCES banks (Id) ON DELETE NO ACTION ON UPDATE NO ACTION;  ALTER TABLE branches ADD COLUMN BranchCode VARCHAR(45) NOT NULL AFTER GLAccount; ALTER TABLE uploadsdata ADD COLUMN Debit1Credit0 TINYINT(1) NULL AFTER AccountNumber, ADD COLUMN PostingCode VARCHAR(45) NULL AFTER Debit1Credit0;  ALTER TABLE uploadsdata CHANGE COLUMN Debit1Credit0 DebitOrCredit TINYINT(1) NULL DEFAULT NULL ;  delete from branches; ";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             _database.Execute(commandText, parameters);
         }

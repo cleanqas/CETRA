@@ -1,6 +1,9 @@
 ﻿using AspNet.Identity.MySQL;
 using CETRA.Models;
 using Microsoft.AspNet.Identity;
+using NPOI.HSSF.UserModel;
+using NPOI.SS.UserModel;
+using NPOI.XSSF.UserModel;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -38,10 +41,28 @@ namespace CETRA.Controllers
         //POST: /HOOperator/GetAllProcessedUploads
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<JsonResult> GetAllProcessedUploads(string branchId)
+        public async Task<JsonResult> GetAllProcessedUploads()
         {
-            var branchUploads = await new UploadStore<UploadEntity>(new ApplicationDbContext()).FindUploadsByStatusAsync(2);
-            return Json(new { data = branchUploads }, JsonRequestBehavior.AllowGet);
+            var allProcessedUploads = await new UploadStore<UploadEntity>(new ApplicationDbContext()).FindUploadsByStatusAsync(2);
+            List<UploadEntityModel> allProcessedUploadsWithDetails = new List<UploadEntityModel>();
+            foreach (var data in allProcessedUploads)
+            {
+                var branchDetail = await Helper.GetBranchNameAndCode(data.BranchId);
+                allProcessedUploadsWithDetails.Add(new UploadEntityModel()
+                {
+                    BankId = data.BankId,
+                    BankName = await Helper.GetBankName(data.BankId),
+                    BranchId = data.BranchId,
+                    BranchName = branchDetail["BranchName"],
+                    BranchCode = branchDetail["BranchCode"],
+                    Id = data.Id,
+                    OperatorId = data.OperatorId,
+                    Status = data.Status,
+                    UploadDate = data.UploadDate,
+                    UploaderId = data.UploaderId
+                });
+            }
+            return Json(new { data = allProcessedUploadsWithDetails }, JsonRequestBehavior.AllowGet);
         }
 
         //POST: /HOOperator/GetAllUploadDataDetail
@@ -64,15 +85,12 @@ namespace CETRA.Controllers
             return Json(new { code = "00", message = "Successful" }, JsonRequestBehavior.AllowGet);
         }
 
-        //
-        // POST: /HOOPeration/Upload
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<JsonResult> Upload(UploadModel model)
+        public async Task<JsonResult> ConfirmUpload(UploadDataModel model)
         {
-            if (ModelState.IsValid)
+            if (ModelState.IsValid & model != null)
             {
-                var upload = new UploadEntity(User.Identity.GetUserId(), model.BranchId, 0);
+                var upload = new UploadEntity(User.Identity.GetUserId(), model.BankId, model.BranchId, 0);
                 bool result = false;
                 try
                 {
@@ -84,25 +102,11 @@ namespace CETRA.Controllers
                 }
                 if (result)
                 {
-                    List<PDataModel> PData = null;
                     try
                     {
-                        PData = getPaymentDataFromCSV(model.PaymentFile);
-                    }
-                    catch (Exception ex)
-                    {
-                        UploadManager.Delete(upload);
-                        throw new HttpException(400, ex.Message);
-                    }
-
-                    UploadDataEntity uploaddata = null;
-
-                    //upload created, now to extract the data. If data extraction fails, we delete the update record
-                    try
-                    {
-                        foreach (var data in PData)
+                        foreach (var data in model.PData)
                         {
-                            uploaddata = new UploadDataEntity(upload.Id, data.Narration, data.Amount);
+                            var uploaddata = new UploadDataEntity(upload.Id, data.Narration, data.Amount, data.AccountNumber, data.Debit1Credit0, data.PostingCode);
                             UploadDataManager.Create(uploaddata);
                         }
                     }
@@ -113,48 +117,148 @@ namespace CETRA.Controllers
                         UploadManager.Delete(upload);
                         throw new HttpException(400, "Upload failed");
                     }
-
-                    return Json(new { code = "00", message = "Sucessfull" }, JsonRequestBehavior.AllowGet);
+                    return Json(new { code = "00", message = "Successful" }, JsonRequestBehavior.AllowGet);
                 }
                 else
                 {
                     throw new HttpException(400, "Upload creation failed");
                 }
+
             }
             throw new HttpException(400, "Invalid Data Submitted");
         }
 
-        private List<PDataModel> getPaymentDataFromCSV(HttpPostedFileBase postedFile)
+        //
+        // POST: /HOOPeration/Upload
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<JsonResult> Upload(UploadModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                List<PDataModel> PData = null;
+                try
+                {
+                    var fileParts = model.PaymentFile.FileName.Split('.');
+                    var ext = fileParts[fileParts.Length - 1];
+                    var upload_ref_filename = fileParts[0];
+                    string savedfilepath = saveUploadedFile(model.PaymentFile);
+                    switch (ext)
+                    {
+                        case "csv":
+                            PData = getPaymentDataFromCSV(savedfilepath);
+                            break;
+                        case "xlsx":
+                            PData = getPaymentDataFromXlsx(savedfilepath);
+                            break;
+                        case "xls":
+                            PData = getPaymentDataFromXls(savedfilepath);
+                            break;
+                        default:
+                            throw new HttpException(400, "Unknow file type uploaded");
+                    }
+
+                    var bankAccounts = await new AccountNumberStore<IdentityAccountNumber>(new ApplicationDbContext()).GetBankAccountNumbers(model.BankId);
+
+                    return Json(new { code = "00", uploadData = PData, accounts = bankAccounts }, JsonRequestBehavior.AllowGet);
+                }
+                catch (Exception ex)
+                {
+                    throw new HttpException(400, ex.Message);
+                }
+            }
+            throw new HttpException(400, "Invalid Data Submitted");
+        }
+
+        private List<PDataModel> getPaymentDataFromXls(string filepath)
+        {
+            List<PDataModel> PData = new List<PDataModel>();
+            HSSFWorkbook hssfwb;
+            using (FileStream file = new FileStream(filepath, FileMode.Open, FileAccess.Read))
+            {
+                hssfwb = new HSSFWorkbook(file);
+            }
+
+            ISheet sheet = hssfwb.GetSheet("Sheet1");
+            for (int row = 0; row <= sheet.LastRowNum; row++)
+            {
+                if (sheet.GetRow(row) != null) //null is when the row only contains empty cells 
+                {
+                    PData.Add(new PDataModel
+                    {
+                        Narration = sheet.GetRow(row).GetCell(0).StringCellValue,
+                        Amount = Convert.ToDecimal(sheet.GetRow(row).GetCell(1).StringCellValue),
+                        AccountNumber = sheet.GetRow(row).GetCell(2).StringCellValue
+                    });
+                }
+            }
+            return PData;
+        }
+
+        private List<PDataModel> getPaymentDataFromXlsx(string filepath)
+        {
+            List<PDataModel> PData = new List<PDataModel>();
+            XSSFWorkbook xssfwb;
+            using (FileStream file = new FileStream(filepath, FileMode.Open, FileAccess.Read))
+            {
+                xssfwb = new XSSFWorkbook(file);
+            }
+
+            ISheet sheet = xssfwb.GetSheet("Sheet1");
+            for (int row = 0; row <= sheet.LastRowNum; row++)
+            {
+                if (sheet.GetRow(row) != null) //null is when the row only contains empty cells 
+                {
+                    PData.Add(new PDataModel
+                    {
+                        Narration = sheet.GetRow(row).GetCell(0).StringCellValue,
+                        Amount = Convert.ToDecimal(sheet.GetRow(row).GetCell(1).StringCellValue),
+                        AccountNumber = sheet.GetRow(row).GetCell(2).StringCellValue
+                    });
+                }
+            }
+            return PData;
+        }
+        private string saveUploadedFile(HttpPostedFileBase postedFile)
+        {
+            string filepath = string.Empty;
+            if (postedFile != null)
+            {
+                string path = Server.MapPath("~/Uploads/");
+                if (!Directory.Exists(path))
+                {
+                    Directory.CreateDirectory(path);
+                }
+
+                filepath = path + Path.GetFileName(postedFile.FileName);
+                string extension = Path.GetExtension(postedFile.FileName);
+                postedFile.SaveAs(filepath);
+            }
+            return filepath;
+        }
+
+        private List<PDataModel> getPaymentDataFromCSV(string filepath)
         {
             List<PDataModel> PData = new List<PDataModel>();
             try
             {
-                if (postedFile != null)
+                //Read the contents of CSV file.
+                string csvData = System.IO.File.ReadAllText(filepath);
+
+                //Execute a loop over the rows.
+                foreach (string row in csvData.Split('\n'))
                 {
-                    string path = Server.MapPath("~/Uploads/");
-                    if (!Directory.Exists(path))
+                    var split = row.Split(',');
+                    if (!string.IsNullOrEmpty(row))
                     {
-                        Directory.CreateDirectory(path);
-                    }
-
-                    var filePath = path + Path.GetFileName(postedFile.FileName);
-                    string extension = Path.GetExtension(postedFile.FileName);
-                    postedFile.SaveAs(filePath);
-
-                    //Read the contents of CSV file.
-                    string csvData = System.IO.File.ReadAllText(filePath);
-
-                    //Execute a loop over the rows.
-                    foreach (string row in csvData.Split('\n'))
-                    {
-                        if (!string.IsNullOrEmpty(row))
+                        PData.Add(new PDataModel
                         {
-                            PData.Add(new PDataModel
-                            {
-                                Narration = row.Split(',')[0],
-                                Amount = Convert.ToDecimal(row.Split(',')[1])
-                            });
-                        }
+                            AccountNumber = row.Split(',')[0],
+                            Debit1Credit0 = string.IsNullOrEmpty(row.Split(',')[2]) ? string.IsNullOrEmpty(row.Split(',')[3]) ? false : false : true,
+                            PostingCode = row.Split(',')[4],
+                            Narration = row.Split(',')[5],
+                            Amount = string.IsNullOrEmpty(row.Split(',')[2]) ? string.IsNullOrEmpty(row.Split(',')[3]) ? 0 : Convert.ToDecimal(row.Split(',')[3]) : Convert.ToDecimal(row.Split(',')[2])
+                        });
                     }
                 }
             }

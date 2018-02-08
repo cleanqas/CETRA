@@ -12,9 +12,9 @@ namespace CETRA.Models
         [Required]
         public string BranchName { get; set; }
         [Required]
-        public string BankId { get; set; }
-        [Required]
         public string GLAccount { get; set; }
+        [Required]
+        public string BranchCode { get; set; }
     }
 
     public class BankModel

@@ -26,10 +26,11 @@ namespace AspNet.Identity.MySQL
         /// <returns></returns>
         public int Insert(UploadEntity upload)
         {
-            string commandText = "Insert into uploads (Id, UploaderId, BranchId, Status) values (@id, @uploaderId, @branchId, @status)";
+            string commandText = "Insert into uploads (Id, UploaderId, BankId, BranchId, Status) values (@id, @uploaderId, @bankId, @branchId, @status)";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@id", upload.Id);
             parameters.Add("@uploaderId", upload.UploaderId);
+            parameters.Add("@bankId", upload.BankId);
             parameters.Add("@branchId", upload.BranchId);
             parameters.Add("@status", upload.Status);
 
@@ -48,7 +49,7 @@ namespace AspNet.Identity.MySQL
 
             if (uploaddetail != null)
             {
-                upload = new UploadEntity(uploadId, uploaddetail["UploaderId"], uploaddetail["BranchId"], Convert.ToInt32(uploaddetail["status"]));
+                upload = new UploadEntity(uploadId, uploaddetail["UploaderId"], uploaddetail["BankId"], uploaddetail["BranchId"], Convert.ToInt32(uploaddetail["status"]));
             }
 
             return upload;
@@ -61,7 +62,7 @@ namespace AspNet.Identity.MySQL
         /// <returns>Bank name</returns>
         public Dictionary<string, string> GetUploadDetail(string uploadId)
         {
-            string commandText = "Select UploaderId, BranchId, Status from uploads where Id = @id";
+            string commandText = "Select UploaderId, BankId, BranchId, Status from uploads where Id = @id";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@id", uploadId);
             Dictionary<string, string> uploaddetail = new Dictionary<string, string>();
@@ -69,6 +70,7 @@ namespace AspNet.Identity.MySQL
             foreach (var res in result)
             {
                 uploaddetail["UploaderId"] = res["UploaderId"];
+                uploaddetail["BankId"] = res["BankId"];
                 uploaddetail["BranchId"] = res["BranchId"];
                 uploaddetail["Status"] = res["Status"];
             }
@@ -97,7 +99,7 @@ namespace AspNet.Identity.MySQL
         /// 
         public List<UploadEntity> GetUploadsByBranchID(string branchId)
         {
-            string commandText = "Select Id, UploaderId, BranchId, Status, UploadDate from uploads where BranchId = @branchId";
+            string commandText = "Select Id, UploaderId, BankId, BranchId, Status, UploadDate from uploads where BranchId = @branchId";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@branchId", branchId);
             List<UploadEntity> uploads = new List<UploadEntity>();
@@ -106,6 +108,7 @@ namespace AspNet.Identity.MySQL
             {
                 uploads.Add(new UploadEntity()
                 {
+                    BankId = res["BankId"],
                     BranchId = res["BranchId"],
                     Id = res["Id"],
                     Status = Convert.ToInt32(res["Status"]),
@@ -199,7 +202,7 @@ namespace AspNet.Identity.MySQL
         /// 
         public List<UploadEntity> GetUploadsByStatus(int status)
         {
-            string commandText = "Select Id, UploaderId, BranchId, Status, UploadDate from uploads where Status = @status";
+            string commandText = "Select Id, UploaderId, BankId, BranchId, Status, UploadDate from uploads where Status = @status";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@status", status);
             List<UploadEntity> uploads = new List<UploadEntity>();
@@ -208,6 +211,7 @@ namespace AspNet.Identity.MySQL
             {
                 uploads.Add(new UploadEntity()
                 {
+                    BankId = res["BankId"],
                     BranchId = res["BranchId"],
                     Id = res["Id"],
                     Status = Convert.ToInt32(res["Status"]),
@@ -226,7 +230,7 @@ namespace AspNet.Identity.MySQL
         /// 
         public List<UploadEntity> GetUploadsByBranchAndStatus(string branchId, int status)
         {
-            string commandText = "Select Id, UploaderId, BranchId, Status, UploadDate, OperatorId from uploads where BranchId = @branchId and Status = @Status";
+            string commandText = "Select Id, UploaderId, BankId, BranchId, Status, UploadDate, OperatorId from uploads where BranchId = @branchId and Status = @Status";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@branchId", branchId);
             parameters.Add("@Status", status);
@@ -236,6 +240,7 @@ namespace AspNet.Identity.MySQL
             {
                 uploads.Add(new UploadEntity()
                 {
+                    BankId = res["BankId"],
                     BranchId = res["BranchId"],
                     Id = res["Id"],
                     Status = Convert.ToInt32(res["Status"]),

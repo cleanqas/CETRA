@@ -69,10 +69,10 @@
                                 <label for="role" class="control-label">Role:</label>
                                 <select name="role" id="role" required class="form-control">
                                     <optgroup label="Select Role">
-                                        <option value="62a9d8b0-5a61-4de9-9f32-e4e3d4f303dc" selected>Administrator</option>
-                                        <option value="fddf3310-e645-4fe7-b3a4-ba493889f304">Head Office Operator</option>
-                                        <option value="fb0b498b-4ecb-46c6-8dd2-def87ad6f2d0">Branch Operator</option>
-                                        <option value="e4d99ca7-2384-4af2-a3bb-fb7db5e84c38">Branch Verifier</option>
+                                        <option value="13f6c48f-edf9-4530-b4b8-ea24e9dc3c2c" selected>Administrator</option>
+                                        <option value="af919b6d-b025-4d9b-8766-e43cd9646d4c">Head Office Operator</option>
+                                        <option value="977729af-7855-4934-b64d-fff5845796b0">Branch Operator</option>
+                                        <option value="794956f9-2275-4d18-9b7a-30afc8525d2a">Branch Verifier</option>
                                     </optgroup>
                                 </select>
                             </div>
@@ -171,19 +171,17 @@
                     <div class="modal-body">
                         <form>
                             <div class="form-group">
+                                <label for="branchcode" class="control-label">Branch Code</label>
+                                <input type="text" name="branchcode" id="branchcode" placeholder="Branch Code" required class="form-control" />
+                            </div>
+                            <div class="form-group">
                                 <label for="branchname" class="control-label">Branch Name:</label>
                                 <input type="text" name="branchname" id="branchname" placeholder="Branch Name" autofocus autocomplete="off" required class="form-control" />
                             </div>
                             <div class="form-group">
                                 <label for="glaccount" class="control-label">GL Account</label>
                                 <input type="text" name="glaccount" id="glaccount" placeholder="GL Account" required class="form-control" />
-                            </div>
-                            <div class="form-group">
-                                <label for="bank_branch" class="control-label">Bank:</label>
-                                <select name="bank_branch" id="bank_branch" required class="form-control">
-                                    <optgroup label="Select Bank"></optgroup>
-                                </select>
-                            </div>
+                            </div>                            
                             <div class="form-group">
                                 <button class="btn btn-primary" type="button" id="registerNewBranch" data-loading-text="<i class='fa fa-spinner fa-spin '></i> Registering New Branch ...">Submit </button>
                             </div>
@@ -202,11 +200,10 @@
     <script type="text/javascript">
         $(function () {
             helpers.getData("/SetUp/GetAllBranches", function (data) {
-                helpers.buildDropdown(data, $('#branch_user'), 'Select Branch');
+                helpers.buildDropdown(data, $('#branch_user'), 'Select Branch', 'BranchCode');
             });
             
             helpers.getData("/SetUp/GetAllBanks", function (data) {
-                helpers.buildDropdown(data, $('#bank_branch'), 'Select Bank');
                 helpers.buildDropdown(data, $('#bank_account'), 'Select Bank');
             });
             
@@ -265,7 +262,7 @@
             $.ajax({
                 type: 'POST',
                 contentType: 'application/x-www-form-urlencoded',
-                data: { __RequestVerificationToken: helpers.getAntiForgeryToken(), BankName: $('#bankname').val() },
+                data: { __RequestVerificationToken: helpers.getAntiForgeryToken(), BankName: $('#bankname').val(), BankCode: $('#bankcode').val() },
                 url: '/SetUp/RegisterNewBank',
                 success: function (data) {
                     $('#manageBank').modal('hide');
@@ -316,9 +313,9 @@
 
             var _data = {
                 __RequestVerificationToken: helpers.getAntiForgeryToken(),
-                BankId: $('#bank_branch').val(),
                 BranchName: $('#branchname').val(),
-                GLAccount: $('#glaccount').val()
+                GLAccount: $('#glaccount').val(),
+                BranchCode: $('#branchcode').val()
             };
             $.ajax({
                 type: 'POST',

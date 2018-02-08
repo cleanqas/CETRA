@@ -49,6 +49,8 @@
                     <tr>
                         <th>Upload ID</th>
                         <th>Date and Time</th>
+                        <th>Bank</th>
+                        <th>Branch</th>
                         <th>Process</th>
                     </tr>
                 </thead>
@@ -70,10 +72,14 @@
                     <table id="UploadDataTable" class="display"  style="width: 100%">
                         <thead>
                             <tr>
+                                <th>Account Number</th>
+                                <th>Branch Code</th>
+                                <th>Debit</th>
+                                <th>Credit</th>
+                                <th>Posting Code</th>
                                 <th>Narration</th>
                                 <th>Amount</th>
-                                <th>Bank</th>
-                                <th>Account Number</th>
+                                <th>Bank</th>                                
                                 <th>Account Name</th>
                             </tr>
                         </thead>
@@ -120,6 +126,8 @@
                 columns: [
                     { data: "Id" },
                     { data: "UploadDate" },
+                    { data: "BankName" },
+                    { data: "BranchCode" },
                     {
                         render: function (data, type, full, meta) {
                             return '<a class="btn btn-default" onClick="openModal(\'' + full.Id + '\', \'' + full.UploaderId + '\', \'' + full.OperatorId + '\')">Process</a>'
@@ -150,10 +158,28 @@
                 $("#UploadDataTable").dataTable({
                     data: paymentData,
                     columns: [
+                        { data: "AccountNumber" },
+                        { data: "BranchCode" },
+                        {
+                            render: function (data, type, full, meta) {
+                                var sym = "";
+                                if (full.Debit1Credit0)
+                                    sym = "D";
+                                return '<p>' + sym + '</p>'
+                            }
+                        },
+                        {
+                            render: function (data, type, full, meta) {
+                                var sym = "";
+                                if (!full.Debit1Credit0)
+                                    sym = "C";
+                                return '<p>' + sym + '</p>'
+                            }
+                        },
+                        { data: "PostingCode" },
                         { data: "Narration" },
                         { data: "Amount" },
-                        { data: "BankName" },
-                        { data: "AccountNumber" },
+                        { data: "BankName" },                        
                         { data: "AccountName" }
                     ]
                 });

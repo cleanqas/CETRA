@@ -15,7 +15,5 @@ namespace CETRA.Models
         public string UploadDataId { get; set; }
         [Required]
         public string AccountNumber { get; set; }
-        [Required]
-        public string BankId { get; set; }
     }
 }

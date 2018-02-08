@@ -47,7 +47,25 @@ namespace CETRA.Controllers
         public async Task<JsonResult> GetAllPendingVerificationBranchUploads(string branchId)
         {
             var branchUploads = await new UploadStore<UploadEntity>(new ApplicationDbContext()).FindPendingVerificationUploadsByBranchIdAsync(branchId);
-            return Json(new { data = branchUploads }, JsonRequestBehavior.AllowGet);
+            List<UploadEntityModel> allPendingVerificationUploadsWithDetails = new List<UploadEntityModel>();
+            foreach (var data in branchUploads)
+            {
+                var branchDetail = await Helper.GetBranchNameAndCode(data.BranchId);
+                allPendingVerificationUploadsWithDetails.Add(new UploadEntityModel()
+                {
+                    BankId = data.BankId,
+                    BankName = await Helper.GetBankName(data.BankId),
+                    BranchId = data.BranchId,
+                    BranchName = branchDetail["BranchName"],
+                    BranchCode = branchDetail["BranchCode"],
+                    Id = data.Id,
+                    OperatorId = data.OperatorId,
+                    Status = data.Status,
+                    UploadDate = data.UploadDate,
+                    UploaderId = data.UploaderId
+                });
+            }
+            return Json(new { data = allPendingVerificationUploadsWithDetails }, JsonRequestBehavior.AllowGet);
         }
 
         //POST: /BranchVerifier/GetAllUploadDataDetail

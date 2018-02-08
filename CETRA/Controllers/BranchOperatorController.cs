@@ -47,15 +47,33 @@ namespace CETRA.Controllers
         public async Task<JsonResult> GetAllPendingBranchUploads(string branchId)
         {
             var branchUploads = await new UploadStore<UploadEntity>(new ApplicationDbContext()).FindPendingUploadsByBranchIdAsync(branchId);
-            return Json(new { data = branchUploads }, JsonRequestBehavior.AllowGet);
+            List<UploadEntityModel> allPendingUploadsWithDetails = new List<UploadEntityModel>();
+            foreach (var data in branchUploads)
+            {
+                var branchDetail = await Helper.GetBranchNameAndCode(data.BranchId);
+                allPendingUploadsWithDetails.Add(new UploadEntityModel()
+                {
+                    BankId = data.BankId,
+                    BankName = await Helper.GetBankName(data.BankId),
+                    BranchId = data.BranchId,
+                    BranchName = branchDetail["BranchName"],
+                    BranchCode = branchDetail["BranchCode"],
+                    Id = data.Id,
+                    OperatorId = data.OperatorId,
+                    Status = data.Status,
+                    UploadDate = data.UploadDate,
+                    UploaderId = data.UploaderId
+                });
+            }
+            return Json(new { data = allPendingUploadsWithDetails }, JsonRequestBehavior.AllowGet);
         }
 
-        //POST: /BranchOperator/GetAllAccounts
+        //POST: /BranchOperator/GetBankAccounts
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<JsonResult> GetAllAccounts()
+        public async Task<JsonResult> GetBankAccounts(string BankId)
         {
-            var accounts = await new AccountNumberStore<IdentityAccountNumber>(new ApplicationDbContext()).GetAllAccountNumbers();
+            var accounts = await new AccountNumberStore<IdentityAccountNumber>(new ApplicationDbContext()).GetBankAccountNumbers(BankId);
             return Json(accounts, JsonRequestBehavior.AllowGet);
         }
 
@@ -69,7 +87,6 @@ namespace CETRA.Controllers
                 {
                     var uploaddata = new UploadDataEntity(data.UploadDataId);
                     uploaddata.AccountNumber = data.AccountNumber;
-                    uploaddata.BankId = data.BankId;
                     var updatedata = await new UploadDataStore<UploadDataEntity>(new ApplicationDbContext()).UpdateUploadsDataAsync(uploaddata);
                 }
                 UploadManager.UpdateUploadStatus(model[0].UploadId, 1);

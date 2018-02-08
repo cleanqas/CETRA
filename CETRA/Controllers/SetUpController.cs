@@ -87,7 +87,7 @@ namespace CETRA.Controllers
         {
             if (ModelState.IsValid)
             {
-                var branch = new IdentityBranch(model.BranchName, model.BankId, model.GLAccount);
+                var branch = new IdentityBranch(model.BranchName, model.GLAccount, model.BranchCode);
                 var result = await BranchManager.CreateAsync(branch);
                 if (result)
                 {

@@ -13,17 +13,19 @@ namespace AspNet.Identity.MySQL
             Id = Guid.NewGuid().ToString();
         }
 
-        public UploadEntity(string uploaderId, string branchId, int status) : this()
+        public UploadEntity(string uploaderId, string bankId, string branchId, int status) : this()
         {
             UploaderId = uploaderId;
+            BankId = bankId;
             BranchId = branchId;
             Status = status;
         }
 
-        public UploadEntity(string id, string uploaderId, string branchId, int status)
+        public UploadEntity(string id, string uploaderId, string bankId, string branchId, int status)
         {
             Id = id;
             UploaderId = uploaderId;
+            BankId = bankId;
             BranchId = branchId;
             Status = status;
         }
@@ -39,9 +41,15 @@ namespace AspNet.Identity.MySQL
         public string UploaderId { get; set; }
 
         /// <summary>
+        /// Bank ID
+        /// </summary>
+        public string BankId { get; set; }
+
+        /// <summary>
         /// Branch ID
         /// </summary>
         public string BranchId { get; set; }
+
 
         /// <summary>
         /// Status

@@ -1,11 +1,18 @@
 ﻿var helpers =
             {
-                buildDropdown: function (result, dropDown, emptyMessage) {
+                buildDropdown: function (result, dropDown, emptyMessage, field) {
                     dropDown.html('');
                     dropDown.append('<option value="">' + emptyMessage + '</option>');
                     if (result != '') {
                         $.each(result, function (k, v) {
-                            dropDown.append('<option value="' + v.Id + '">' + v.Name + '</option>');
+                            if (field === undefined) {
+                                dropDown.append('<option value="' + v.Id + '">' + v.Name + '</option>');
+                            } else {
+                                console.log(field)
+                                console.log(v[field])
+                                dropDown.append('<option value="' + v.Id + '">' + v[field] + '</option>');
+                            }
+                            
                         })
                     }
                 },
@@ -36,5 +43,15 @@
                     var token = $('input[name="__RequestVerificationToken"]', form).val();
                     console.log(token);
                     return token;
+                },
+
+                getBankName: function (bankId, banks) {
+                    console.log(banks);
+                    console.log(bankId);
+                    $.each(banks, function (i, v) {
+                        if (v.Id == bankId) {
+                            return v.BankName;
+                        }
+                    });
                 }
             };
