@@ -26,10 +26,9 @@ namespace AspNet.Identity.MySQL
         /// <returns></returns>
         public int Insert(IdentityAccountNumber accountno)
         {
-            string commandText = "Insert into accountnumbers (Id, BankId, AccountNumber, AccountName) values (@id, @bankId, @accountNumber, @accountname)";
+            string commandText = "Insert into accountnumbers (Id, AccountNumber, AccountName) values (@id, @accountNumber, @accountname)";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@id", accountno.Id);
-            parameters.Add("@bankId", accountno.BankId);
             parameters.Add("@accountNumber", accountno.AccountNumber);
             parameters.Add("@accountName", accountno.AccountName);
 
@@ -48,7 +47,7 @@ namespace AspNet.Identity.MySQL
 
             if (accountdetail != null)
             {
-                account = new IdentityAccountNumber(accountdetail["Id"], accountdetail["BankId"], accountNumber, accountdetail["AccountName"]);
+                account = new IdentityAccountNumber(accountdetail["Id"], accountNumber, accountdetail["AccountName"]);
             }
 
             return account;
@@ -61,7 +60,7 @@ namespace AspNet.Identity.MySQL
         /// <returns>Bank name</returns>
         public Dictionary<string, string> GetAccountDetail(string accountNumber)
         {
-            string commandText = "Select Id, BankId, AccountName from accountnumbers where AccountNumber = @accountno";
+            string commandText = "Select Id, AccountName from accountnumbers where AccountNumber = @accountno";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@accountno", accountNumber);
             Dictionary<string, string> accountdetail = new Dictionary<string, string>();
@@ -69,7 +68,6 @@ namespace AspNet.Identity.MySQL
             foreach (var res in result)
             {
                 accountdetail["Id"] = res["Id"];
-                accountdetail["BankId"] = res["BankId"];
                 accountdetail["AccountName"] = res["AccountName"];
             }
             return accountdetail;
@@ -96,7 +94,7 @@ namespace AspNet.Identity.MySQL
         /// <returns>Bank name</returns>
         public List<IdentityAccountNumber> GetAllAccount()
         {
-            string commandText = "Select Id, BankId, AccountNumber, AccountName from accountnumbers";
+            string commandText = "Select Id, AccountNumber, AccountName from accountnumbers";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             List<IdentityAccountNumber> accounts = new List<IdentityAccountNumber>();
             var result = _database.Query(commandText, parameters);
@@ -106,7 +104,6 @@ namespace AspNet.Identity.MySQL
                 {
                     AccountName = res["AccountName"],
                     AccountNumber = res["AccountNumber"],
-                    BankId = res["BankId"],
                     Id = res["Id"]
                 });
             }
@@ -120,7 +117,7 @@ namespace AspNet.Identity.MySQL
         /// <returns>Bank name</returns>
         public List<IdentityAccountNumber> GetBankAccounts(string bankId)
         {
-            string commandText = "Select Id, BankId, AccountNumber, AccountName from accountnumbers where BankId = @bankId";
+            string commandText = "Select Id, AccountNumber, AccountName from accountnumbers where BankId = @bankId";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@bankId", bankId);
 
@@ -132,7 +129,6 @@ namespace AspNet.Identity.MySQL
                 {
                     AccountName = res["AccountName"],
                     AccountNumber = res["AccountNumber"],
-                    BankId = res["BankId"],
                     Id = res["Id"]
                 });
             }

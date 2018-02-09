@@ -258,3 +258,12 @@ ADD COLUMN `PostingCode` VARCHAR(45) NULL AFTER `Debit1Credit0`;
 
 ALTER TABLE `cetra`.`uploadsdata` 
 CHANGE COLUMN `Debit1Credit0` `DebitOrCredit` TINYINT(1) NULL DEFAULT NULL ;
+
+ALTER TABLE `cetra`.`accountnumbers` 
+DROP FOREIGN KEY `AccountNumber_Bank`;
+
+ALTER TABLE `cetra`.`accountnumbers` 
+DROP COLUMN `BankId`,
+DROP PRIMARY KEY,
+ADD PRIMARY KEY (`AccountNumber`),
+DROP INDEX `AccountNumber_Bank_idx` ;

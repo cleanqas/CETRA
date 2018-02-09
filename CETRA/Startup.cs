@@ -26,7 +26,7 @@ namespace CETRA
             var bankManager = new BankManager<IdentityBank>(new BankStore<IdentityBank>(context));
 
             var user = new ApplicationUser();
-            branchManager.CreateUploadStatus();
+            //branchManager.CreateUploadStatus();
             if (!roleManager.RoleExists("Admin"))
             {
 
@@ -77,10 +77,11 @@ namespace CETRA
 
                 var branch = new AspNet.Identity.MySQL.IdentityBranch();
                 branch.Name = "Head Office";
+                branch.BranchCode = "HeadOffice";
                 branch.GLAccount = ConfigurationManager.AppSettings["DefaultGLAccount"];
                 branchManager.Create(branch);
                 branchManager.AddUserToBranch(user.Id, branch.Id);
-                branchManager.CreateUploadStatus();                
+                //branchManager.CreateUploadStatus();                
             } 
         }
     }

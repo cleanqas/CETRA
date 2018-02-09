@@ -179,7 +179,7 @@ namespace AspNet.Identity.MySQL
 
         public void CreateUploadStatus()
         {
-            string commandText = "ALTER TABLE uploadsdata DROP COLUMN BankId; ALTER TABLE uploadsdata DROP FOREIGN KEY Uploadsdata_Bank; ALTER TABLE uploadsdata DROP INDEX Uploadsdata_Bank_idx ; ALTER TABLE branches DROP FOREIGN KEY Branch_Bank; ALTER TABLE branches DROP COLUMN BankId, DROP INDEX Branch_Bank_idx ;  ALTER TABLE uploads ADD COLUMN BankId VARCHAR(128) NOT NULL AFTER UploaderId;  ALTER TABLE uploads ADD CONSTRAINT Upload_Bank FOREIGN KEY (BankId) REFERENCES banks (Id) ON DELETE NO ACTION ON UPDATE NO ACTION;  ALTER TABLE branches ADD COLUMN BranchCode VARCHAR(45) NOT NULL AFTER GLAccount; ALTER TABLE uploadsdata ADD COLUMN Debit1Credit0 TINYINT(1) NULL AFTER AccountNumber, ADD COLUMN PostingCode VARCHAR(45) NULL AFTER Debit1Credit0;  ALTER TABLE uploadsdata CHANGE COLUMN Debit1Credit0 DebitOrCredit TINYINT(1) NULL DEFAULT NULL ;  delete from branches; ";
+            string commandText = "ALTER TABLE branches DROP FOREIGN KEY Branch_Bank; ALTER TABLE branches DROP COLUMN BankId, DROP INDEX Branch_Bank_idx ;  ";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             _database.Execute(commandText, parameters);
         }

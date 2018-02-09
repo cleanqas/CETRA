@@ -145,7 +145,7 @@
 
             $.ajax({
                 type: 'POST',
-                data: { __RequestVerificationToken: helpers.getAntiForgeryToken(), BankId: bankId },
+                data: { __RequestVerificationToken: helpers.getAntiForgeryToken() },
                 url: '/BranchOperator/GetBankAccounts',
                 success: function (data) {
                     accountNumbers = data;
@@ -196,7 +196,7 @@
                          { data: "Narration" },
                         {
                             render: function (data, type, full, meta) {
-                                return '<input type="text" placeholder="Account Name" class="form-control" name="acctName_' + full.Id + '" id="acctName_' + full.Id + '"/>'
+                                return '<input type="text" placeholder="Account Name" class="form-control" value="' + full.AccountName + '" name="acctName_' + full.Id + '" id="acctName_' + full.Id + '"/>'
                             }
                         }
                     ]

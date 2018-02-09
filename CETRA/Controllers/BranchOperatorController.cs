@@ -71,9 +71,9 @@ namespace CETRA.Controllers
         //POST: /BranchOperator/GetBankAccounts
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<JsonResult> GetBankAccounts(string BankId)
+        public async Task<JsonResult> GetBankAccounts()
         {
-            var accounts = await new AccountNumberStore<IdentityAccountNumber>(new ApplicationDbContext()).GetBankAccountNumbers(BankId);
+            var accounts = await new AccountNumberStore<IdentityAccountNumber>(new ApplicationDbContext()).GetAllAccountNumbers();
             return Json(accounts, JsonRequestBehavior.AllowGet);
         }
 
@@ -83,7 +83,7 @@ namespace CETRA.Controllers
         {
             if (ModelState.IsValid & model != null)
             {
-                foreach(var data in model)
+                foreach (var data in model)
                 {
                     var uploaddata = new UploadDataEntity(data.UploadDataId);
                     uploaddata.AccountNumber = data.AccountNumber;
@@ -92,7 +92,7 @@ namespace CETRA.Controllers
                 UploadManager.UpdateUploadStatus(model[0].UploadId, 1);
                 UploadManager.UpdateUploadOperator(model[0].UploadId, User.Identity.GetUserId());
                 return Json(new { code = "00", message = "Successful" }, JsonRequestBehavior.AllowGet);
-                
+
             }
             throw new HttpException(400, "Invalid Data Submitted");
         }
@@ -103,7 +103,27 @@ namespace CETRA.Controllers
         public async Task<JsonResult> GetUploadData(string UploadId)
         {
             var uploadData = await new UploadDataStore<UploadDataEntity>(new ApplicationDbContext()).FindUploadDataAsync(UploadId);
-            return Json(uploadData, JsonRequestBehavior.AllowGet);
+
+            var bankAccounts = await new AccountNumberStore<IdentityAccountNumber>(new ApplicationDbContext()).GetAllAccountNumbers();
+            List<PDataModel> PData = new List<PDataModel>();
+            uploadData.ForEach(k => PData.Add(new PDataModel()
+            {
+                AccountNumber = k.AccountNumber,
+                Amount = k.Amount,
+                Debit1Credit0 = k.Debit1Credit0,
+                Narration = k.Narration,
+                PostingCode = k.PostingCode,
+                Id = k.Id
+            }));
+
+            foreach (var p in PData)
+            {
+                var pAcct = bankAccounts.Find(k => k.AccountNumber == p.AccountNumber);
+                p.AccountName = pAcct == null ? string.Empty : pAcct.AccountName;
+                p.AccountNumber = p.AccountNumber == null ? string.Empty : p.AccountNumber; 
+            }
+
+            return Json(PData, JsonRequestBehavior.AllowGet);
         }
 
     }

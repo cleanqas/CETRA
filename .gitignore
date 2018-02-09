@@ -6,6 +6,9 @@
 *.user
 *.sln.docstates
 
+# Ignore Prod folder in Setup View
+CETRA/Views/SetUp/prod/
+
 # Build results
 
 [Dd]ebug/

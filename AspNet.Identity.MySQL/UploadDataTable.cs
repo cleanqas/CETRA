@@ -90,7 +90,7 @@ namespace AspNet.Identity.MySQL
         /// 
         public List<UploadDataWithBankAndAccountDetails> GetUploadsDataWithAccountName(string uploadId)
         {
-            string commandText = "Select u.Id, u.UploadId, u.Narration, u.Amount, u.DebitOrCredit, u.PostingCode, (select BankName from banks where Id = up.BankId) BankName, (select BranchCode from branches where Id = up.BranchId)  BranchCode, u.AccountNumber, a.AccountName from uploadsdata u join uploads up on u.UploadId = up.Id left join accountnumbers a on a.AccountNumber = u.AccountNumber and a.BankId = up.BankId where u.UploadId = @uploadId";
+            string commandText = "Select u.Id, u.UploadId, u.Narration, u.Amount, u.DebitOrCredit, u.PostingCode, (select BankName from banks where Id = up.BankId) BankName, (select BranchCode from branches where Id = up.BranchId)  BranchCode, u.AccountNumber, a.AccountName from uploadsdata u join uploads up on u.UploadId = up.Id left join accountnumbers a on a.AccountNumber = u.AccountNumber where u.UploadId = @uploadId";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@uploadId", uploadId);
             List<UploadDataWithBankAndAccountDetails> uploaddata = new List<UploadDataWithBankAndAccountDetails>();

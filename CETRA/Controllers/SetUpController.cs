@@ -131,7 +131,7 @@ namespace CETRA.Controllers
         {
             if (ModelState.IsValid)
             {
-                var account = new IdentityAccountNumber(model.BankId, model.AccountNumber, model.AccountName);
+                var account = new IdentityAccountNumber(model.AccountNumber, model.AccountName);
                 var result = await AccountNumberManager.CreateAsync(account);
                 if (result)
                 {

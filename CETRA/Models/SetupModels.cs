@@ -28,8 +28,6 @@ namespace CETRA.Models
     {
         public string Id { get; set; }
         [Required]
-        public string BankId { get; set; }
-        [Required]
         public string AccountNumber { get; set; }
         [Required]
         public string AccountName { get; set; }

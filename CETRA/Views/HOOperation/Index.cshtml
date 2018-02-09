@@ -200,16 +200,19 @@
 
         var searchAccount = function (acctNumber, uploadDataId) {
 
-            console.log(accountNumbers)
-            $.each(accountNumbers, function (i, v) {
-                if (v.AccountNumber == acctNumber) {
-                    $('#acctName_' + uploadDataId).val(v.AccountName);
+            console.log(accounts)
+            console.log(acctNumber)
 
-                    $.each(uploadPaymentData.uploadData, function (i, v) {
-                        if (v.Id == uploadDataId) {
-                            v.AccountNumber = acctNumber;
-                        }
-                    });
+            $.each(uploadPaymentData.uploadData, function (i, v) {
+                if (v.Id == uploadDataId) {
+                    v.AccountNumber = acctNumber;
+                }
+            });
+
+            $.each(accounts, function (i, v) {
+                if (v.AccountNumber == acctNumber) {
+                    console.log("matched")
+                    $('#acctName_' + uploadDataId).val(v.AccountName);                    
                 } else {
                     $('#acctName_' + uploadDataId).val('');
                 }
@@ -253,7 +256,7 @@
                          { data: "Narration" },
                         {
                             render: function (data, type, full, meta) {
-                                return '<input type="text" placeholder="Account Name" class="form-control" name="acctName_' + full.Id + '" id="acctName_' + full.Id + '"/>'
+                                return '<input type="text" placeholder="Account Name" class="form-control" value="' + full.AccountName + '" name="acctName_' + full.Id + '" id="acctName_' + full.Id + '"/>'
                             }
                         }
                 ]

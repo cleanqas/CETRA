@@ -13,16 +13,14 @@ namespace AspNet.Identity.MySQL
             Id = Guid.NewGuid().ToString();
         }
 
-        public IdentityAccountNumber(string bankId, string accountNumber, string accountName) : this()
+        public IdentityAccountNumber(string accountNumber, string accountName) : this()
         {
-            BankId = bankId;
             AccountNumber = accountNumber;
             AccountName = accountName;
         }
 
-        public IdentityAccountNumber(string id, string bankId, string accountNumber, string accountName)
+        public IdentityAccountNumber(string id, string accountNumber, string accountName)
         {
-            BankId = bankId;
             Id = id;
             AccountNumber = accountNumber;
             AccountName = accountName;
@@ -32,11 +30,6 @@ namespace AspNet.Identity.MySQL
         /// Bank ID
         /// </summary>
         public string Id { get; set; }
-
-        /// <summary>
-        /// Bank Id
-        /// </summary>
-        public string BankId { get; set; }
 
         /// <summary>
         /// AccountNumber

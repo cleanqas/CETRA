@@ -158,8 +158,15 @@ namespace CETRA.Controllers
                             throw new HttpException(400, "Unknow file type uploaded");
                     }
 
-                    var bankAccounts = await new AccountNumberStore<IdentityAccountNumber>(new ApplicationDbContext()).GetBankAccountNumbers(model.BankId);
+                    var bankAccounts = await new AccountNumberStore<IdentityAccountNumber>(new ApplicationDbContext()).GetAllAccountNumbers();
 
+                    foreach (var p in PData)
+                    {
+                        var pAcct = bankAccounts.Find(k => k.AccountNumber == p.AccountNumber);
+                        p.AccountName = pAcct == null ? string.Empty : pAcct.AccountName;
+                        p.Id = Guid.NewGuid().ToString();
+                        p.AccountNumber = p.AccountNumber == null ? string.Empty : p.AccountNumber;
+                    }
                     return Json(new { code = "00", uploadData = PData, accounts = bankAccounts }, JsonRequestBehavior.AllowGet);
                 }
                 catch (Exception ex)

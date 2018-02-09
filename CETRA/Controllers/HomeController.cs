@@ -8,7 +8,7 @@ namespace CETRA.Controllers
 {
     public class HomeController : Controller
     {
-        [Authorize(Roles = "")]
+        [Authorize(Roles = "Default")]
         public ActionResult Index()
         {
             return View();
