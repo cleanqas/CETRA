@@ -56,7 +56,6 @@
                         <thead>
                             <tr>
                                 <th>Account Number</th>
-                                <th>Amount</th>
                                 <th>Debit</th>
                                 <th>Credit</th>
                                 <th>PostingCode</th>
@@ -175,21 +174,25 @@
                                 return '<input type="text" placeholder="Account Number" class="form-control" value="' + full.AccountNumber + '" name="acctNumber_' + full.Id + '" id="acctNumber_' + full.Id + '" onChange="searchAccount(this.value, \'' + full.Id + '\')"/>'
                             }
                         },
-                        { data: "Amount" },
                         {
                             render: function (data, type, full, meta) {
                                 var sym = "";
-                                if (full.Debit1Credit0)
-                                    sym = "D";
-                                return '<p>' + sym + '</p>'
+                                if (full.Debit1Credit0) {
+                                    return '<p>' + full.Amount + '</p>';
+                                } else {
+                                    return '<p></p>';
+                                }
+                                    
                             }
                         },
                         {
                             render: function (data, type, full, meta) {
                                 var sym = "";
-                                if (!full.Debit1Credit0)
-                                    sym = "C";
-                                return '<p>' + sym + '</p>'
+                                if (!full.Debit1Credit0) {
+                                    return '<p>' + full.Amount + '</p>';
+                                } else {
+                                    return '<p></p>';
+                                }                                    
                             }
                         },
                          { data: "PostingCode" },

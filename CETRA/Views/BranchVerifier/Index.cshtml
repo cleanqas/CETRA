@@ -78,7 +78,6 @@
                                 <th>Credit</th>
                                 <th>Posting Code</th>
                                 <th>Narration</th>
-                                <th>Amount</th>
                                 <th>Bank</th>                                
                                 <th>Account Name</th>
                             </tr>
@@ -163,22 +162,25 @@
                         {
                             render: function (data, type, full, meta) {
                                 var sym = "";
-                                if (full.Debit1Credit0)
-                                    sym = "D";
-                                return '<p>' + sym + '</p>'
+                                if (full.Debit1Credit0) {
+                                    return '<p>' + full.Amount + '</p>';
+                                } else {
+                                    return '<p></p>';
+                                }                                    
                             }
                         },
                         {
                             render: function (data, type, full, meta) {
                                 var sym = "";
-                                if (!full.Debit1Credit0)
-                                    sym = "C";
-                                return '<p>' + sym + '</p>'
+                                if (!full.Debit1Credit0) {
+                                    return '<p>' + full.Amount + '</p>';
+                                } else {
+                                    return '<p></p>';
+                                }                                    
                             }
                         },
                         { data: "PostingCode" },
                         { data: "Narration" },
-                        { data: "Amount" },
                         { data: "BankName" },                        
                         { data: "AccountName" }
                     ]

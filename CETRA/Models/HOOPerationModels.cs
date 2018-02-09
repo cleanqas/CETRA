@@ -22,7 +22,7 @@ namespace CETRA.Models
         public string Id { get; set; }
         public string AccountNumber { get; set; }
         public string BranchCode { get; set; }
-        public bool Debit1Credit0 { get; set; }
+        public Nullable<bool> Debit1Credit0 { get; set; }
         public string Narration { get; set; }
         public string PostingCode { get; set; }
         public decimal Amount { get; set; }

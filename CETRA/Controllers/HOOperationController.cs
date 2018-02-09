@@ -6,6 +6,7 @@ using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -166,6 +167,9 @@ namespace CETRA.Controllers
                         p.AccountName = pAcct == null ? string.Empty : pAcct.AccountName;
                         p.Id = Guid.NewGuid().ToString();
                         p.AccountNumber = p.AccountNumber == null ? string.Empty : p.AccountNumber;
+
+                        if(p.Debit1Credit0 == null || p.PostingCode == null || !ConfigurationManager.AppSettings["PostingCodes"].Contains(p.PostingCode) || p.BranchCode == null || p.Narration == null)
+                            throw new HttpException(400, "Incomplete contents in the file");
                     }
                     return Json(new { code = "00", uploadData = PData, accounts = bankAccounts }, JsonRequestBehavior.AllowGet);
                 }
@@ -258,10 +262,11 @@ namespace CETRA.Controllers
                     var split = row.Split(',');
                     if (!string.IsNullOrEmpty(row))
                     {
+                        bool? j = null;
                         PData.Add(new PDataModel
                         {
                             AccountNumber = row.Split(',')[0],
-                            Debit1Credit0 = string.IsNullOrEmpty(row.Split(',')[2]) ? string.IsNullOrEmpty(row.Split(',')[3]) ? false : false : true,
+                            Debit1Credit0 = string.IsNullOrEmpty(row.Split(',')[2]) ? string.IsNullOrEmpty(row.Split(',')[3]) ? j : false : true,
                             PostingCode = row.Split(',')[4],
                             Narration = row.Split(',')[5],
                             Amount = string.IsNullOrEmpty(row.Split(',')[2]) ? string.IsNullOrEmpty(row.Split(',')[3]) ? 0 : Convert.ToDecimal(row.Split(',')[3]) : Convert.ToDecimal(row.Split(',')[2])
