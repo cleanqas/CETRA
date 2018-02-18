@@ -227,11 +227,19 @@
             var updates = [];
 
             $.each(paymentData, function (i, v) {
-                if (v.AccountNumber != null)
+                if (v.AccountNumber != null && v.Narration != null) {
                     updates.push({ UploadDataId: v.Id, AccountNumber: v.AccountNumber, UploadId: v.UploadId, Narration: v.Narration });
+                } else {
+                    return false;
+                }                    
+                
             });
 
-            
+            if (paymentData.length != updates.length) {
+                alert("Please fill in all the records. Do not leave any account number or narration blank");
+                return false;
+            };
+
             $.ajax({
                 type: 'POST',
                 url: '/BranchOperator/UpdateUploadData',

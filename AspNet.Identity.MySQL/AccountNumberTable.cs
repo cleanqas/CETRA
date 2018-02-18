@@ -26,11 +26,12 @@ namespace AspNet.Identity.MySQL
         /// <returns></returns>
         public int Insert(IdentityAccountNumber accountno)
         {
-            string commandText = "Insert into accountnumbers (Id, AccountNumber, AccountName) values (@id, @accountNumber, @accountname)";
+            string commandText = "Insert into accountnumbers (Id, AccountNumber, AccountName, AccountBranch) values (@id, @accountNumber, @accountname, @accountbranch)";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@id", accountno.Id);
             parameters.Add("@accountNumber", accountno.AccountNumber);
             parameters.Add("@accountName", accountno.AccountName);
+            parameters.Add("@accountbranch", accountno.AccountBranch);
 
             return _database.Execute(commandText, parameters);
         }
@@ -47,7 +48,7 @@ namespace AspNet.Identity.MySQL
 
             if (accountdetail != null)
             {
-                account = new IdentityAccountNumber(accountdetail["Id"], accountNumber, accountdetail["AccountName"]);
+                account = new IdentityAccountNumber(accountdetail["Id"], accountNumber, accountdetail["AccountName"], accountdetail["AccountBranch"]);
             }
 
             return account;
@@ -60,7 +61,7 @@ namespace AspNet.Identity.MySQL
         /// <returns>Bank name</returns>
         public Dictionary<string, string> GetAccountDetail(string accountNumber)
         {
-            string commandText = "Select Id, AccountName from accountnumbers where AccountNumber = @accountno";
+            string commandText = "Select Id, AccountName, AccountBranch from accountnumbers where AccountNumber = @accountno";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@accountno", accountNumber);
             Dictionary<string, string> accountdetail = new Dictionary<string, string>();
@@ -69,6 +70,7 @@ namespace AspNet.Identity.MySQL
             {
                 accountdetail["Id"] = res["Id"];
                 accountdetail["AccountName"] = res["AccountName"];
+                accountdetail["AccountBranch"] = res["AccountBranch"];
             }
             return accountdetail;
         }
@@ -104,6 +106,7 @@ namespace AspNet.Identity.MySQL
                 {
                     AccountName = res["AccountName"],
                     AccountNumber = res["AccountNumber"],
+                    AccountBranch = res["AccountBranch"],
                     Id = res["Id"]
                 });
             }
@@ -129,6 +132,7 @@ namespace AspNet.Identity.MySQL
                 {
                     AccountName = res["AccountName"],
                     AccountNumber = res["AccountNumber"],
+                    AccountBranch = res["AccountBranch"],
                     Id = res["Id"]
                 });
             }

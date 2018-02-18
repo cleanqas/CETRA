@@ -32,6 +32,7 @@ namespace CETRA.Models
         public string AccountNumber { get; set; }
         [Required]
         public string AccountName { get; set; }
+        public string AccountBranch { get; set; }
     }
 
     public class BulkAccountUploadModel

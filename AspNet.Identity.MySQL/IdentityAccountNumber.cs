@@ -13,17 +13,20 @@ namespace AspNet.Identity.MySQL
             Id = Guid.NewGuid().ToString();
         }
 
-        public IdentityAccountNumber(string accountNumber, string accountName) : this()
+        public IdentityAccountNumber(string accountNumber, string accountName, string accountBranch)
+            : this()
         {
             AccountNumber = accountNumber;
             AccountName = accountName;
+            AccountBranch = accountBranch;
         }
 
-        public IdentityAccountNumber(string id, string accountNumber, string accountName)
+        public IdentityAccountNumber(string id, string accountNumber, string accountName, string accountBranch)
         {
             Id = id;
             AccountNumber = accountNumber;
             AccountName = accountName;
+            AccountBranch = accountBranch;
         }
 
         /// <summary>
@@ -40,5 +43,10 @@ namespace AspNet.Identity.MySQL
         /// AccountName
         /// </summary>
         public string AccountName { get; set; }
+
+        /// <summary>
+        /// AccountBranch
+        /// </summary>
+        public string AccountBranch { get; set; }
     }
 }

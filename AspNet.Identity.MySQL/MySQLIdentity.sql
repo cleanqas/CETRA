@@ -267,3 +267,5 @@ DROP COLUMN `BankId`,
 DROP PRIMARY KEY,
 ADD PRIMARY KEY (`AccountNumber`),
 DROP INDEX `AccountNumber_Bank_idx` ;
+
+ALTER TABLE `accountnumbers` ADD `AccountBranch` VARCHAR(128) NOT NULL AFTER `AccountName`;

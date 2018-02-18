@@ -145,7 +145,12 @@
                                 <label for="accountname" class="control-label">Account Name:</label>
                                 <input type="text" name="accountname" id="accountname" placeholder="Account Name" required class="form-control" />
                             </div>
-                            
+                            <div class="form-group">
+                                <label for="branch_account" class="control-label">Account Branch:</label>
+                                <select name="branch_account" id="branch_account" required class="form-control">
+                                    <optgroup label="Select Branch"></optgroup>
+                                </select>
+                            </div>
                             <div class="form-group">
                                 <button class="btn btn-primary" type="button" id="registerNewAccount" data-loading-text="<i class='fa fa-spinner fa-spin '></i> Registering New Account">Submit </button>
                             </div>
@@ -208,6 +213,7 @@
         $(function () {
             helpers.getData("/SetUp/GetAllBranches", function (data) {
                 helpers.buildDropdown(data, $('#branch_user'), 'Select Branch', 'BranchCode');
+                helpers.buildDropdown(data, $('#branch_account'), 'Select Branch', 'BranchCode');
             });
         });
 
@@ -326,7 +332,8 @@
             var _data = {
                 __RequestVerificationToken: helpers.getAntiForgeryToken(),
                 AccountNumber: $('#accountnumber').val(),
-                AccountName: $('#accountname').val()
+                AccountName: $('#accountname').val(),
+                AccountBranch: $('#branch_account').val()
             };
             $.ajax({
                 type: 'POST',

@@ -170,7 +170,7 @@ namespace CETRA.Controllers
                         p.Id = Guid.NewGuid().ToString();
                         p.AccountNumber = p.AccountNumber == null ? string.Empty : p.AccountNumber;
 
-                        if(p.Debit1Credit0 == null || p.PostingCode == null || !ConfigurationManager.AppSettings["PostingCodes"].Contains(p.PostingCode) || p.BranchCode == null || p.Narration == null)
+                        if(p.Debit1Credit0 == null || p.PostingCode == null || !ConfigurationManager.AppSettings["PostingCodes"].Contains(p.PostingCode) || p.BranchCode == null )
                             throw new HttpException(400, "Incomplete contents in the file");
                     }
                     return Json(new { code = "00", uploadData = PData, accounts = bankAccounts }, JsonRequestBehavior.AllowGet);

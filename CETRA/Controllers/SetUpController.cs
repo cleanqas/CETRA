@@ -142,7 +142,7 @@ namespace CETRA.Controllers
                     if (!string.IsNullOrEmpty(row))
                     {
                         var split = row.Split(',');
-                        var account = new IdentityAccountNumber(split[0], split[1]);
+                        var account = new IdentityAccountNumber(split[0], split[1], split[2]);
                         var result = await AccountNumberManager.CreateAsync(account);
                     }
                 }
@@ -163,7 +163,7 @@ namespace CETRA.Controllers
         {
             if (ModelState.IsValid)
             {
-                var account = new IdentityAccountNumber(model.AccountNumber, model.AccountName);
+                var account = new IdentityAccountNumber(model.AccountNumber, model.AccountName, model.AccountBranch);
                 var result = await AccountNumberManager.CreateAsync(account);
                 if (result)
                 {
