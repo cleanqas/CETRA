@@ -135,15 +135,14 @@
                     v.AccountNumber = acctNumber;
                 }
             });
-            $.each(accountNumbers, function (i, v) {
+            var acn = "";
+            $.each(accountNumbers, function (i, v) {                
                 if (v.AccountNumber == acctNumber) {
-                    $('#acctName_' + uploadDataId).val(v.AccountName);
-                   
-                } else {
-                    $('#acctName_' + uploadDataId).val('');
-                }
-                console.log(paymentData);
+                    acn = v.AccountName;
+                    return false;
+                }    
             });
+            $('#acctName_' + uploadDataId).text(acn);
         };
 
         var openModal = function (uploadId, bankId, bankName) {
@@ -211,7 +210,7 @@
                          },
                         {
                             render: function (data, type, full, meta) {
-                                return '<input type="text" placeholder="Account Name" class="form-control" value="' + full.AccountName + '" name="acctName_' + full.Id + '" id="acctName_' + full.Id + '"/>'
+                                return '<div name="acctName_' + full.Id + '" id="acctName_' + full.Id + '">' + full.AccountName + '</div>'
                             }
                         }
                     ]
@@ -227,7 +226,7 @@
             var updates = [];
 
             $.each(paymentData, function (i, v) {
-                if (v.AccountNumber != null && v.Narration != null) {
+                if (v.AccountNumber != null && v.AccountNumber != "" && v.Narration != null && v.Narration != "" && v.AccountName != null && v.AccountName != "") {
                     updates.push({ UploadDataId: v.Id, AccountNumber: v.AccountNumber, UploadId: v.UploadId, Narration: v.Narration });
                 } else {
                     return false;
@@ -236,10 +235,13 @@
             });
 
             if (paymentData.length != updates.length) {
-                alert("Please fill in all the records. Do not leave any account number or narration blank");
+                alert("Please fill in all the records. Do not leave any account number or narration blank. Incase of blanck account name, contact adminstrator to register account number");
+                $('#updateUploadData').button('reset');
                 return false;
             };
 
+            console.log(paymentData)
+            console.log(updates)
             $.ajax({
                 type: 'POST',
                 url: '/BranchOperator/UpdateUploadData',

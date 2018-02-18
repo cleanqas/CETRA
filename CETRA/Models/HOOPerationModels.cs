@@ -27,6 +27,7 @@ namespace CETRA.Models
         public string PostingCode { get; set; }
         public decimal Amount { get; set; }
         public string AccountName { get; set; }
+        public string UploadId { get; set; }
     }
 
     public class UploadDataModel

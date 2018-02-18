@@ -106,9 +106,9 @@ namespace CETRA.Controllers
         //POST: /BranchOperator/GetUploadData
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<JsonResult> GetUploadData(string UploadId)
+        public async Task<JsonResult> GetUploadData(string uploadId)
         {
-            var uploadData = await new UploadDataStore<UploadDataEntity>(new ApplicationDbContext()).FindUploadDataAsync(UploadId);
+            var uploadData = await new UploadDataStore<UploadDataEntity>(new ApplicationDbContext()).FindUploadDataAsync(uploadId);
 
             var bankAccounts = await new AccountNumberStore<IdentityAccountNumber>(new ApplicationDbContext()).GetAllAccountNumbers();
             List<PDataModel> PData = new List<PDataModel>();
@@ -119,14 +119,15 @@ namespace CETRA.Controllers
                 Debit1Credit0 = k.Debit1Credit0,
                 Narration = k.Narration,
                 PostingCode = k.PostingCode,
-                Id = k.Id
+                Id = k.Id,
+                UploadId = uploadId
             }));
 
             foreach (var p in PData)
             {
                 var pAcct = bankAccounts.Find(k => k.AccountNumber == p.AccountNumber);
                 p.AccountName = pAcct == null ? string.Empty : pAcct.AccountName;
-                p.AccountNumber = p.AccountNumber == null ? string.Empty : p.AccountNumber; 
+                p.AccountNumber = p.AccountNumber == null ? string.Empty : p.AccountNumber;
             }
 
             return Json(PData, JsonRequestBehavior.AllowGet);

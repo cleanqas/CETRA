@@ -214,16 +214,14 @@
                     v.AccountNumber = acctNumber;
                 }
             });
-
+            var acn = "";
             $.each(accounts, function (i, v) {
                 if (v.AccountNumber == acctNumber) {
-                    console.log("matched")
-                    $('#acctName_' + uploadDataId).val(v.AccountName);
-                } else {
-                    $('#acctName_' + uploadDataId).val('');
+                    acn = v.AccountName;
+                    return false;
                 }
-                console.log(uploadPaymentData);
             });
+            $('#acctName_' + uploadDataId).text(acn);
         };
 
         var completeUploadModal = function (bankId, branchId, bankName, branchName) {
@@ -271,7 +269,7 @@
                          },
                         {
                             render: function (data, type, full, meta) {
-                                return '<input type="text" placeholder="Account Name" class="form-control" value="' + full.AccountName + '" name="acctName_' + full.Id + '" id="acctName_' + full.Id + '"/>'
+                                return '<div name="acctName_' + full.Id + '" id="acctName_' + full.Id + '">"' + full.AccountName + '"</div>'
                             }
                         }
                 ]

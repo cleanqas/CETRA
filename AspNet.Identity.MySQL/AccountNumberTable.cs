@@ -96,7 +96,7 @@ namespace AspNet.Identity.MySQL
         /// <returns>Bank name</returns>
         public List<IdentityAccountNumber> GetAllAccount()
         {
-            string commandText = "Select Id, AccountNumber, AccountName from accountnumbers";
+            string commandText = "Select Id, AccountNumber, AccountName, AccountBranch from accountnumbers";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             List<IdentityAccountNumber> accounts = new List<IdentityAccountNumber>();
             var result = _database.Query(commandText, parameters);
@@ -120,7 +120,7 @@ namespace AspNet.Identity.MySQL
         /// <returns>Bank name</returns>
         public List<IdentityAccountNumber> GetBankAccounts(string bankId)
         {
-            string commandText = "Select Id, AccountNumber, AccountName from accountnumbers where BankId = @bankId";
+            string commandText = "Select Id, AccountNumber, AccountName, AccountBranch from accountnumbers where BankId = @bankId";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@bankId", bankId);
 
