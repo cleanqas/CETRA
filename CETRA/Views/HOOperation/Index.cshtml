@@ -68,7 +68,7 @@
                     <form enctype="multipart/form-data" id="uploadForm">
                         <div class="form-group">
                             <label for="paymentfile" class="control-label">Payment File:</label>
-                            <input type="file" name="paymentfile" id="paymentfile" placeholder="Payment File" required class="form-control" accept="csv,xlsx,xls" />
+                            <input type="file" name="paymentfile" id="paymentfile" placeholder="Payment File" required class="form-control" accept="csv" />
                         </div>
                         <div class="form-group">
                             <label for="bank_upload" class="control-label">Bank:</label>
@@ -196,6 +196,14 @@
             });
         });
 
+        var updateNarration = function (narration, uploadDataId) {
+            $.each(uploadPaymentData.uploadData, function (i, v) {
+                if (v.Id == uploadDataId) {
+                    v.Narration = narration;
+                }
+            });
+        }
+
         var searchAccount = function (acctNumber, uploadDataId) {
 
             console.log(accounts)
@@ -256,7 +264,11 @@
                             }
                         },
                          { data: "PostingCode" },
-                         { data: "Narration" },
+                         {
+                             render: function (data, type, full, meta) {
+                                 return '<input type="text" placeholder="Narration" class="form-control" value="' + full.Narration + '" name="narration_' + full.Id + '" id="narration_' + full.Id + '" onChange="updateNarration(this.value, \'' + full.Id + '\')"/>'
+                             }
+                         },
                         {
                             render: function (data, type, full, meta) {
                                 return '<input type="text" placeholder="Account Name" class="form-control" value="' + full.AccountName + '" name="acctName_' + full.Id + '" id="acctName_' + full.Id + '"/>'

@@ -118,6 +118,8 @@ namespace CETRA.Controllers
                         UploadManager.Delete(upload);
                         throw new HttpException(400, "Upload failed");
                     }
+                    var branchDetail = await Helper.GetBranchNameAndCode(upload.BranchId);
+                    new EmailSender().SendToBranchOperator(branchDetail["BranchCode"]);
                     return Json(new { code = "00", message = "Successful" }, JsonRequestBehavior.AllowGet);
                 }
                 else

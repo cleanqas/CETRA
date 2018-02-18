@@ -3,6 +3,7 @@ using CETRA.Models;
 using Microsoft.AspNet.Identity;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -60,7 +61,7 @@ namespace CETRA.Controllers
 
                 if(userexist != null && userexist.Result != null && userexist.Result.Id != null) return Json(new { code = "02", message = userexist }, JsonRequestBehavior.AllowGet);
 
-                var user = new ApplicationUser() { UserName = model.UserName };
+                var user = new ApplicationUser() { UserName = model.UserName, Email = model.Email, EmailConfirmed = true };
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
@@ -124,6 +125,37 @@ namespace CETRA.Controllers
         }
 
         //
+        // POST: /SetUp/BulkRegisterAccount
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<JsonResult> BulkRegisterAccount(BulkAccountUploadModel model)
+        {
+            string filepath = saveUploadedFile(model.AccountFile);
+            try
+            {
+                //Read the contents of CSV file.
+                string csvData = System.IO.File.ReadAllText(filepath);
+
+                //Execute a loop over the rows.
+                foreach (string row in csvData.Split('\n'))
+                {                    
+                    if (!string.IsNullOrEmpty(row))
+                    {
+                        var split = row.Split(',');
+                        var account = new IdentityAccountNumber(split[0], split[1]);
+                        var result = await AccountNumberManager.CreateAsync(account);
+                    }
+                }
+                return Json(new { code = "00", message = "Sucessfull" }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                //TODO: implement log
+                throw new Exception("Inavlid File Uploaded");
+            }
+        }
+
+        //
         // POST: /SetUp/RegisterNewAccount
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -163,6 +195,24 @@ namespace CETRA.Controllers
         {
             var banks = await new BankStore<IdentityBank>(new ApplicationDbContext()).GetAllBanksAsync();
             return Json(banks, JsonRequestBehavior.AllowGet);
+        }
+
+        private string saveUploadedFile(HttpPostedFileBase postedFile)
+        {
+            string filepath = string.Empty;
+            if (postedFile != null)
+            {
+                string path = Server.MapPath("~/Uploads/");
+                if (!Directory.Exists(path))
+                {
+                    Directory.CreateDirectory(path);
+                }
+
+                filepath = path + Path.GetFileName(postedFile.FileName);
+                string extension = Path.GetExtension(postedFile.FileName);
+                postedFile.SaveAs(filepath);
+            }
+            return filepath;
         }
     }
 }

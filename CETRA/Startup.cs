@@ -35,6 +35,7 @@ namespace CETRA
                 roleManager.Create(role);
                 
                 user.UserName = "administrator";
+                user.Email = "qasim.okuneye@gmail.com";
                 
                 string userPWD = "password77$";
 

@@ -58,6 +58,10 @@
                                 <input type="text" name="username" id="username" placeholder="User Name" autofocus required class="form-control" />
                             </div>
                             <div class="form-group">
+                                <label for="useremail" class="control-label">User Email:</label>
+                                <input type="email" name="useremail" id="useremail" placeholder="User Email" required class="form-control" />
+                            </div>
+                            <div class="form-group">
                                 <label for="password" class="control-label">Password:</label>
                                 <input type="password" name="password" id="password" placeholder="Password" autocomplete="off" required class="form-control" />
                             </div>
@@ -132,7 +136,7 @@
                         <h3 class="modal-title" id="ManageAccountLabel">Add Customer Accounts</h3>
                     </div>
                     <div class="modal-body">
-                        <form>
+                        <form id="frmManageAccount">
                             <div class="form-group">
                                 <label for="accountnumber" class="control-label">Account Number:</label>
                                 <input type="text" name="accountnumber" id="accountnumber" placeholder="Account Number" autofocus autocomplete="off" required class="form-control" />
@@ -148,6 +152,14 @@
                         </form>
                     </div>
                     <div class="modal-footer">
+                        <div class="row">
+                            <div class="col-md-7">
+                                <input type="file" id="accountfile" name="accountfile" placeholder="Account File" accept="csv" />
+                            </div>
+                            <div class="col-md-5">
+                                <button class="btn btn-primary" type="button" id="bulkRegisterAccounts" data-loading-text="<i class='fa fa-spinner fa-spin '></i> Registering New Accounts">Upload Account File </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -164,7 +176,7 @@
                         <h3 class="modal-title" id="ManageBranchLabel">Add Branch</h3>
                     </div>
                     <div class="modal-body">
-                        <form>
+                        <form id="frmManageBranch">
                             <div class="form-group">
                                 <label for="branchcode" class="control-label">Branch Code</label>
                                 <input type="text" name="branchcode" id="branchcode" placeholder="Branch Code" required class="form-control" />
@@ -219,6 +231,7 @@
             var _data = {
                 __RequestVerificationToken: helpers.getAntiForgeryToken(),
                 UserName: $('#username').val(),
+                Email: $('#useremail').val(),
                 Role: $('#role').val(),
                 Branch: $('#branch_user').val(),
                 Password: $('#password').val(),
@@ -264,6 +277,44 @@
                 },
                 complete: function () {
                     $('#registerNewBank').button('reset');
+                }
+            });
+        });
+
+        $('#bulkRegisterAccounts').click(function (e) {
+            $(this).button('loading');
+
+            console.log($('#accountfile'));
+
+            var _data = new FormData();
+            _data.append("__RequestVerificationToken", helpers.getAntiForgeryToken());
+            _data.append("AccountFile", $('#accountfile')[0].files[0])
+
+            
+            $.ajax({
+                type: 'POST',
+                xhr: function () {
+                    var uXhr = $.ajaxSettings.xhr();
+                    if (uXhr.upload) {
+                        console.log(uXhr);
+                    }
+                    return uXhr;
+                },
+                data: _data,
+                contentType: false,
+                processData: false,
+                url: '/SetUp/BulkRegisterAccount',
+                success: function (data) {
+                    console.log(data);
+                    $('#manageAccount').modal('hide');
+                    $('#confirmationModal').modal();
+                    $('#notification').text('Accounts Registered Succesfully');
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    alert('Error Occured, Check Data Input');
+                },
+                complete: function (data) {
+                    $('#bulkRegisterAccounts').button('reset');
                 }
             });
         });

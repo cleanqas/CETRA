@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Web;
 
 namespace CETRA.Models
 {
@@ -31,5 +32,10 @@ namespace CETRA.Models
         public string AccountNumber { get; set; }
         [Required]
         public string AccountName { get; set; }
+    }
+
+    public class BulkAccountUploadModel
+    {
+        public HttpPostedFileBase AccountFile { get; set; }
     }
 }

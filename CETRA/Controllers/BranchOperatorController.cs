@@ -87,10 +87,16 @@ namespace CETRA.Controllers
                 {
                     var uploaddata = new UploadDataEntity(data.UploadDataId);
                     uploaddata.AccountNumber = data.AccountNumber;
+                    uploaddata.Narration = data.Narration;
                     var updatedata = await new UploadDataStore<UploadDataEntity>(new ApplicationDbContext()).UpdateUploadsDataAsync(uploaddata);
                 }
                 UploadManager.UpdateUploadStatus(model[0].UploadId, 1);
                 UploadManager.UpdateUploadOperator(model[0].UploadId, User.Identity.GetUserId());
+
+                var upload = await new UploadStore<UploadEntity>(new ApplicationDbContext()).FindUploadAsync(model[0].UploadId);
+                var branchDetail = await Helper.GetBranchNameAndCode(upload.BranchId);
+                new EmailSender().SendToBranchVerifier(branchDetail["BranchCode"]);
+
                 return Json(new { code = "00", message = "Successful" }, JsonRequestBehavior.AllowGet);
 
             }

@@ -119,6 +119,14 @@
             return bank_name;
         }
 
+        var updateNarration = function (narration, uploadDataId) {
+            $.each(paymentData, function (i, v) {
+                if (v.Id == uploadDataId) {
+                    v.Narration = narration;
+                }
+            });
+        }
+
         var searchAccount = function (acctNumber, uploadDataId) {
 
             console.log(accountNumbers)
@@ -196,7 +204,11 @@
                             }
                         },
                          { data: "PostingCode" },
-                         { data: "Narration" },
+                         {
+                             render: function (data, type, full, meta) {
+                                 return '<input type="text" placeholder="Narration" class="form-control" value="' + full.Narration + '" name="narration_' + full.Id + '" id="narration_' + full.Id + '" onChange="updateNarration(this.value, \'' + full.Id + '\')"/>'
+                             }
+                         },
                         {
                             render: function (data, type, full, meta) {
                                 return '<input type="text" placeholder="Account Name" class="form-control" value="' + full.AccountName + '" name="acctName_' + full.Id + '" id="acctName_' + full.Id + '"/>'
@@ -216,7 +228,7 @@
 
             $.each(paymentData, function (i, v) {
                 if (v.AccountNumber != null)
-                    updates.push({ UploadDataId: v.Id, AccountNumber: v.AccountNumber, UploadId: v.UploadId });
+                    updates.push({ UploadDataId: v.Id, AccountNumber: v.AccountNumber, UploadId: v.UploadId, Narration: v.Narration });
             });
 
             

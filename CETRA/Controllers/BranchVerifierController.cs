@@ -3,6 +3,7 @@ using CETRA.Models;
 using Microsoft.AspNet.Identity;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
@@ -85,6 +86,11 @@ namespace CETRA.Controllers
             var uploadStore = new UploadStore<UploadEntity>(new ApplicationDbContext());
             await uploadStore.UpdateUploadStatus(UploadId, 2);
             await uploadStore.UpdateUploadVerifier(UploadId, User.Identity.GetUserId());
+
+            var upload = await new UploadStore<UploadEntity>(new ApplicationDbContext()).FindUploadAsync(UploadId);
+            var branchDetail = await Helper.GetBranchNameAndCode(upload.BranchId);
+            new EmailSender().SendToHOOperator(branchDetail["BranchCode"], ConfigurationManager.AppSettings["BranchVerifierActionApprove"]);
+
             return Json(new { code = "00", message = "Successful" }, JsonRequestBehavior.AllowGet);
         }
 
@@ -99,6 +105,11 @@ namespace CETRA.Controllers
                 await uploadStore.UpdateUploadStatus(model.UploadId, -1);
                 await uploadStore.UpdateUploadVerifier(model.UploadId, User.Identity.GetUserId());
                 await uploadStore.UpdateUploadRejectReason(model.UploadId, model.RejectReason);
+
+                var upload = await new UploadStore<UploadEntity>(new ApplicationDbContext()).FindUploadAsync(model.UploadId);
+                var branchDetail = await Helper.GetBranchNameAndCode(upload.BranchId);
+                new EmailSender().SendToHOOperator(branchDetail["BranchCode"], ConfigurationManager.AppSettings["BranchVerifierActionReject"]);
+
                 return Json(new { code = "00", message = "Successful" }, JsonRequestBehavior.AllowGet);
             }
             throw new HttpException(400, "Invalid Data Submitted");

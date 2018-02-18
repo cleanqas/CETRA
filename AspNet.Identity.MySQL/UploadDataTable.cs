@@ -73,7 +73,7 @@ namespace AspNet.Identity.MySQL
                     Id = res["Id"],
                     AccountNumber = res["AccountNumber"],
                     Amount = Convert.ToDecimal(res["Amount"]),
-                    Narration = res["Amount"],
+                    Narration = res["Narration"],
                     UploadId = res["UploadId"],
                     PostingCode = res["PostingCode"],
                     Debit1Credit0 = Convert.ToBoolean(res["DebitOrCredit"])
@@ -122,10 +122,11 @@ namespace AspNet.Identity.MySQL
         /// 
         public bool UpdateUploadsData(UploadDataEntity uploadData)
         {
-            string commandText = "Update uploadsdata set AccountNumber = @accountNo where Id = @Id ";
+            string commandText = "Update uploadsdata set AccountNumber = @accountNo, Narration = @narration where Id = @Id ";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@Id", uploadData.Id);
             parameters.Add("@accountNo", uploadData.AccountNumber);
+            parameters.Add("@narration", uploadData.Narration);
 
             return _database.Execute(commandText, parameters) > 0;
         }
