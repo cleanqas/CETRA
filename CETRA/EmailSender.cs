@@ -51,21 +51,21 @@ namespace CETRA
 
         public bool SendToBranchOperator(string branchCode)
         {
-            string toAddress = string.Format("{0}_{1}@{2}", ConfigurationManager.AppSettings["branchOperatorEmailPrefix"], branchCode, ConfigurationManager.AppSettings["emailDomail"]);
+            string toAddress = string.Format("{0}_{1}@{2}", ConfigurationManager.AppSettings["branchOperatorEmailPrefix"], branchCode, ConfigurationManager.AppSettings["emailDomain"]);
             string messageBody = ConfigurationManager.AppSettings["BranchOperatorMessage"];
             return SendEmail(toAddress, messageBody);
         }
 
         public bool SendToBranchVerifier(string branchCode)
         {
-            string toAddress = string.Format("{0}_{1}@{2}", ConfigurationManager.AppSettings["branchVerifierEmailPrefix"], branchCode, ConfigurationManager.AppSettings["emailDomail"]);
+            string toAddress = string.Format("{0}_{1}@{2}", ConfigurationManager.AppSettings["branchVerifierEmailPrefix"], branchCode, ConfigurationManager.AppSettings["emailDomain"]);
             string messageBody = ConfigurationManager.AppSettings["BranchVerifierMessage"];
             return SendEmail(toAddress, messageBody);
         }
 
         public bool SendToHOOperator(string branchCode, string action)
         {
-            string toAddress = string.Format("{0}@{1}", ConfigurationManager.AppSettings["hoOperatorEmailPrefix"], ConfigurationManager.AppSettings["emailDomail"]);
+            string toAddress = string.Format("{0}@{1}", ConfigurationManager.AppSettings["hoOperatorEmailPrefix"], ConfigurationManager.AppSettings["emailDomain"]);
             string messageBody = string.Format(ConfigurationManager.AppSettings["HOOperatorMessage"], branchCode);
             return SendEmail(toAddress, messageBody, action);
         }

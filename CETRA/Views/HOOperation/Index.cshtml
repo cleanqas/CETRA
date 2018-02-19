@@ -209,7 +209,7 @@
             console.log(accounts)
             console.log(acctNumber)
 
-            $.each(uploadPaymentData.uploadData, function (i, v) {
+            $.each(accounts, function (i, v) {
                 if (v.Id == uploadDataId) {
                     v.AccountNumber = acctNumber;
                 }
@@ -269,7 +269,7 @@
                          },
                         {
                             render: function (data, type, full, meta) {
-                                return '<div name="acctName_' + full.Id + '" id="acctName_' + full.Id + '">"' + full.AccountName + '"</div>'
+                                return '<div name="acctName_' + full.Id + '" id="acctName_' + full.Id + '">' + full.AccountName + '</div>'
                             }
                         }
                 ]

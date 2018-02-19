@@ -49,7 +49,7 @@ namespace AspNet.Identity.MySQL
 
             if (uploaddetail != null)
             {
-                upload = new UploadEntity(uploadId, uploaddetail["UploaderId"], uploaddetail["BankId"], uploaddetail["BranchId"], Convert.ToInt32(uploaddetail["status"]));
+                upload = new UploadEntity(uploadId, uploaddetail["UploaderId"], uploaddetail["BankId"], uploaddetail["BranchId"], Convert.ToInt32(uploaddetail["Status"]));
             }
 
             return upload;
