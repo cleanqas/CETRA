@@ -11,6 +11,7 @@ using System.Web.Mvc;
 
 namespace CETRA.Controllers
 {
+    [ClientErrorHandler]
     public class BranchVerifierController : Controller
     {
         public UploadManager<UploadEntity> UploadManager;
@@ -112,7 +113,7 @@ namespace CETRA.Controllers
 
                 return Json(new { code = "00", message = "Successful" }, JsonRequestBehavior.AllowGet);
             }
-            throw new HttpException(400, "Invalid Data Submitted");
+            throw new Exception( "Invalid Data Submitted");
         }
     }
 }

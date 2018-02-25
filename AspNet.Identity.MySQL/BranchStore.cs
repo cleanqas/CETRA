@@ -52,6 +52,16 @@ namespace AspNet.Identity.MySQL
             return Task.FromResult<bool>(branchTable.BranchExists(branchName));
         }
 
+        public Task<bool> BranchCodeExists(string branchCode)
+        {
+            if (branchCode == null)
+            {
+                throw new ArgumentNullException("branch");
+            }
+
+            return Task.FromResult<bool>(branchTable.BranchCodeExists(branchCode));
+        }
+
         public Task CreateAsync(TBranch branch)
         {
             if (branch == null)

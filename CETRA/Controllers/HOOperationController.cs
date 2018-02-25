@@ -15,6 +15,7 @@ using System.Web.Mvc;
 
 namespace CETRA.Controllers
 {
+    [ClientErrorHandler]
     public class HOOperationController : Controller
     {
         public UploadManager<UploadEntity> UploadManager;
@@ -99,7 +100,7 @@ namespace CETRA.Controllers
                 }
                 catch (Exception ex)
                 {
-                    throw new HttpException(400, ex.Message);
+                    throw new Exception( ex.Message);
                 }
                 if (result)
                 {
@@ -116,7 +117,7 @@ namespace CETRA.Controllers
                         //TODO: implement log
                         UploadDataManager.Delete(upload.Id);
                         UploadManager.Delete(upload);
-                        throw new HttpException(400, "Upload failed");
+                        throw new Exception( "Upload failed");
                     }
                     var branchDetail = await Helper.GetBranchNameAndCode(upload.BranchId);
                     new EmailSender().SendToBranchOperator(branchDetail["BranchCode"]);
@@ -124,11 +125,11 @@ namespace CETRA.Controllers
                 }
                 else
                 {
-                    throw new HttpException(400, "Upload creation failed");
+                    throw new Exception( "Upload creation failed");
                 }
 
             }
-            throw new HttpException(400, "Invalid Data Submitted");
+            throw new Exception( "Invalid Data Submitted");
         }
 
         //
@@ -158,7 +159,7 @@ namespace CETRA.Controllers
                             PData = getPaymentDataFromXls(savedfilepath);
                             break;
                         default:
-                            throw new HttpException(400, "Unknow file type uploaded");
+                            throw new Exception( "Unknow file type uploaded");
                     }
 
                     var bankAccounts = await new AccountNumberStore<IdentityAccountNumber>(new ApplicationDbContext()).GetAllAccountNumbers();
@@ -171,16 +172,16 @@ namespace CETRA.Controllers
                         p.AccountNumber = p.AccountNumber == null ? string.Empty : p.AccountNumber;
 
                         if(p.Debit1Credit0 == null || p.PostingCode == null || !ConfigurationManager.AppSettings["PostingCodes"].Contains(p.PostingCode) )
-                            throw new HttpException(400, "Incomplete contents in the file");
+                            throw new Exception( "Incomplete contents in the file");
                     }
                     return Json(new { code = "00", uploadData = PData, accounts = bankAccounts }, JsonRequestBehavior.AllowGet);
                 }
                 catch (Exception ex)
                 {
-                    throw new HttpException(400, ex.Message);
+                    throw new Exception( ex.Message);
                 }
             }
-            throw new HttpException(400, "Invalid Data Submitted");
+            throw new Exception( "Invalid Data Submitted");
         }
 
         private List<PDataModel> getPaymentDataFromXls(string filepath)

@@ -165,10 +165,12 @@
         var uploadPaymentData = {};
         var banks = {};
         var accounts = {};
+        var branches = {};
 
         $(function () {
             helpers.getData("/SetUp/GetAllBranches", function (data) {
                 helpers.buildDropdown(data, $('#branch_upload'), 'Select Branch', 'BranchCode');
+                branches = data;
             });
 
             helpers.getData("/SetUp/GetAllBanks", function (data) {
@@ -200,8 +202,22 @@
             $.each(uploadPaymentData.uploadData, function (i, v) {
                 if (v.Id == uploadDataId) {
                     v.Narration = narration;
+                    return false;
                 }
             });
+        }
+
+        var searchBranchName = function (branchCode) {
+            console.log(branches);
+            console.log(branchCode);
+            var branchName = "";
+            $.each(branches, function (i, v) {
+                if (v.BranchCode == branchCode) {
+                    branchName = v.Name;
+                    return false;
+                }
+            });
+            return branchName;
         }
 
         var searchAccount = function (acctNumber, uploadDataId) {
@@ -212,6 +228,7 @@
             $.each(accounts, function (i, v) {
                 if (v.Id == uploadDataId) {
                     v.AccountNumber = acctNumber;
+                    return false;
                 }
             });
             var acn = "";
@@ -224,11 +241,11 @@
             $('#acctName_' + uploadDataId).text(acn);
         };
 
-        var completeUploadModal = function (bankId, branchId, bankName, branchName) {
+        var completeUploadModal = function (bankId, branchId, bankName, branchCode) {
 
             accounts = uploadPaymentData.accounts;
 
-            $('#ConfirmUploadDataLabel').text("Complete Upload for Branch: " + branchName + " in Bank: " + bankName);
+            $('#ConfirmUploadDataLabel').text("Complete Upload for Branch: " + searchBranchName(branchCode) + " in Bank: " + bankName);
 
             $("#ConfirmUploadDataTable").dataTable().fnDestroy();
             $("#ConfirmUploadDataTable").dataTable({
@@ -300,7 +317,7 @@
                     $('#notification').text('Upload Submitted Successfully');
                 },
                 error: function (xhr, textStatus, errorThrown) {
-                    alert('Error Occured, Check Data Input');
+                    alert('Error Occured, ' + xhr.responseText);
                 },
                 complete: function (data) {
                     $('#confirmUploadData').button('reset');
@@ -381,7 +398,7 @@
                     $('#notification').text('Upload Marked As Processed');
                 },
                 error: function (xhr, textStatus, errorThrown) {
-                    alert('Error Occured, Check Data Input');
+                    alert('Error Occured, ' + xhr.responseText);
                 },
                 complete: function (data) {
                     $('#markAsProcesed').button('reset');
@@ -422,7 +439,7 @@
                     //$('#notification').text('File Upload Succesfully');
                 },
                 error: function (xhr, textStatus, errorThrown) {
-                    alert('Error Occured, Check Data Input');
+                    alert('Error Occured, ' + xhr.responseText);
                 },
                 complete: function (data) {
                     $('#uploadNewFile').button('reset');

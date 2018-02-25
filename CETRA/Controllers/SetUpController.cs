@@ -12,6 +12,7 @@ using System.Web.Mvc;
 
 namespace CETRA.Controllers
 {
+    [ClientErrorHandler]
     public class SetUpController : Controller
     {
 
@@ -73,11 +74,11 @@ namespace CETRA.Controllers
                 }
                 else
                 {
-                    throw new HttpException(400, "Cannot Create User");
+                    throw new Exception("Cannot Create User");
                 }
             }
 
-            throw new HttpException(400, "Invalid Data");
+            throw new Exception("Invalid Data");
         }
 
         //
@@ -88,6 +89,12 @@ namespace CETRA.Controllers
         {
             if (ModelState.IsValid)
             {
+                var branchExist = BranchManager.BranchExists(model.BranchName);
+                if (branchExist) throw new Exception("Branch already exist");
+
+                var branchCodeExist = BranchManager.BranchExists(model.BranchCode);
+                if (branchCodeExist) throw new Exception("Branch Code already exist"); 
+
                 var branch = new IdentityBranch(model.BranchName, model.GLAccount, model.BranchCode);
                 var result = await BranchManager.CreateAsync(branch);
                 if (result)
@@ -96,10 +103,10 @@ namespace CETRA.Controllers
                 }
                 else
                 {
-                    throw new HttpException(400, "Branch creation failed");
+                    throw new Exception("Branch creation failed");
                 }
             }
-            throw new HttpException(400, "Invalid Data Submitted");
+            throw new Exception("Invalid Data Submitted");
         }
 
         //
@@ -118,10 +125,10 @@ namespace CETRA.Controllers
                 }
                 else
                 {
-                    throw new HttpException(400, "Bank creation failed");
+                    throw new Exception("Bank creation failed");
                 }
             }
-            throw new HttpException(400, "Invalid Data Submitted");
+            throw new Exception("Invalid Data Submitted");
         }
 
         //
@@ -171,10 +178,10 @@ namespace CETRA.Controllers
                 }
                 else
                 {
-                    throw new HttpException(400, "New Account creation failed");
+                    throw new Exception("New Account creation failed");
                 }
             }
-            throw new HttpException(400, "Invalid Data Submitted");
+            throw new Exception("Invalid Data Submitted");
         }
 
         //

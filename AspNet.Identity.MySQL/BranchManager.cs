@@ -20,6 +20,11 @@ namespace AspNet.Identity.MySQL
             return AsyncHelper.RunSync<bool>(() => _store.BranchExists(branchName));
         }
 
+        public bool BranchCodeExists(string branchCode)
+        {
+            return AsyncHelper.RunSync<bool>(() => _store.BranchExists(branchCode));
+        }
+
         public void Create(TBranch branch)
         {
             AsyncHelper.RunSync(() => _store.CreateAsync(branch));

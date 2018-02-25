@@ -256,7 +256,7 @@
                     $('#notification').text('New User Registered');
                 },
                 error: function (xhr, textStatus, errorThrown) {
-                    alert('Error Occured, Check Data Input');
+                    alert('Error Occured, ' + xhr.responseText);
                 },
                 complete: function () {
                     $('#registerNewUser').button('reset');
@@ -279,7 +279,7 @@
                     $('#notification').text('New Bank Registered');
                 },
                 error: function (xhr, textStatus, errorThrown) {
-                    alert('Error Occured, Check Data Input');                    
+                    alert('Error Occured, ' + xhr.responseText);
                 },
                 complete: function () {
                     $('#registerNewBank').button('reset');
@@ -317,7 +317,7 @@
                     $('#notification').text('Accounts Registered Succesfully');
                 },
                 error: function (xhr, textStatus, errorThrown) {
-                    alert('Error Occured, Check Data Input');
+                    alert('Error Occured, ' + xhr.responseText);
                 },
                 complete: function (data) {
                     $('#bulkRegisterAccounts').button('reset');
@@ -346,7 +346,7 @@
                     $('#notification').text('New Customer Account Registered');
                 },
                 error: function (xhr, textStatus, errorThrown) {
-                    alert('Error Occured, Check Data Input');
+                    alert('Error Occured, ' + xhr.responseText);
                 },
                 complete: function () {
                     $('#registerNewAccount').button('reset');
@@ -375,7 +375,7 @@
                     $('#notification').text('New Branch Registered');
                 },
                 error: function (xhr, textStatus, errorThrown) {
-                    alert('Error Occured, Check Data Input');
+                    alert('Error Occured, ' + xhr.responseText);
                 },
                 complete: function () {
                     $('#registerNewBranch').button('reset');

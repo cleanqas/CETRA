@@ -202,7 +202,7 @@
                     $('#notification').text('Payment Data Approved');
                 },
                 error: function (xhr, textStatus, errorThrown) {
-                    alert('Error Occured, Check Data Input');
+                    alert('Error Occured, ' + xhr.responseText);
                 }
             })
         });
@@ -212,7 +212,7 @@
             $("#rejectReasonDiv").show();
         });
 
-        $("submitReject").click(function (e) {
+        $("#submitReject").click(function (e) {
             $(this).button('loading');
             var _data = {
                 __RequestVerificationToken: helpers.getAntiForgeryToken(),
@@ -232,7 +232,7 @@
                     $('#notification').text('Payment Data Rejected');
                 },
                 error: function (xhr, textStatus, errorThrown) {
-                    alert('Error Occured, Check Data Input');
+                    alert('Error Occured, ' + xhr.responseText);
                 }
             })
         });

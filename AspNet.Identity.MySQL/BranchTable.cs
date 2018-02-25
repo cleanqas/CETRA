@@ -26,9 +26,18 @@ namespace AspNet.Identity.MySQL
         /// <returns></returns>
         public bool BranchExists(string branchName)
         {
-            string commandText = "Select count(*) as count from branches where BranchName = @name";
+            string commandText = "Select count(*) as count from branches where LOWER(BranchName) = @name";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
-            parameters.Add("@name", branchName);
+            parameters.Add("@name", branchName == null ? "" : branchName.ToLower());
+            Int64 exst = (Int64)_database.QueryValue(commandText, parameters);
+            return exst > 0;
+        }
+
+        public bool BranchCodeExists(string branchCode)
+        {
+            string commandText = "Select count(*) as count from branches where LOWER(BranchCode) = @code";
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("@code", branchCode == null ? "" : branchCode.ToLower());
             Int64 exst = (Int64)_database.QueryValue(commandText, parameters);
             return exst > 0;
         }

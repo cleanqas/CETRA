@@ -114,6 +114,7 @@
             $.each(banks, function (i, v) {
                 if (v.Id == bankId) {
                     bank_name = v.BankName;
+                    return false;
                 }
             });
             return bank_name;
@@ -123,6 +124,7 @@
             $.each(paymentData, function (i, v) {
                 if (v.Id == uploadDataId) {
                     v.Narration = narration;
+                    return false;
                 }
             });
         }
@@ -133,6 +135,7 @@
             $.each(paymentData, function (i, v) {
                 if (v.Id == uploadDataId) {
                     v.AccountNumber = acctNumber;
+                    return false;
                 }
             });
             var acn = "";
@@ -228,10 +231,7 @@
             $.each(paymentData, function (i, v) {
                 if (v.AccountNumber != null && v.AccountNumber != "" && v.Narration != null && v.Narration != "" && v.AccountName != null && v.AccountName != "") {
                     updates.push({ UploadDataId: v.Id, AccountNumber: v.AccountNumber, UploadId: v.UploadId, Narration: v.Narration });
-                } else {
-                    return false;
-                }                    
-                
+                }
             });
 
             if (paymentData.length != updates.length) {
@@ -255,7 +255,7 @@
                     $('#notification').text('Payment Data Updated');
                 },
                 error: function (xhr, textStatus, errorThrown) {
-                    alert('Error Occured, Check Data Input');
+                    alert('Error Occured, ' + xhr.responseText);
                 },
                 complete: function (data) {
                     $('#updateUploadData').button('reset');
