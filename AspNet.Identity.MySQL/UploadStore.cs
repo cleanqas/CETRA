@@ -83,6 +83,20 @@ namespace AspNet.Identity.MySQL
             return Task.FromResult<List<TUpload>>(result);
         }
 
+        public Task<List<TUpload>> UnidentifiedUploads()
+        {
+            List<TUpload> result = uploadTable.GetUnidentifiedUploads() as List<TUpload>;
+
+            return Task.FromResult<List<TUpload>>(result);
+        }
+
+        public Task<List<TUpload>> UnidentifiedUploadsByBranchIdAsync(string branchId)
+        {
+            List<TUpload> result = uploadTable.GetUnidentifiedUploadsByBranch(branchId, 1) as List<TUpload>;
+
+            return Task.FromResult<List<TUpload>>(result);
+        }
+
         public Task<List<TUpload>> FindPendingVerificationUploadsByBranchIdAsync(string branchId)
         {
             List<TUpload> result = uploadTable.GetUploadsByBranchAndStatus(branchId, 1) as List<TUpload>;

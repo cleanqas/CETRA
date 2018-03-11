@@ -12,6 +12,7 @@ namespace CETRA.Models
     public class UploadModel
     {
         public string BankId { get; set; }
+        public string GLAccount { get; set; }
         public string BranchId { get; set; }
         public HttpPostedFileBase PaymentFile { get; set; }
         public int Status { get; set; }
@@ -28,6 +29,9 @@ namespace CETRA.Models
         public decimal Amount { get; set; }
         public string AccountName { get; set; }
         public string UploadId { get; set; }
+        public string TranDate { get; set; }
+        public int Status { get; set; }
+        public string TranID { get; set; }
     }
 
     public class UploadDataModel

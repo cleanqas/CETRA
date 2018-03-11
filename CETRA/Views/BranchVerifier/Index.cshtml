@@ -23,28 +23,50 @@
         width: 90%;
     }
 
-    .modal-footer-left{
+    .modal-footer-left {
         text-align: left;
     }
 
-    .wide-input{
-        max-width: 100%
+    .wide-input {
+        max-width: 100%;
     }
 
-    .dataTables_length, .dataTables_filter{
+    .dataTables_length, .dataTables_filter {
         display: none;
     }
-
 </style>
 
 <div class="container container-table">
     <div class="row vertical-center-row">
         <div>
             <div>
-                <input type="hidden" id="uploadOperatorId"/>
+                <input type="hidden" id="uploadOperatorId" />
                 <input type="hidden" id="uploadUploaderId" />
             </div>
-            <table id="UploadsTable" class="display"  style="width: 100%">
+            <table id="UploadsTable" class="display" style="width: 100%">
+                <thead>
+                    <tr>
+                        <th>Upload ID</th>
+                        <th>Date and Time</th>
+                        <th>Bank</th>
+                        <th>Branch</th>
+                        <th>Process</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+        <hr />
+        <h2>Uploads with unidentified payments</h2>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="datefilter" class="control-label">Filter Upload Date:</label>
+                    <input type="text" name="datefilter" id="datefilter" class="form-control wide-input" />
+                </div>
+            </div>
+        </div>
+        <div>
+            <table id="UnidentifiedUploadsTable" class="display" style="width: 100%">
                 <thead>
                     <tr>
                         <th>Upload ID</th>
@@ -69,7 +91,7 @@
                     <h3 class="modal-title" id="UploadDataLabel">Process Upload</h3>
                 </div>
                 <div class="modal-body">
-                    <table id="UploadDataTable" class="display"  style="width: 100%">
+                    <table id="UploadDataTable" class="display" style="width: 100%">
                         <thead>
                             <tr>
                                 <th>Account Number</th>
@@ -78,7 +100,7 @@
                                 <th>Credit</th>
                                 <th>Posting Code</th>
                                 <th>Narration</th>
-                                <th>Bank</th>                                
+                                <th>Bank</th>
                                 <th>Account Name</th>
                             </tr>
                         </thead>
@@ -108,10 +130,44 @@
     </div>
 </div>
 
+@*View and download unidentified payments*@
+<div class="row">
+    <div class="modal fade" id="unidentifieddata" tabindex="-1" role="dialog" aria-labelledby="UnidentifiedDataLabel" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="close"><span aria-hidden="true">&times;</span></button>
+                    <h3 class="modal-title" id="UnidentifiedDataLabel">Unidentified Payments</h3>
+                </div>
+                <div class="modal-body">
+                    <table id="UnidentifiedDataTable" class="display" style="width: 100%">
+                        <thead>
+                            <tr>
+                                <th>Account Number</th>
+                                <th>Branch Code</th>
+                                <th>Debit</th>
+                                <th>Credit</th>
+                                <th>Posting Code</th>
+                                <th>Narration</th>
+                                <th>Bank</th>
+                                <th>Account Name</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                <div class="modal-footer">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section scripts
 {
     <script type="text/javascript">
         var paymentData = {};
+        var unidentifiedPaymentData = {};
 
         $(function () {
 
@@ -121,7 +177,7 @@
 
             console.log("starting")
 
-            $("#UploadsTable").dataTable({
+            $("#UploadsTable").DataTable({
                 columns: [
                     { data: "Id" },
                     { data: "UploadDate" },
@@ -139,6 +195,30 @@
                     data: { __RequestVerificationToken: helpers.getAntiForgeryToken(), branchId: '@ViewBag.UserBranch' }
                 }
             });
+
+            var unitable = $("#UnidentifiedUploadsTable").DataTable({
+                columns: [
+                    { data: "Id" },
+                    { data: "UploadDate" },
+                    { data: "BankName" },
+                    { data: "BranchCode" },
+                    {
+                        render: function (data, type, full, meta) {
+                            return '<a class="btn btn-default" onClick="openUnidentifiedModal(\'' + full.Id + '\', \'' + full.UploaderId + '\', \'' + full.OperatorId + '\')">Process</a>'
+                        }
+                    }
+                ],
+                ajax: {
+                    url: '/BranchVerifier/UnidentifiedBranchUploads',
+                    method: 'POST',
+                    data: { __RequestVerificationToken: helpers.getAntiForgeryToken(), branchId: '@ViewBag.UserBranch' }
+                }
+            });
+
+            $('#datefilter').on('keyup', function () {
+                unitable.column(1).search(this.value).draw();
+            });
+
         });
 
         var openModal = function (uploadId, uploaderId, operatorId) {
@@ -153,8 +233,8 @@
                     paymentData = data;
                 }
             }).done(function () {
-                $("#UploadDataTable").dataTable().fnDestroy();
-                $("#UploadDataTable").dataTable({
+                $("#UploadDataTable").DataTable().clear().destroy();
+                $("#UploadDataTable").DataTable({
                     data: paymentData,
                     columns: [
                         { data: "AccountNumber" },
@@ -166,7 +246,7 @@
                                     return '<p>' + full.Amount + '</p>';
                                 } else {
                                     return '<p></p>';
-                                }                                    
+                                }
                             }
                         },
                         {
@@ -176,17 +256,96 @@
                                     return '<p>' + full.Amount + '</p>';
                                 } else {
                                     return '<p></p>';
-                                }                                    
+                                }
                             }
                         },
                         { data: "PostingCode" },
                         { data: "Narration" },
-                        { data: "BankName" },                        
-                        { data: "AccountName" }
+                        { data: "BankName" },
+                        {
+                            render: function (data, type, full, meta) {
+                                if (full.TranID.endsWith("GL")) {
+                                    return '<p> GL Account </p>';
+                                } else {
+                                    return '<p>' + full.AccountName + '</p>'
+                                }
+                            }
+                        }
                     ]
                 });
             });
             $('#uploaddata').modal();
+        };
+
+        var openUnidentifiedModal = function (uploadId) {
+            $.ajax({
+                type: 'POST',
+                data: { __RequestVerificationToken: helpers.getAntiForgeryToken(), UploadId: '' + uploadId + '' },
+                url: '/BranchVerifier/UnindentifiedUploadDataDetail',
+                success: function (data) {
+                    console.log(data);
+                    unidentifiedPaymentData = data;
+                }
+            }).done(function () {
+                $("#UnidentifiedDataTable").DataTable().clear().destroy();
+                $("#UnidentifiedDataTable").DataTable({
+                    data: unidentifiedPaymentData,
+                    dom: 'Bfrtip',
+                    buttons: [
+                    {
+                        extend: 'excelHtml5',
+                        text: 'Download Excel',
+                        filename: 'Unclaimed_' + unidentifiedPaymentData[0].BranchName + '_' + unidentifiedPaymentData[0].TranDate,
+                        exportOptions: {
+                            modifier: {
+                                page: 'all'
+                            }
+                        }
+                    }],
+                    columns: [
+                        { data: "AccountNumber" },
+                        { data: "BranchCode" },
+                        {
+                            render: function (data, type, full, meta) {
+                                var sym = "";
+                                if (full.Debit1Credit0) {
+                                    return '<p>' + full.Amount + '</p>';
+                                } else {
+                                    return '<p></p>';
+                                }
+                            }
+                        },
+                        {
+                            render: function (data, type, full, meta) {
+                                var sym = "";
+                                if (!full.Debit1Credit0) {
+                                    return '<p>' + full.Amount + '</p>';
+                                } else {
+                                    return '<p></p>';
+                                }
+                            }
+                        },
+                        { data: "PostingCode" },
+                        { data: "Narration" },
+                        { data: "BankName" },
+                        {
+                            render: function (data, type, full, meta) {
+                                if (full.TranID.endsWith("GL")) {
+                                    return '<p> GL Account </p>';
+                                } else {
+                                    if (full.AccountName == null) {
+                                        return '<p></p>'
+                                    } else {
+                                        return '<p>' + full.AccountName + '</p>'
+                                    }
+                                    
+                                }
+                            }
+                        }
+                    ]
+                });
+            });
+            $('#unidentifieddata').modal();
         };
 
         $("#approveUpload").click(function (e) {
@@ -246,6 +405,6 @@
         $('#confirmationModal').on('hide.bs.modal', function (e) {
             location.reload();
         });
-        
+
     </script>
 }

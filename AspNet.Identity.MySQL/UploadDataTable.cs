@@ -26,7 +26,7 @@ namespace AspNet.Identity.MySQL
         /// <returns></returns>
         public int Insert(UploadDataEntity uploaddata)
         {
-            string commandText = "Insert into uploadsdata (Id, UploadId, Narration, Amount, AccountNumber, DebitOrCredit, PostingCode) values (@Id, @uploadId, @narration, @amount, @accountNo, @debitcredit, @postingCode)";
+            string commandText = "Insert into uploadsdata (Id, UploadId, Narration, Amount, AccountNumber, DebitOrCredit, PostingCode, TranDate, Status, TranID) values (@Id, @uploadId, @narration, @amount, @accountNo, @debitcredit, @postingCode, @tranDate, @status, @tranId)";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@Id", uploaddata.Id);
             parameters.Add("@uploadId", uploaddata.UploadId);
@@ -35,6 +35,9 @@ namespace AspNet.Identity.MySQL
             parameters.Add("@accountNo", uploaddata.AccountNumber);
             parameters.Add("@debitcredit", uploaddata.Debit1Credit0);
             parameters.Add("@postingCode", uploaddata.PostingCode);
+            parameters.Add("@tranDate", uploaddata.TranDate);
+            parameters.Add("@status", uploaddata.Status);
+            parameters.Add("@tranId", uploaddata.TranID);
 
             return _database.Execute(commandText, parameters);
         }
@@ -61,7 +64,7 @@ namespace AspNet.Identity.MySQL
         /// 
         public List<UploadDataEntity> GetUploadsData(string uploadId)
         {
-            string commandText = "Select Id, UploadId, Narration, Amount, AccountNumber, DebitOrCredit, PostingCode from uploadsdata where UploadId = @uploadId";
+            string commandText = "Select Id, UploadId, Narration, Amount, AccountNumber, DebitOrCredit, PostingCode, TranDate, Status, TranID from uploadsdata where UploadId = @uploadId and Status <> 1";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@uploadId", uploadId);
             List<UploadDataEntity> uploaddata = new List<UploadDataEntity>();
@@ -76,7 +79,10 @@ namespace AspNet.Identity.MySQL
                     Narration = res["Narration"],
                     UploadId = res["UploadId"],
                     PostingCode = res["PostingCode"],
-                    Debit1Credit0 = Convert.ToBoolean(res["DebitOrCredit"])
+                    Debit1Credit0 = Convert.ToBoolean(res["DebitOrCredit"]),
+                    Status = Convert.ToInt32(res["Status"]),
+                    TranDate = res["TranDate"],
+                    TranID = res["TranID"]
                 });
             }
             return uploaddata;
@@ -88,9 +94,9 @@ namespace AspNet.Identity.MySQL
         /// <param name="uploadId">The Branch Id</param>
         /// <returns></returns>
         /// 
-        public List<UploadDataWithBankAndAccountDetails> GetUploadsDataWithAccountName(string uploadId)
+        public List<UploadDataWithBankAndAccountDetails> GetUploadsDataWithAccountName(string uploadId, bool processed)
         {
-            string commandText = "Select u.Id, u.UploadId, u.Narration, u.Amount, u.DebitOrCredit, u.PostingCode, (select BankName from banks where Id = up.BankId) BankName, (select BranchCode from branches where Id = up.BranchId)  BranchCode, u.AccountNumber, a.AccountName from uploadsdata u join uploads up on u.UploadId = up.Id left join accountnumbers a on a.AccountNumber = u.AccountNumber where u.UploadId = @uploadId";
+            string commandText = string.Format("Select u.Id, u.UploadId, u.Narration, u.Amount, u.DebitOrCredit, u.PostingCode, u.TranDate, u.Status, u.TranID, (select BankName from banks where Id = up.BankId) BankName, (select BranchCode from branches where Id = up.BranchId)  BranchCode, u.AccountNumber, a.AccountName from uploadsdata u join uploads up on u.UploadId = up.Id left join accountnumbers a on a.AccountNumber = u.AccountNumber where u.UploadId = @uploadId and u.Status {0}", (processed) ? " = 1" : " <> 1");
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@uploadId", uploadId);
             List<UploadDataWithBankAndAccountDetails> uploaddata = new List<UploadDataWithBankAndAccountDetails>();
@@ -108,7 +114,10 @@ namespace AspNet.Identity.MySQL
                     BankName = res["BankName"],
                     PostingCode = res["PostingCode"],
                     Debit1Credit0 = Convert.ToBoolean(res["DebitOrCredit"]),
-                    BranchCode = res["BranchCode"]
+                    BranchCode = res["BranchCode"],
+                    Status = Convert.ToInt32(res["Status"]),
+                    TranDate = res["TranDate"],
+                    TranID = res["TranID"]
                 });
             }
             return uploaddata;
@@ -122,11 +131,22 @@ namespace AspNet.Identity.MySQL
         /// 
         public bool UpdateUploadsData(UploadDataEntity uploadData)
         {
-            string commandText = "Update uploadsdata set AccountNumber = @accountNo, Narration = @narration where Id = @Id ";
+            string commandText = "Update uploadsdata set Narration = @narration, Status = 1 where UploadId = @uploadId and TranID like @tranId ";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
-            parameters.Add("@Id", uploadData.Id);
-            parameters.Add("@accountNo", uploadData.AccountNumber);
+            parameters.Add("@uploadId", uploadData.UploadId);
+            parameters.Add("@tranId", string.Format("{0}__", uploadData.TranID.Substring(0,6)));
             parameters.Add("@narration", uploadData.Narration);
+
+            return _database.Execute(commandText, parameters) > 0;
+        }
+
+        public bool UpdateUploadsDataAccount(UploadDataEntity uploadData)
+        {
+            string commandText = "Update uploadsdata set AccountNumber = @accountNo where Id = @id and UploadId = @uploadId ";
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("@uploadId", uploadData.UploadId);
+            parameters.Add("@accountNo", uploadData.AccountNumber);
+            parameters.Add("@id", uploadData.Id);
 
             return _database.Execute(commandText, parameters) > 0;
         }

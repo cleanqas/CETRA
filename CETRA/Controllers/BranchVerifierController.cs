@@ -70,13 +70,84 @@ namespace CETRA.Controllers
             return Json(new { data = allPendingVerificationUploadsWithDetails }, JsonRequestBehavior.AllowGet);
         }
 
+        //POST: /BranchVerifier/UnidentifiedBranchUploads
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<JsonResult> UnidentifiedBranchUploads(string branchId)
+        {
+            var branchUploads = await new UploadStore<UploadEntity>(new ApplicationDbContext()).UnidentifiedUploadsByBranchIdAsync(branchId);
+            List<UploadEntityModel> allPendingUploadsWithDetails = new List<UploadEntityModel>();
+            foreach (var data in branchUploads)
+            {
+                var branchDetail = await Helper.GetBranchNameAndCode(data.BranchId);
+                allPendingUploadsWithDetails.Add(new UploadEntityModel()
+                {
+                    BankId = data.BankId,
+                    BankName = await Helper.GetBankName(data.BankId),
+                    BranchId = data.BranchId,
+                    BranchName = branchDetail["BranchName"],
+                    BranchCode = branchDetail["BranchCode"],
+                    Id = data.Id,
+                    OperatorId = data.OperatorId,
+                    Status = data.Status,
+                    UploadDate = data.UploadDate,
+                    UploaderId = data.UploaderId
+                });
+            }
+            return Json(new { data = allPendingUploadsWithDetails }, JsonRequestBehavior.AllowGet);
+        }
+
         //POST: /BranchVerifier/GetAllUploadDataDetail
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<JsonResult> GetAllUploadDataDetail(string UploadId)
         {
             var uploadData = await new UploadDataStore<UploadDataEntity>(new ApplicationDbContext()).GetUploadsDataWithAccountName(UploadId);
+            uploadData.OrderBy(u => u.TranID);
             return Json(uploadData, JsonRequestBehavior.AllowGet);
+        }
+
+        //POST: /BranchVerifier/UnindentifiedUploadDataDetail
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<JsonResult> UnindentifiedUploadDataDetail(string UploadId)
+        {
+            List<UploadDataEntityModel> uploadsWithDetails = new List<UploadDataEntityModel>();
+            try
+            {
+                var uploadData = await new UploadDataStore<UploadDataEntity>(new ApplicationDbContext()).UnindentifiedDataWithAccountName(UploadId);
+                var correspondingUpload = await new UploadStore<UploadEntity>(new ApplicationDbContext()).FindUploadAsync(uploadData.First().UploadId);
+
+                foreach (var data in uploadData)
+                {
+                    var branchDetail = await Helper.GetBranchNameAndCode(correspondingUpload.BranchId);
+                    uploadsWithDetails.Add(new UploadDataEntityModel()
+                    {
+                        BankId = correspondingUpload.BankId,
+                        BankName = await Helper.GetBankName(correspondingUpload.BankId),
+                        BranchId = correspondingUpload.BranchId,
+                        BranchName = branchDetail["BranchName"],
+                        BranchCode = branchDetail["BranchCode"],
+                        Id = data.Id,
+                        Status = data.Status,
+                        UploadDate = correspondingUpload.UploadDate,
+                        AccountNumber = data.AccountNumber,
+                        Amount = data.Amount,
+                        Debit1Credit0 = data.Debit1Credit0,
+                        Narration = data.Narration,
+                        PostingCode = data.PostingCode,
+                        UploadId = data.UploadId,
+                        TranDate = data.TranDate,
+                        AccountName = data.AccountName, TranID = data.TranID
+                    });
+                }
+                uploadsWithDetails.OrderBy(p => p.TranID);
+            }catch(Exception ex)
+            {
+
+            }
+
+            return Json(uploadsWithDetails, JsonRequestBehavior.AllowGet);
         }
 
         //POST: /BranchVerifier/ApproveUpload

@@ -251,5 +251,57 @@ namespace AspNet.Identity.MySQL
             }
             return uploads;
         }
+
+        /// <summary>
+        /// Gets all uploads from the uploads table by Branch ID
+        /// </summary>
+        /// <param name="branchId">The Branch Id</param>
+        /// <returns></returns>
+        /// 
+        public List<UploadEntity> GetUnidentifiedUploadsByBranch(string branchId, int status)
+        {
+            string commandText = "Select distinct up.Id, up.UploaderId, up.BankId, up.BranchId, up.Status, up.UploadDate, up.OperatorId from uploads up join uploadsdata ud on up.Id = ud.UploadId where up.BranchId = @branchId and up.Status = @status and ud.Status <> 1";
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("@branchId", branchId);
+            parameters.Add("@status", status);
+            List<UploadEntity> uploads = new List<UploadEntity>();
+            var result = _database.Query(commandText, parameters);
+            foreach (var res in result)
+            {
+                uploads.Add(new UploadEntity()
+                {
+                    BankId = res["BankId"],
+                    BranchId = res["BranchId"],
+                    Id = res["Id"],
+                    Status = Convert.ToInt32(res["Status"]),
+                    UploaderId = res["UploaderId"],
+                    UploadDate = Convert.ToDateTime(res["UploadDate"]).ToString("dd-MM-yyyy hh:mm:ss"),
+                    OperatorId = res["OperatorId"]
+                });
+            }
+            return uploads;
+        }
+
+        public List<UploadEntity> GetUnidentifiedUploads()
+        {
+            string commandText = "Select distinct up.Id, up.UploaderId, up.BankId, up.BranchId, up.Status, up.UploadDate, up.OperatorId from uploads up join uploadsdata ud on up.Id = ud.UploadId where up.Status <> 3 and ud.Status <> 1";
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            List<UploadEntity> uploads = new List<UploadEntity>();
+            var result = _database.Query(commandText, parameters);
+            foreach (var res in result)
+            {
+                uploads.Add(new UploadEntity()
+                {
+                    BankId = res["BankId"],
+                    BranchId = res["BranchId"],
+                    Id = res["Id"],
+                    Status = Convert.ToInt32(res["Status"]),
+                    UploaderId = res["UploaderId"],
+                    UploadDate = Convert.ToDateTime(res["UploadDate"]).ToString("dd-MM-yyyy hh:mm:ss"),
+                    OperatorId = res["OperatorId"]
+                });
+            }
+            return uploads;
+        }
     }
 }

@@ -61,6 +61,8 @@
     <Compile Include="AccountNumberStore.cs" />
     <Compile Include="AccountNumberTable.cs" />
     <Compile Include="AsyncHelper.cs" />
+    <Compile Include="BankGLAccountStore.cs" />
+    <Compile Include="BankGLAccountTable.cs" />
     <Compile Include="BankManager.cs" />
     <Compile Include="BankStore.cs" />
     <Compile Include="BankTable.cs" />
@@ -69,6 +71,7 @@
     <Compile Include="BranchTable.cs" />
     <Compile Include="IdentityAccountNumber.cs" />
     <Compile Include="IdentityBank.cs" />
+    <Compile Include="IdentityBankGLAccount.cs" />
     <Compile Include="IdentityBranch.cs" />
     <Compile Include="IdentityRole.cs" />
     <Compile Include="IdentityUserBranch.cs" />

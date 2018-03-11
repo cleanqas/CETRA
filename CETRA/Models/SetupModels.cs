@@ -39,4 +39,13 @@ namespace CETRA.Models
     {
         public HttpPostedFileBase AccountFile { get; set; }
     }
+
+    public class GLAccountModel
+    {
+        public string Id { get; set; }
+        [Required]
+        public string BankId { get; set; }
+        [Required]
+        public string GLAccount { get; set; }
+    }
 }

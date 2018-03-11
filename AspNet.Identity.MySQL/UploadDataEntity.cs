@@ -13,7 +13,7 @@ namespace AspNet.Identity.MySQL
             Id = Guid.NewGuid().ToString();
         }
 
-        public UploadDataEntity(string uploadId, string narration, decimal amount, string accountNumber, bool? debitOrCredit, string postingCode) : this()
+        public UploadDataEntity(string uploadId, string narration, decimal amount, string accountNumber, bool? debitOrCredit, string postingCode, string tranID, string tranDate, int status) : this()
         {
             UploadId = uploadId;
             Narration = narration;
@@ -21,6 +21,9 @@ namespace AspNet.Identity.MySQL
             AccountNumber = accountNumber;
             Debit1Credit0 = debitOrCredit;
             PostingCode = postingCode;
+            TranID = tranID;
+            TranDate = tranDate;
+            Status = status;
         }
 
         public UploadDataEntity(string id)
@@ -62,6 +65,21 @@ namespace AspNet.Identity.MySQL
         /// Posting Code
         /// </summary>
         public string PostingCode { get; set; }
+
+        /// <summary>
+        /// Transaction Date
+        /// </summary>
+        public string TranDate { get; set; }
+
+        /// <summary>
+        /// Status
+        /// </summary>
+        public int Status { get; set; }
+
+        /// <summary>
+        /// TranID
+        /// </summary>
+        public string TranID { get; set; }
     }
 
     public class UploadDataWithBankAndAccountDetails : UploadDataEntity

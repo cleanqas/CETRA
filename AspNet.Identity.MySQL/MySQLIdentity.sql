@@ -269,3 +269,18 @@ ADD PRIMARY KEY (`AccountNumber`),
 DROP INDEX `AccountNumber_Bank_idx` ;
 
 ALTER TABLE `accountnumbers` ADD `AccountBranch` VARCHAR(128) NOT NULL AFTER `AccountName`;
+
+CREATE TABLE `cetra`.`bankglaccounts` (
+  `Id` VARCHAR(128) NOT NULL,
+  `BankId` VARCHAR(128) NOT NULL,
+  `GLAccount` VARCHAR(45) NOT NULL,
+  UNIQUE INDEX `Id_UNIQUE` (`Id` ASC),
+  PRIMARY KEY (`BankId`, `GLAccount`));
+
+ALTER TABLE `cetra`.`bankglaccounts` 
+ADD CONSTRAINT `glaccount_bank`
+  FOREIGN KEY (`BankId`)
+  REFERENCES `cetra`.`banks` (`Id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+

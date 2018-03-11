@@ -64,14 +64,21 @@ namespace AspNet.Identity.MySQL
 
         public Task<bool> UpdateUploadsDataAsync(UploadDataEntity uploadData)
         {
-            bool result = uploadDataTable.UpdateUploadsData(uploadData);
+            bool result = uploadDataTable.UpdateUploadsDataAccount(uploadData);
+            result = uploadDataTable.UpdateUploadsData(uploadData);           
 
             return Task.FromResult<bool>(result);
         }
 
         public Task<List<UploadDataWithBankAndAccountDetails>> GetUploadsDataWithAccountName(string uploadId)
         {
-            List<UploadDataWithBankAndAccountDetails> result = uploadDataTable.GetUploadsDataWithAccountName(uploadId);
+            List<UploadDataWithBankAndAccountDetails> result = uploadDataTable.GetUploadsDataWithAccountName(uploadId, true);
+            return Task.FromResult<List<UploadDataWithBankAndAccountDetails>>(result);
+        }
+
+        public Task<List<UploadDataWithBankAndAccountDetails>> UnindentifiedDataWithAccountName(string uploadId)
+        {
+            List<UploadDataWithBankAndAccountDetails> result = uploadDataTable.GetUploadsDataWithAccountName(uploadId, false);
             return Task.FromResult<List<UploadDataWithBankAndAccountDetails>>(result);
         }
     }

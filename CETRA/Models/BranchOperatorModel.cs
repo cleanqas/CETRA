@@ -17,5 +17,7 @@ namespace CETRA.Models
         public string AccountNumber { get; set; }
         [Required]
         public string Narration { get; set; }
+        [Required]
+        public string TranID { get; set; }
     }
 }

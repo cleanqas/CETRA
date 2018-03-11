@@ -69,6 +69,33 @@ namespace CETRA.Controllers
             return Json(new { data = allPendingUploadsWithDetails }, JsonRequestBehavior.AllowGet);
         }
 
+        //POST: /BranchOperator/GetAllPendingBranchUploads
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<JsonResult> UnidentifiedBranchUploads(string branchId)
+        {
+            var branchUploads = await new UploadStore<UploadEntity>(new ApplicationDbContext()).UnidentifiedUploadsByBranchIdAsync(branchId);
+            List<UploadEntityModel> allPendingUploadsWithDetails = new List<UploadEntityModel>();
+            foreach (var data in branchUploads)
+            {
+                var branchDetail = await Helper.GetBranchNameAndCode(data.BranchId);
+                allPendingUploadsWithDetails.Add(new UploadEntityModel()
+                {
+                    BankId = data.BankId,
+                    BankName = await Helper.GetBankName(data.BankId),
+                    BranchId = data.BranchId,
+                    BranchName = branchDetail["BranchName"],
+                    BranchCode = branchDetail["BranchCode"],
+                    Id = data.Id,
+                    OperatorId = data.OperatorId,
+                    Status = data.Status,
+                    UploadDate = data.UploadDate,
+                    UploaderId = data.UploaderId
+                });
+            }
+            return Json(new { data = allPendingUploadsWithDetails }, JsonRequestBehavior.AllowGet);
+        }
+
         //POST: /BranchOperator/GetBankAccounts
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -89,6 +116,8 @@ namespace CETRA.Controllers
                     var uploaddata = new UploadDataEntity(data.UploadDataId);
                     uploaddata.AccountNumber = data.AccountNumber;
                     uploaddata.Narration = data.Narration;
+                    uploaddata.TranID = data.TranID;
+                    uploaddata.UploadId = data.UploadId;
                     var updatedata = await new UploadDataStore<UploadDataEntity>(new ApplicationDbContext()).UpdateUploadsDataAsync(uploaddata);
                 }
                 UploadManager.UpdateUploadStatus(model[0].UploadId, 1);
@@ -121,7 +150,8 @@ namespace CETRA.Controllers
                 Narration = k.Narration,
                 PostingCode = k.PostingCode,
                 Id = k.Id,
-                UploadId = uploadId
+                UploadId = uploadId,
+                TranID = k.TranID
             }));
 
             foreach (var p in PData)
@@ -130,9 +160,10 @@ namespace CETRA.Controllers
                 p.AccountName = pAcct == null ? string.Empty : pAcct.AccountName;
                 p.AccountNumber = p.AccountNumber == null ? string.Empty : p.AccountNumber;
             }
-
+            PData.OrderBy(p => p.TranID);
             return Json(PData, JsonRequestBehavior.AllowGet);
         }
+
 
     }
 }

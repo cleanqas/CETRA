@@ -1,19 +1,25 @@
 ﻿var helpers =
             {
-                buildDropdown: function (result, dropDown, emptyMessage, field) {
+                buildDropdown: function (result, dropDown, emptyMessage, field, id) {
                     dropDown.html('');
                     dropDown.append('<option value="">' + emptyMessage + '</option>');
                     if (result != '') {
                         $.each(result, function (k, v) {
                             if (field === undefined) {
-                                dropDown.append('<option value="' + v.Id + '">' + v.Name + '</option>');
+                                if (id === undefined) {
+                                    dropDown.append('<option value="' + v.Id + '">' + v.Name + '</option>');
+                                } else {
+                                    dropDown.append('<option value="' + v[id] + '">' + v.Name + '</option>');
+                                }
                             } else {
-                                console.log(field)
-                                console.log(v[field])
-                                dropDown.append('<option value="' + v.Id + '">' + v[field] + '</option>');
+                                if (id === undefined) {
+                                    dropDown.append('<option value="' + v.Id + '">' + v[field] + '</option>');
+                                } else {
+                                    dropDown.append('<option value="' + v[id] + '">' + v[field] + '</option>');
+                                }
                             }
-                            
-                        })
+
+                        });
                     }
                 },
 

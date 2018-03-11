@@ -185,6 +185,28 @@ namespace CETRA.Controllers
         }
 
         //
+        // POST: /SetUp/RegisterNewBankGLAccount
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<JsonResult> RegisterNewBankGLAccount(GLAccountModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var glAccount = new IdentityBankGLAccount(model.BankId, model.GLAccount);
+                var result = await new BankGLAccountStore<IdentityBankGLAccount>(new ApplicationDbContext()).CreateAsync(glAccount);
+                if (result)
+                {
+                    return Json(new { code = "00", message = "Sucessfull" }, JsonRequestBehavior.AllowGet);
+                }
+                else
+                {
+                    throw new Exception("GL Account creation failed");
+                }
+            }
+            throw new Exception("Invalid Data Submitted");
+        }
+
+        //
         // POST: /SetUp/GetAllBranches
         [HttpPost]
         [ValidateAntiForgeryToken]

@@ -67,6 +67,33 @@ namespace CETRA.Controllers
             return Json(new { data = allProcessedUploadsWithDetails }, JsonRequestBehavior.AllowGet);
         }
 
+        //POST: /HOOperator/UnidentifiedUploads
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<JsonResult> GetUnidentifiedUploads()
+        {
+            var uUploads = await new UploadStore<UploadEntity>(new ApplicationDbContext()).UnidentifiedUploads();
+            List<UploadEntityModel> allPendingUploadsWithDetails = new List<UploadEntityModel>();
+            foreach (var data in uUploads)
+            {
+                var branchDetail = await Helper.GetBranchNameAndCode(data.BranchId);
+                allPendingUploadsWithDetails.Add(new UploadEntityModel()
+                {
+                    BankId = data.BankId,
+                    BankName = await Helper.GetBankName(data.BankId),
+                    BranchId = data.BranchId,
+                    BranchName = branchDetail["BranchName"],
+                    BranchCode = branchDetail["BranchCode"],
+                    Id = data.Id,
+                    OperatorId = data.OperatorId,
+                    Status = data.Status,
+                    UploadDate = data.UploadDate,
+                    UploaderId = data.UploaderId
+                });
+            }
+            return Json(new { data = allPendingUploadsWithDetails }, JsonRequestBehavior.AllowGet);
+        }
+
         //POST: /HOOperator/GetAllUploadDataDetail
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -74,6 +101,40 @@ namespace CETRA.Controllers
         {
             var uploadData = await new UploadDataStore<UploadDataEntity>(new ApplicationDbContext()).GetUploadsDataWithAccountName(UploadId);
             return Json(uploadData, JsonRequestBehavior.AllowGet);
+        }
+
+        //POST: /HOOperator/UnindentifiedUploadDataDetail
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<JsonResult> UnindentifiedUploadDataDetail(string UploadId)
+        {
+            var uploadData = await new UploadDataStore<UploadDataEntity>(new ApplicationDbContext()).UnindentifiedDataWithAccountName(UploadId);
+            var correspondingUpload = await new UploadStore<UploadEntity>(new ApplicationDbContext()).FindUploadAsync(uploadData.First().UploadId);
+            List<UploadDataEntityModel> uploadsWithDetails = new List<UploadDataEntityModel>();
+            foreach (var data in uploadData)
+            {
+                var branchDetail = await Helper.GetBranchNameAndCode(correspondingUpload.BranchId);
+                uploadsWithDetails.Add(new UploadDataEntityModel()
+                {
+                    BankId = correspondingUpload.BankId,
+                    BankName = await Helper.GetBankName(correspondingUpload.BankId),
+                    BranchId = correspondingUpload.BranchId,
+                    BranchName = branchDetail["BranchName"],
+                    BranchCode = branchDetail["BranchCode"],
+                    Id = data.Id,
+                    Status = data.Status,
+                    UploadDate = correspondingUpload.UploadDate,
+                    AccountNumber = data.AccountNumber,
+                    Amount = data.Amount,
+                    Debit1Credit0 = data.Debit1Credit0,
+                    Narration = data.Narration,
+                    PostingCode = data.PostingCode,
+                    UploadId = data.UploadId,
+                    TranDate = data.TranDate,
+                    AccountName = data.AccountName
+                });
+            }
+            return Json(uploadsWithDetails, JsonRequestBehavior.AllowGet);
         }
 
         //POST: /HOOperator/MarkUploadAsProcessed
@@ -85,6 +146,16 @@ namespace CETRA.Controllers
             await uploadStore.UpdateUploadStatus(UploadId, 3);
             await uploadStore.UpdateUploadHOProcessor(UploadId, User.Identity.GetUserId());
             return Json(new { code = "00", message = "Successful" }, JsonRequestBehavior.AllowGet);
+        }
+
+        //
+        // POST: /HOOperator/GetBankGLAccounts
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<JsonResult> GetBankGLAccounts(string BankId)
+        {
+            var glAccounts = await new BankGLAccountStore<IdentityBankGLAccount>(new ApplicationDbContext()).GetBankGLAccounts(BankId);
+            return Json(glAccounts, JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]
@@ -100,7 +171,7 @@ namespace CETRA.Controllers
                 }
                 catch (Exception ex)
                 {
-                    throw new Exception( ex.Message);
+                    throw new Exception(ex.Message);
                 }
                 if (result)
                 {
@@ -108,7 +179,7 @@ namespace CETRA.Controllers
                     {
                         foreach (var data in model.PData)
                         {
-                            var uploaddata = new UploadDataEntity(upload.Id, data.Narration, data.Amount, data.AccountNumber, data.Debit1Credit0, data.PostingCode);
+                            var uploaddata = new UploadDataEntity(upload.Id, data.Narration, data.Amount, data.AccountNumber, data.Debit1Credit0, data.PostingCode, data.TranID, data.TranDate, 0);
                             UploadDataManager.Create(uploaddata);
                         }
                     }
@@ -117,7 +188,7 @@ namespace CETRA.Controllers
                         //TODO: implement log
                         UploadDataManager.Delete(upload.Id);
                         UploadManager.Delete(upload);
-                        throw new Exception( "Upload failed");
+                        throw new Exception("Upload failed");
                     }
                     var branchDetail = await Helper.GetBranchNameAndCode(upload.BranchId);
                     new EmailSender().SendToBranchOperator(branchDetail["BranchCode"]);
@@ -125,11 +196,11 @@ namespace CETRA.Controllers
                 }
                 else
                 {
-                    throw new Exception( "Upload creation failed");
+                    throw new Exception("Upload creation failed");
                 }
 
             }
-            throw new Exception( "Invalid Data Submitted");
+            throw new Exception("Invalid Data Submitted");
         }
 
         //
@@ -150,7 +221,7 @@ namespace CETRA.Controllers
                     switch (ext)
                     {
                         case "csv":
-                            PData = getPaymentDataFromCSV(savedfilepath);
+                            PData = getPaymentDataFromCSV(savedfilepath, model.GLAccount);
                             break;
                         case "xlsx":
                             PData = getPaymentDataFromXlsx(savedfilepath);
@@ -159,7 +230,7 @@ namespace CETRA.Controllers
                             PData = getPaymentDataFromXls(savedfilepath);
                             break;
                         default:
-                            throw new Exception( "Unknow file type uploaded");
+                            throw new Exception("Unknow file type uploaded");
                     }
 
                     var bankAccounts = await new AccountNumberStore<IdentityAccountNumber>(new ApplicationDbContext()).GetAllAccountNumbers();
@@ -171,17 +242,18 @@ namespace CETRA.Controllers
                         p.Id = Guid.NewGuid().ToString();
                         p.AccountNumber = p.AccountNumber == null ? string.Empty : p.AccountNumber;
 
-                        if(p.Debit1Credit0 == null || p.PostingCode == null || !ConfigurationManager.AppSettings["PostingCodes"].Contains(p.PostingCode) )
-                            throw new Exception( "Incomplete contents in the file");
+                        if (p.Debit1Credit0 == null || p.PostingCode == null || !ConfigurationManager.AppSettings["PostingCodes"].Contains(p.PostingCode))
+                            throw new Exception("Incomplete contents in the file");
                     }
+                    PData.OrderBy(p => p.TranID);
                     return Json(new { code = "00", uploadData = PData, accounts = bankAccounts }, JsonRequestBehavior.AllowGet);
                 }
                 catch (Exception ex)
                 {
-                    throw new Exception( ex.Message);
+                    throw new Exception(ex.Message);
                 }
             }
-            throw new Exception( "Invalid Data Submitted");
+            throw new Exception("Invalid Data Submitted");
         }
 
         private List<PDataModel> getPaymentDataFromXls(string filepath)
@@ -251,28 +323,41 @@ namespace CETRA.Controllers
             return filepath;
         }
 
-        private List<PDataModel> getPaymentDataFromCSV(string filepath)
+        private List<PDataModel> getPaymentDataFromCSV(string filepath, string glAccount)
         {
             List<PDataModel> PData = new List<PDataModel>();
             try
             {
                 //Read the contents of CSV file.
                 string csvData = System.IO.File.ReadAllText(filepath);
-
+                var tranCount = 0;
                 //Execute a loop over the rows.
                 foreach (string row in csvData.Split('\n'))
                 {
+                    tranCount += 1;
                     var split = row.Split(',');
                     if (!string.IsNullOrEmpty(row))
                     {
-                        bool? j = null;
                         PData.Add(new PDataModel
                         {
-                            AccountNumber = row.Split(',')[0],
-                            Debit1Credit0 = string.IsNullOrEmpty(row.Split(',')[2]) ? string.IsNullOrEmpty(row.Split(',')[3]) ? j : false : true,
-                            PostingCode = row.Split(',')[4],
-                            Narration = row.Split(',')[5],
-                            Amount = string.IsNullOrEmpty(row.Split(',')[2]) ? string.IsNullOrEmpty(row.Split(',')[3]) ? 0 : Convert.ToDecimal(row.Split(',')[3]) : Convert.ToDecimal(row.Split(',')[2])
+                            TranDate = row.Split(',')[0],
+                            Amount = Convert.ToDecimal(row.Split(',')[1]),
+                            Debit1Credit0 = false,
+                            PostingCode = "203",
+                            Narration = row.Split(',')[2],
+                            Status = 0,
+                            TranID = tranCount.ToString().PadLeft(6, '0').Substring(tranCount.ToString().Length - 1, 6) + "CL"
+                        });
+                        PData.Add(new PDataModel
+                        {
+                            AccountNumber = glAccount,
+                            TranDate = row.Split(',')[0],
+                            Amount = Convert.ToDecimal(row.Split(',')[1]),
+                            Debit1Credit0 = true,
+                            PostingCode = "203",
+                            Narration = row.Split(',')[2],
+                            Status = 0,
+                            TranID = tranCount.ToString().PadLeft(6, '0').Substring(tranCount.ToString().Length - 1, 6) + "GL"
                         });
                     }
                 }

@@ -40,8 +40,32 @@
                 </thead>
             </table>
         </div>
+        <hr />
+        <h2>Uploads with unclaimed payments</h2>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="datefilter" class="control-label">Filter Upload Date:</label>
+                    <input type="text" name="datefilter" id="datefilter" class="form-control wide-input" />
+                </div>
+            </div>
+        </div>
+        <div>
+            <table id="UnidentifiedUploadsTable" class="display" style="width: 100%">
+                <thead>
+                    <tr>
+                        <th>Upload ID</th>
+                        <th>Date and Time</th>
+                        <th>Bank</th>
+                        <th>Branch</th>
+                        <th>Process</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
     </div>
 </div>
+
 @*Upload Data Modal*@
 <div class="row">
     <div class="modal fade" id="uploaddata" tabindex="-1" role="dialog" aria-labelledby="UploadDataLabel" data-backdrop="static" data-keyboard="false">
@@ -87,7 +111,7 @@
                 banks = data;
             });
 
-            $("#UploadsTable").dataTable({
+            $("#UploadsTable").DataTable({
                 columns: [
                     { data: "Id" },
                     { data: "UploadDate" },
@@ -104,6 +128,29 @@
                     method: 'POST',
                     data: { __RequestVerificationToken: helpers.getAntiForgeryToken(), branchId: '@ViewBag.UserBranch' }
                 }
+            });
+
+            var unitable = $("#UnidentifiedUploadsTable").DataTable({
+                columns: [
+                    { data: "Id" },
+                    { data: "UploadDate" },
+                    { data: "BankName" },
+                    { data: "BranchCode" },
+                    {
+                        render: function (data, type, full, meta) {
+                            return '<a class="btn btn-default process_uploaddata" onClick="openModal(\'' + full.Id + '\', \'' + full.BankId + '\', \'' + full.BankName + '\')" data-loading-text="<i class=\'fa fa-spinner fa-spin \'></i> Getting unidentified Data ...">Process</a>'
+                        }
+                    }
+                ],
+                ajax: {
+                    url: '/BranchOperator/UnidentifiedBranchUploads',
+                    method: 'POST',
+                    data: { __RequestVerificationToken: helpers.getAntiForgeryToken(), branchId: '@ViewBag.UserBranch' }
+                }
+            });
+
+            $('#datefilter').on('keyup', function () {
+                unitable.column(1).search(this.value).draw();
             });
         });
 
@@ -131,7 +178,7 @@
 
         var searchAccount = function (acctNumber, uploadDataId) {
 
-            console.log(accountNumbers)
+            
             $.each(paymentData, function (i, v) {
                 if (v.Id == uploadDataId) {
                     v.AccountNumber = acctNumber;
@@ -139,13 +186,24 @@
                 }
             });
             var acn = "";
-            $.each(accountNumbers, function (i, v) {                
+            $.each(accountNumbers, function (i, v) {
                 if (v.AccountNumber == acctNumber) {
                     acn = v.AccountName;
+                    $.each(paymentData, function (j, vl) {
+                        if (vl.AccountNumber == v.AccountNumber) {
+                            vl.AccountName = v.AccountName;
+                            return false;
+                        }
+                    });
                     return false;
-                }    
+                }
             });
-            $('#acctName_' + uploadDataId).text(acn);
+            if (acn == "") {
+                alert("Invalid account number");
+                $('#acctNumber_' + uploadDataId).val(acn)
+            } else {
+                $('#acctName_' + uploadDataId).text(acn);
+            }            
         };
 
         var openModal = function (uploadId, bankId, bankName) {
@@ -171,17 +229,22 @@
                 data: { __RequestVerificationToken: helpers.getAntiForgeryToken(), UploadId: '' + uploadId + '' },
                 url: '/BranchOperator/GetUploadData',
                 success: function (data) {
-                    console.log(data);
-                    paymentData = data;
+                    paymentData = $.grep(data, function (v) {
+                        return v.TranID.endsWith("CL");
+                    });
                 }
-            }).done(function () {
-                $("#UploadDataTable").dataTable().fnDestroy();
-                $("#UploadDataTable").dataTable({
+            }).done(function () {                
+                $("#UploadDataTable").DataTable().clear().destroy();
+                $("#UploadDataTable").DataTable({
                     data: paymentData,
                     columns: [
                         {
                             render: function (data, type, full, meta) {
-                                return '<input type="text" placeholder="Account Number" class="form-control" value="' + full.AccountNumber + '" name="acctNumber_' + full.Id + '" id="acctNumber_' + full.Id + '" onChange="searchAccount(this.value, \'' + full.Id + '\')"/>'
+                                if (full.TranID.endsWith("GL")) {
+                                    return '<p>' + full.AccountNumber + '</p>';
+                                } else {
+                                    return '<input type="text" placeholder="Account Number" class="form-control" value="' + full.AccountNumber + '" name="acctNumber_' + full.Id + '" id="acctNumber_' + full.Id + '" onChange="searchAccount(this.value, \'' + full.Id + '\')"/>'
+                                }
                             }
                         },
                         {
@@ -192,7 +255,7 @@
                                 } else {
                                     return '<p></p>';
                                 }
-                                    
+
                             }
                         },
                         {
@@ -202,18 +265,26 @@
                                     return '<p>' + full.Amount + '</p>';
                                 } else {
                                     return '<p></p>';
-                                }                                    
+                                }
                             }
                         },
                          { data: "PostingCode" },
                          {
                              render: function (data, type, full, meta) {
-                                 return '<input type="text" placeholder="Narration" class="form-control" value="' + full.Narration + '" name="narration_' + full.Id + '" id="narration_' + full.Id + '" onChange="updateNarration(this.value, \'' + full.Id + '\')"/>'
+                                 if (full.TranID.endsWith("GL")) {
+                                     return '<p>' + full.Narration + '</p>';
+                                 } else {
+                                     return '<input type="text" placeholder="Narration" class="form-control" value="' + full.Narration + '" name="narration_' + full.Id + '" id="narration_' + full.Id + '" onChange="updateNarration(this.value, \'' + full.Id + '\')"/>'
+                                 }
                              }
                          },
                         {
                             render: function (data, type, full, meta) {
-                                return '<div name="acctName_' + full.Id + '" id="acctName_' + full.Id + '">' + full.AccountName + '</div>'
+                                if (full.TranID.endsWith("GL")) {
+                                    return '<p> GL Account </p>';
+                                } else {
+                                    return '<div name="acctName_' + full.Id + '" id="acctName_' + full.Id + '">' + full.AccountName + '</div>'
+                                }
                             }
                         }
                     ]
@@ -230,15 +301,15 @@
 
             $.each(paymentData, function (i, v) {
                 if (v.AccountNumber != null && v.AccountNumber != "" && v.Narration != null && v.Narration != "" && v.AccountName != null && v.AccountName != "") {
-                    updates.push({ UploadDataId: v.Id, AccountNumber: v.AccountNumber, UploadId: v.UploadId, Narration: v.Narration });
+                    updates.push({ UploadDataId: v.Id, AccountNumber: v.AccountNumber, UploadId: v.UploadId, Narration: v.Narration, TranID: v.TranID });
                 }
             });
 
-            if (paymentData.length != updates.length) {
-                alert("Please fill in all the records. Do not leave any account number or narration blank. Incase of blanck account name, contact adminstrator to register account number");
-                $('#updateUploadData').button('reset');
-                return false;
-            };
+            //if (paymentData.length != updates.length) {
+            //    alert("Please fill in all the records. Do not leave any account number or narration blank. Incase of blanck account name, contact adminstrator to register account number");
+            //    $('#updateUploadData').button('reset');
+            //    return false;
+            //};
 
             console.log(paymentData)
             console.log(updates)

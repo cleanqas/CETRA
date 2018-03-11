@@ -52,6 +52,29 @@
                 </thead>
             </table>
         </div>
+        <hr />
+        <h2>Uploads with unidentified payments</h2>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="datefilter" class="control-label">Filter Upload Date:</label>
+                    <input type="text" name="datefilter" id="datefilter" class="form-control wide-input" />
+                </div>
+            </div>
+        </div>
+        <div>
+            <table id="UnidentifiedUploadsTable" class="display" style="width: 100%">
+                <thead>
+                    <tr>
+                        <td>Id</td>
+                        <td>UploadDate</td>
+                        <th>Bank</th>
+                        <th>Branch</th>
+                        <td>Process</td>
+                    </tr>
+                </thead>
+            </table>
+        </div>
     </div>
 </div>
 
@@ -74,6 +97,12 @@
                             <label for="bank_upload" class="control-label">Bank:</label>
                             <select name="bank_upload" id="bank_upload" required class="form-control">
                                 <optgroup label="Select Bank"></optgroup>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="bank_glaccount" class="control-label">GL Account:</label>
+                            <select name="bank_glaccount" id="bank_glaccount" required class="form-control" disabled>
+                                <optgroup label="Select GLAccount"></optgroup>
                             </select>
                         </div>
                         <div class="form-group">
@@ -113,6 +142,39 @@
                                 <th>Credit</th>
                                 <th>Posting Code</th>
                                 <th>Narration</th>
+                                @*<th>Bank</th>
+                                    <th>Account Name</th>*@
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <a href="#" class="btn btn-primary" id="markAsProcesed" data-loading-text="<i class='fa fa-spinner fa-spin '></i> Processing...">Mark As Processed</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@*Unindentified Data Modal*@
+<div class="row">
+    <div class="modal fade" id="unidentifieddata" tabindex="-1" role="dialog" aria-labelledby="UnidentifiedDataLabel" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="close"><span aria-hidden="true">&times;</span></button>
+                    <h3 class="modal-title" id="UnidentifiedDataLabel">Unindentified Payments</h3>
+                </div>
+                <div class="modal-body">
+                    <table id="UnidentifiedDataTable" class="display" style="width: 100%">
+                        <thead>
+                            <tr>
+                                <th>Account Number</th>
+                                <th>Branch Code</th>
+                                <th>Debit</th>
+                                <th>Credit</th>
+                                <th>Posting Code</th>
+                                <th>Narration</th>
                                 <th>Bank</th>
                                 <th>Account Name</th>
                             </tr>
@@ -120,7 +182,6 @@
                     </table>
                 </div>
                 <div class="modal-footer">
-                    <a href="#" class="btn btn-primary" id="markAsProcesed" data-loading-text="<i class='fa fa-spinner fa-spin '></i> Processing...">Mark As Processed</a>
                 </div>
             </div>
         </div>
@@ -166,6 +227,7 @@
         var banks = {};
         var accounts = {};
         var branches = {};
+        var unidentifiedPaymentData = {};
 
         $(function () {
             helpers.getData("/SetUp/GetAllBranches", function (data) {
@@ -178,7 +240,7 @@
                 banks = data;
             });
 
-            $("#UploadsTable").dataTable({
+            $("#UploadsTable").DataTable({
                 columns: [
                     { data: "Id" },
                     { data: "UploadDate" },
@@ -196,6 +258,30 @@
                     data: { __RequestVerificationToken: helpers.getAntiForgeryToken() }
                 }
             });
+
+            var unitable = $("#UnidentifiedUploadsTable").DataTable({
+                columns: [
+                    { data: "Id" },
+                    { data: "UploadDate" },
+                    { data: "BankName" },
+                    { data: "BranchCode" },
+                    {
+                        render: function (data, type, full, meta) {
+                            return '<a class="btn btn-default" onClick="openUnidentifiedModal(\'' + full.Id + '\', \'' + full.UploaderId + '\', \'' + full.OperatorId + '\')">Process</a>'
+                        }
+                    }
+                ],
+                ajax: {
+                    url: '/HOOperation/GetUnidentifiedUploads',
+                    method: 'POST',
+                    data: { __RequestVerificationToken: helpers.getAntiForgeryToken() }
+                }
+            });
+
+            $('#datefilter').on('keyup', function () {
+                unitable.column(1).search(this.value).draw();
+            });
+
         });
 
         var updateNarration = function (narration, uploadDataId) {
@@ -225,7 +311,7 @@
             console.log(accounts)
             console.log(acctNumber)
 
-            $.each(accounts, function (i, v) {
+            $.each(uploadPaymentData.uploadData, function (i, v) {
                 if (v.Id == uploadDataId) {
                     v.AccountNumber = acctNumber;
                     return false;
@@ -235,25 +321,44 @@
             $.each(accounts, function (i, v) {
                 if (v.AccountNumber == acctNumber) {
                     acn = v.AccountName;
+                    $.each(uploadPaymentData.uploadData, function (j, vl) {
+                        if (vl.AccountNumber == v.AccountNumber) {
+                            vl.AccountName = v.AccountName;
+                            return false;
+                        }
+                    });
                     return false;
                 }
             });
-            $('#acctName_' + uploadDataId).text(acn);
+            if (acn == "") {
+                alert("Invalid account number");
+                $('#acctNumber_' + uploadDataId).val(acn)
+            } else {
+                $('#acctName_' + uploadDataId).text(acn);
+            }
         };
 
         var completeUploadModal = function (bankId, branchId, bankName, branchCode) {
 
             accounts = uploadPaymentData.accounts;
 
+            var paymentData = $.grep(uploadPaymentData.uploadData, function (v) {
+                return v.TranID.endsWith("CL");
+            });
+
             $('#ConfirmUploadDataLabel').text("Complete Upload for Branch: " + searchBranchName(branchCode) + " in Bank: " + bankName);
 
-            $("#ConfirmUploadDataTable").dataTable().fnDestroy();
-            $("#ConfirmUploadDataTable").dataTable({
-                data: uploadPaymentData.uploadData,
+            $("#ConfirmUploadDataTable").DataTable().clear().destroy();
+            $("#ConfirmUploadDataTable").DataTable({
+                data: paymentData,
                 columns: [
                         {
                             render: function (data, type, full, meta) {
-                                return '<input type="text" placeholder="Account Number" value="' + full.AccountNumber + '" class="form-control" name="acctNumber_' + full.Id + '" id="acctNumber_' + full.Id + '" onChange="searchAccount(this.value, \'' + full.Id + '\')"/>'
+                                if (full.TranID.endsWith("GL")) {
+                                    return '<p>' + full.AccountNumber + '</p>';
+                                } else {
+                                    return '<input type="text" placeholder="Account Number" value="' + full.AccountNumber + '" class="form-control" name="acctNumber_' + full.Id + '" id="acctNumber_' + full.Id + '" onChange="searchAccount(this.value, \'' + full.Id + '\')"/>'
+                                }
                             }
                         },
                         {
@@ -264,7 +369,7 @@
                                 } else {
                                     return '<p></p>'
                                 }
-                                    
+
                             }
                         },
                         {
@@ -275,18 +380,26 @@
                                 } else {
                                     return '<p></p>'
                                 }
-                                    
+
                             }
                         },
                          { data: "PostingCode" },
                          {
                              render: function (data, type, full, meta) {
-                                 return '<input type="text" placeholder="Narration" class="form-control" value="' + full.Narration + '" name="narration_' + full.Id + '" id="narration_' + full.Id + '" onChange="updateNarration(this.value, \'' + full.Id + '\')"/>'
+                                 if (full.TranID.endsWith("GL")) {
+                                     return '<p>' + full.Narration + '</p>';
+                                 } else {
+                                     return '<input type="text" placeholder="Narration" class="form-control" value="' + full.Narration + '" name="narration_' + full.Id + '" id="narration_' + full.Id + '" onChange="updateNarration(this.value, \'' + full.Id + '\')"/>'
+                                 }
                              }
                          },
                         {
                             render: function (data, type, full, meta) {
-                                return '<div name="acctName_' + full.Id + '" id="acctName_' + full.Id + '">' + full.AccountName + '</div>'
+                                if (full.TranID.endsWith("GL")) {
+                                    return '<p> GL Account </p>';
+                                } else {
+                                    return '<div name="acctName_' + full.Id + '" id="acctName_' + full.Id + '">' + full.AccountName + '</div>'
+                                }
                             }
                         }
                 ]
@@ -301,7 +414,7 @@
             var updates = [];
 
             $.each(uploadPaymentData.uploadData, function (i, v) {
-                updates.push({ Narration: v.Narration, Amount: v.Amount, AccountNumber: v.AccountNumber, PostingCode: v.PostingCode, Debit1Credit0: v.Debit1Credit0 });
+                updates.push({ Narration: v.Narration, Amount: v.Amount, AccountNumber: v.AccountNumber, PostingCode: v.PostingCode, Debit1Credit0: v.Debit1Credit0, TranID: v.TranID, TranDate: v.TranDate });
             });
 
             $.ajax({
@@ -327,17 +440,17 @@
         });
 
         var openModal = function (uploadId) {
+            $("#UploadDataTable").DataTable().clear().destroy();
             $.ajax({
                 type: 'POST',
                 data: { __RequestVerificationToken: helpers.getAntiForgeryToken(), UploadId: '' + uploadId + '' },
                 url: '/HOOperation/GetAllUploadDataDetail',
                 success: function (data) {
-                    console.log(data);
                     paymentData = data;
                 }
             }).done(function () {
-                $("#UploadDataTable").dataTable().fnDestroy();
-                $("#UploadDataTable").dataTable({
+
+                $("#UploadDataTable").DataTable({
                     data: paymentData,
                     dom: 'Bfrtip',
                     buttons: [
@@ -362,7 +475,7 @@
                                 } else {
                                     return '<p></p>';
                                 }
-                                    
+
                             }
                         },
                         {
@@ -372,7 +485,78 @@
                                     return '<p>' + full.Amount + '</p>';
                                 } else {
                                     return '<p></p>';
-                                }                                    
+                                }
+                            }
+                        },
+                        { data: "PostingCode" },
+                        { data: "Narration" },
+                        //{ data: "BankName" },
+                        //{
+                        //    render: function (data, type, full, meta) {
+                        //        if (full.TranID.endsWith("GL")) {
+                        //            return '<p> GL Account </p>';
+                        //        } else {
+                        //            if (full.AccountName == null) {
+                        //                return '<p></p>'
+                        //            } else {
+                        //                return '<p>' + full.AccountName + '</p>'
+                        //            }
+
+                        //        }
+                        //    }
+                        //}
+                    ]
+                });
+            });
+            $('#uploaddata').modal();
+        };
+
+        var openUnidentifiedModal = function (uploadId) {
+            console.log($("#UnidentifiedDataTable"));
+            $("#UnidentifiedDataTable").DataTable().clear().destroy();
+            $.ajax({
+                type: 'POST',
+                data: { __RequestVerificationToken: helpers.getAntiForgeryToken(), UploadId: '' + uploadId + '' },
+                url: '/HOOperation/UnindentifiedUploadDataDetail',
+                success: function (data) {
+                    unidentifiedPaymentData = data;
+                }
+            }).done(function () {                
+                $("#UnidentifiedDataTable").DataTable({
+                    data: unidentifiedPaymentData,
+                    dom: 'Bfrtip',
+                    buttons: [
+                    {
+                        extend: 'excelHtml5',
+                        text: 'Download Excel',
+                        filename: 'Unclaimed_' + unidentifiedPaymentData[0].BranchName + '_' + unidentifiedPaymentData[0].TranDate,
+                        exportOptions: {
+                            modifier: {
+                                page: 'all'
+                            }
+                        }
+                    }],
+                    columns: [
+                        { data: "AccountNumber" },
+                        { data: "BranchCode" },
+                        {
+                            render: function (data, type, full, meta) {
+                                var sym = "";
+                                if (full.Debit1Credit0) {
+                                    return '<p>' + full.Amount + '</p>';
+                                } else {
+                                    return '<p></p>';
+                                }
+                            }
+                        },
+                        {
+                            render: function (data, type, full, meta) {
+                                var sym = "";
+                                if (!full.Debit1Credit0) {
+                                    return '<p>' + full.Amount + '</p>';
+                                } else {
+                                    return '<p></p>';
+                                }
                             }
                         },
                         { data: "PostingCode" },
@@ -382,7 +566,7 @@
                     ]
                 });
             });
-            $('#uploaddata').modal();
+            $('#unidentifieddata').modal();
         };
 
         $('#markAsProcesed').click(function (e) {
@@ -414,6 +598,7 @@
             _data.append("__RequestVerificationToken", helpers.getAntiForgeryToken());
             _data.append("BankId", $('#bank_upload').val());
             _data.append("BranchId", $('#branch_upload').val());
+            _data.append("GLAccount", $('#bank_glaccount').val());
             _data.append("PaymentFile", $('#file').context.forms["uploadForm"][0].files[0])
 
             console.log(_data);
@@ -450,6 +635,20 @@
         $('#confirmationModal').on('hide.bs.modal', function (e) {
             console.log('closing notify');
             location.reload();
+        });
+
+        $('#bank_upload').on('change', function () {
+            $('#bank_glaccount').attr('disabled', 'disabled');
+            $.ajax({
+                type: "POST",
+                url: '/HOOperation/GetBankGLAccounts',
+                data: { __RequestVerificationToken: helpers.getAntiForgeryToken(), BankId: $('#bank_upload').val() },
+                contentType: 'application/x-www-form-urlencoded',
+                success: function (data) {
+                    helpers.buildDropdown(data, $('#bank_glaccount'), 'Select GLAccount', 'GLAccount', 'GLAccount');
+                    $('#bank_glaccount').removeAttr('disabled');
+                }
+            });
         });
     </script>
 }
