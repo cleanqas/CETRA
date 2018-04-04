@@ -54,6 +54,33 @@ namespace AspNet.Identity.MySQL
             
         }
 
+        public async Task<bool> DeleteAsync(TBranch branch)
+        {
+            try
+            {
+                await _store.DeleteAsync(branch);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                //TODO: Log the exception
+                return false;
+            }
+
+        }
+
+        public async Task<bool> UpdateAsync(TBranch branch)
+        {
+            if (branch == null)
+            {
+                throw new ArgumentNullException("branch");
+            }
+
+            await _store.UpdateAsync(branch);
+
+            return true;
+        }
+
         public TBranch GetUserBranchByUserId(string userId)
         {
            return AsyncHelper.RunSync(() => _store.GetUserBranchByUserId(userId));            

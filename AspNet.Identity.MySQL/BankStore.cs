@@ -49,8 +49,19 @@ namespace AspNet.Identity.MySQL
             {
                 throw new ArgumentNullException("bank");
             }
-
+            bankTable.DeleteBankGlAccounts(bank.Id);
             bankTable.Delete(bank.Id);
+
+            return Task.FromResult<Object>(null);
+        }
+
+        public Task UpdateAsync(TBank bank)
+        {
+            if (bank == null)
+            {
+                throw new ArgumentNullException("bank");
+            }
+            bankTable.Update(bank);
 
             return Task.FromResult<Object>(null);
         }

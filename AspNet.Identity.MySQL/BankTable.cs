@@ -26,10 +26,27 @@ namespace AspNet.Identity.MySQL
         /// <returns></returns>
         public int Insert(IdentityBank bank)
         {
-            string commandText = "Insert into banks (Id, BankName) values (@id, @name)";
+            string commandText = "Insert into banks (Id, BankName, BankAcronym) values (@id, @name, @acronym)";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@name", bank.Name);
             parameters.Add("@id", bank.Id);
+            parameters.Add("@acronym", bank.Acronym);
+
+            return _database.Execute(commandText, parameters);
+        }
+
+        /// <summary>
+        /// Updates a Bank in the Bank table
+        /// </summary>
+        /// <param name="bank">The Bank's detail</param>
+        /// <returns></returns>
+        public int Update(IdentityBank bank)
+        {
+            string commandText = "Update banks set BankName = @name, BankAcronym = @acronym where Id = @id";
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("@name", bank.Name);
+            parameters.Add("@id", bank.Id);
+            parameters.Add("@acronym", bank.Acronym);
 
             return _database.Execute(commandText, parameters);
         }
@@ -41,12 +58,12 @@ namespace AspNet.Identity.MySQL
         /// <returns></returns>
         public IdentityBank GetBankById(string bankId)
         {
-            var bankName = GetBankName(bankId);
+            var bankDetail = GetBankName(bankId);
             IdentityBank bank = null;
 
-            if (bankName != null)
+            if (bankDetail != null)
             {
-                bank = new IdentityBank(bankName, bankId);
+                bank = new IdentityBank(bankDetail["BankName"], bankDetail["BankAcronym"], bankId);
             }
 
             return bank;
@@ -57,12 +74,34 @@ namespace AspNet.Identity.MySQL
         /// </summary>
         /// <param name="bankId">The Bank Id</param>
         /// <returns>Bank name</returns>
-        public string GetBankName(string bankId)
+        public Dictionary<string, string> GetBankName(string bankId)
         {
-            string commandText = "Select BankName from banks where Id = @id";
+            string commandText = "Select BankName, BankAcronym from banks where Id = @id";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@id", bankId);
-            return _database.GetStrValue(commandText, parameters);
+
+            Dictionary<string, string> bankdetail = new Dictionary<string, string>();
+            var result = _database.Query(commandText, parameters);
+            foreach (var res in result)
+            {
+                bankdetail["BankName"] = res["BankName"];
+                bankdetail["BankAcronym"] = res["BankAcronym"];
+            }
+            return bankdetail;
+        }
+
+        /// <summary>
+        /// Deltes all glAccounts linked to bank from the bankglaccounts table
+        /// </summary>
+        /// <param name="bankId">The bank Id</param>
+        /// <returns></returns>
+        public int DeleteBankGlAccounts(string bankId)
+        {
+            string commandText = "Delete from bankglaccounts where BankId = @id";
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("@id", bankId);
+
+            return _database.Execute(commandText, parameters);
         }
 
         /// <summary>
@@ -70,11 +109,11 @@ namespace AspNet.Identity.MySQL
         /// </summary>
         /// <param name="bankId">The bank Id</param>
         /// <returns></returns>
-        public int Delete(string branchId)
+        public int Delete(string bankId)
         {
             string commandText = "Delete from banks where Id = @id";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
-            parameters.Add("@id", branchId);
+            parameters.Add("@id", bankId);
 
             return _database.Execute(commandText, parameters);
         }
@@ -82,7 +121,7 @@ namespace AspNet.Identity.MySQL
         public List<IdentityBank> GetAllBanks()
         {
             List<IdentityBank> banks = new List<IdentityBank>();
-            string commandText = "Select Id, BankName from banks";
+            string commandText = "Select Id, BankName, BankAcronym from banks";
             Dictionary<string, object> parameters = new Dictionary<string, object>() { };
 
             var result = _database.Query(commandText, parameters);
@@ -93,7 +132,8 @@ namespace AspNet.Identity.MySQL
                     banks.Add(new IdentityBank()
                     {
                         Id = res["Id"],
-                        Name = res["BankName"]
+                        Name = res["BankName"],
+                        Acronym = res["BankAcronym"]
                     });
                 }
             }

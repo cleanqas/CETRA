@@ -39,5 +39,33 @@ namespace AspNet.Identity.MySQL
             }
 
         }
+
+        public async Task<bool> DeleteAsync(TBank bank)
+        {
+            try
+            {
+                await _store.DeleteAsync(bank);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                //TODO: Log the exception
+                return false;
+            }
+        }
+
+        public async Task<bool> UpdateAsync(TBank bank)
+        {
+            try
+            {
+                await _store.UpdateAsync(bank);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                //TODO: Log the exception
+                return false;
+            }
+        }
     }
 }

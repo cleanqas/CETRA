@@ -80,7 +80,8 @@ namespace AspNet.Identity.MySQL
             {
                 throw new ArgumentNullException("branch");
             }
-
+            branchTable.DeleteBranchUploads(branch.Id);
+            branchTable.DeleteBranchUsers(branch.Id);
             branchTable.Delete(branch.Id);
 
             return Task.FromResult<Object>(null);

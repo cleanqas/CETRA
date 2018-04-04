@@ -7,7 +7,7 @@ namespace AspNet.Identity.MySQL
     /// Class that represents the users table in the MySQL Database
     /// </summary>
     public class UserTable<TUser>
-        where TUser :IdentityUser
+        where TUser : IdentityUser
     {
         private MySQLDatabase _database;
 
@@ -67,7 +67,7 @@ namespace AspNet.Identity.MySQL
                 user.PasswordHash = string.IsNullOrEmpty(row["PasswordHash"]) ? null : row["PasswordHash"];
                 user.SecurityStamp = string.IsNullOrEmpty(row["SecurityStamp"]) ? null : row["SecurityStamp"];
                 user.Email = string.IsNullOrEmpty(row["Email"]) ? null : row["Email"];
-                user.EmailConfirmed = row["EmailConfirmed"] == "1" ? true:false;
+                user.EmailConfirmed = row["EmailConfirmed"] == "1" ? true : false;
                 user.PhoneNumber = string.IsNullOrEmpty(row["PhoneNumber"]) ? null : row["PhoneNumber"];
                 user.PhoneNumberConfirmed = row["PhoneNumberConfirmed"] == "1" ? true : false;
                 user.LockoutEnabled = row["LockoutEnabled"] == "1" ? true : false;
@@ -90,7 +90,7 @@ namespace AspNet.Identity.MySQL
             Dictionary<string, object> parameters = new Dictionary<string, object>() { { "@name", userName } };
 
             var rows = _database.Query(commandText, parameters);
-            foreach(var row in rows)
+            foreach (var row in rows)
             {
                 TUser user = (TUser)Activator.CreateInstance(typeof(TUser));
                 user.Id = row["Id"];
@@ -128,7 +128,7 @@ namespace AspNet.Identity.MySQL
             parameters.Add("@id", userId);
 
             var passHash = _database.GetStrValue(commandText, parameters);
-            if(string.IsNullOrEmpty(passHash))
+            if (string.IsNullOrEmpty(passHash))
             {
                 return null;
             }
@@ -193,6 +193,48 @@ namespace AspNet.Identity.MySQL
         }
 
         /// <summary>
+        /// Deletes user's branch from the userbranches
+        /// </summary>
+        /// <param name="userId">The user's id</param>
+        /// <returns></returns>
+        private int DeleteUserBranch(string userId)
+        {
+            string commandText = "Delete from userbranches where UserId = @userId";
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("@userId", userId);
+
+            return _database.Execute(commandText, parameters);
+        }
+
+        /// <summary>
+        /// Deletes all uploads linekd to branch in uploads table
+        /// </summary>
+        /// <param name="branchId">The branch Id</param>
+        /// <returns></returns>
+        public int DeleteUserUploads(string userId)
+        {
+            string commandText = "Delete from uploads where UploderId = @id or OperatorId = @id or Verifier = @id or HOProcessorId = @id";
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("@id", userId);
+
+            return _database.Execute(commandText, parameters);
+        }
+
+        /// <summary>
+        /// Deletes user's role from the userroles
+        /// </summary>
+        /// <param name="userId">The user's id</param>
+        /// <returns></returns>
+        private int DeleteUserRole(string userId)
+        {
+            string commandText = "Delete from userroles where UserId = @userId";
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("@userId", userId);
+
+            return _database.Execute(commandText, parameters);
+        }
+
+        /// <summary>
         /// Deletes a user from the users table
         /// </summary>
         /// <param name="userId">The user's id</param>
@@ -213,7 +255,20 @@ namespace AspNet.Identity.MySQL
         /// <returns></returns>
         public int Delete(TUser user)
         {
+            DeleteUserUploads(user.Id);
+            DeleteUserBranch(user.Id);
+            DeleteUserRole(user.Id);
             return Delete(user.Id);
+        }
+
+        public int DeleteUserBranch(TUser user)
+        {
+            return DeleteUserBranch(user.Id);
+        }
+
+        public int DeleteUserRole(TUser user)
+        {
+            return DeleteUserRole (user.Id);
         }
 
         /// <summary>
@@ -242,6 +297,32 @@ namespace AspNet.Identity.MySQL
             parameters.Add("@twofactorenabled", user.TwoFactorEnabled);
 
             return _database.Execute(commandText, parameters);
+        }
+
+        public List<IdentityUserRoleBranch> GetAllUsers()
+        {
+            List<IdentityUserRoleBranch> users = new List<IdentityUserRoleBranch>();
+            string commandText = "Select u.Id, u.UserName, u.Email, ub.BranchId, b.BranchName ,ur.RoleId, r.Name as RoleName from users u join userbranches ub on u.Id = ub.UserId join branches b on ub.BranchId = b.Id join userroles ur on u.Id = ur.UserId join roles r on ur.RoleId = r.Id";
+            Dictionary<string, object> parameters = new Dictionary<string, object>() { };
+
+            var result = _database.Query(commandText, parameters);
+            if (result != null)
+            {
+                foreach (var res in result)
+                {
+                    users.Add(new IdentityUserRoleBranch()
+                    {
+                        Id = res["Id"],
+                        UserName = res["UserName"],
+                        Email = res["Email"],
+                        BranchId = res["BranchId"],
+                        BranchName = res["BranchName"],
+                        RoleId = res["RoleId"],
+                        RoleName = res["RoleName"]
+                    });
+                }
+            }
+            return users;
         }
     }
 }

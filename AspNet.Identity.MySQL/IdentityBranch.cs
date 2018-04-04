@@ -19,18 +19,18 @@ namespace AspNet.Identity.MySQL
         /// Constructor that takes names as argument 
         /// </summary>
         /// <param name="name"></param>
-        public IdentityBranch(string name, string glAccount, string branchCode) : this()
+        public IdentityBranch(string name, string branchCode) : this()
         {
             Name = name;
-            GLAccount = glAccount;
+          //  GLAccount = glAccount;
             BranchCode = branchCode;
         }
 
-        public IdentityBranch(string name, string id, string glAccount, string branchCode)
+        public IdentityBranch(string id, string name, string branchCode)
         {
             Name = name;
             Id = id;
-            GLAccount = glAccount;
+           // GLAccount = glAccount;
             BranchCode = branchCode;
         }
 
@@ -47,7 +47,7 @@ namespace AspNet.Identity.MySQL
         /// <summary>
         /// Branch GLAccount
         /// </summary>
-        public string GLAccount { get; set; }
+        //public string GLAccount { get; set; }
 
         /// <summary>
         /// Branch BranchCode

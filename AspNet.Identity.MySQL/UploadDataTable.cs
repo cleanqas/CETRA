@@ -134,7 +134,7 @@ namespace AspNet.Identity.MySQL
             string commandText = "Update uploadsdata set Narration = @narration, Status = 1 where UploadId = @uploadId and TranID like @tranId ";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@uploadId", uploadData.UploadId);
-            parameters.Add("@tranId", string.Format("{0}__", uploadData.TranID.Substring(0,6)));
+            parameters.Add("@tranId", string.Format("{0}__", uploadData.TranID.Substring(0,8)));
             parameters.Add("@narration", uploadData.Narration);
 
             return _database.Execute(commandText, parameters) > 0;

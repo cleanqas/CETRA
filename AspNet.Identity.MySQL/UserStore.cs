@@ -405,6 +405,26 @@ namespace AspNet.Identity.MySQL
             return Task.FromResult<Object>(null);
         }
 
+        public Task DeleteUserRoleAsync(TUser user)
+        {
+            if (user != null)
+            {
+                userTable.DeleteUserRole(user);
+            }
+
+            return Task.FromResult<Object>(null);
+        }
+
+        public Task DeleteUserBranchAsync(TUser user)
+        {
+            if (user != null)
+            {
+                userTable.DeleteUserBranch(user);
+            }
+
+            return Task.FromResult<Object>(null);
+        }
+
         /// <summary>
         /// Returns the PasswordHash for a given TUser
         /// </summary>
@@ -694,6 +714,18 @@ namespace AspNet.Identity.MySQL
             userTable.Update(user);
 
             return Task.FromResult(0);
+        }
+
+        /// <summary>
+        /// Returns the user 
+        /// </summary>
+        /// <param name=""></param>
+        /// <returns></returns>
+        public Task<IList<IdentityUserRoleBranch>> GetAllUsersAsync()
+        {            
+            List<IdentityUserRoleBranch> users = userTable.GetAllUsers();         
+
+            return Task.FromResult<IList<IdentityUserRoleBranch>>(users);
         }
     }
 }

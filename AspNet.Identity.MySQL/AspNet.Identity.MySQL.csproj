@@ -75,6 +75,7 @@
     <Compile Include="IdentityBranch.cs" />
     <Compile Include="IdentityRole.cs" />
     <Compile Include="IdentityUserBranch.cs" />
+    <Compile Include="IdentityUserRoleBranch.cs" />
     <Compile Include="RoleStore.cs" />
     <Compile Include="IdentityUser.cs" />
     <Compile Include="UploadDataEntity.cs" />

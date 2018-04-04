@@ -87,7 +87,7 @@ namespace CETRA.Controllers
                     Id = data.Id,
                     OperatorId = data.OperatorId,
                     Status = data.Status,
-                    UploadDate = data.UploadDate,
+                    UploadDate = data.UploadDate, 
                     UploaderId = data.UploaderId
                 });
             }
@@ -234,13 +234,16 @@ namespace CETRA.Controllers
                     }
 
                     var bankAccounts = await new AccountNumberStore<IdentityAccountNumber>(new ApplicationDbContext()).GetAllAccountNumbers();
+                    var BankDetail = await new BankStore<IdentityBank>(new ApplicationDbContext()).FindByIdAsync(model.BankId);
 
                     foreach (var p in PData)
                     {
                         var pAcct = bankAccounts.Find(k => k.AccountNumber == p.AccountNumber);
                         p.AccountName = pAcct == null ? string.Empty : pAcct.AccountName;
                         p.Id = Guid.NewGuid().ToString();
-                        p.AccountNumber = p.AccountNumber == null ? string.Empty : p.AccountNumber;
+                        if(p.Debit1Credit0 == false)
+                            p.AccountNumber = p.AccountNumber == null ? string.Empty : p.AccountNumber;
+                        p.Narration = BankDetail.Acronym + "::" + p.TranID.Substring(0, 8) + "::" + p.TranDate + "::" + p.Narration;
 
                         if (p.Debit1Credit0 == null || p.PostingCode == null || !ConfigurationManager.AppSettings["PostingCodes"].Contains(p.PostingCode))
                             throw new Exception("Incomplete contents in the file");
@@ -338,27 +341,31 @@ namespace CETRA.Controllers
                     var split = row.Split(',');
                     if (!string.IsNullOrEmpty(row))
                     {
+                        var Debit1Credit0 = string.IsNullOrEmpty(row.Split(',')[1]) ? string.IsNullOrEmpty(row.Split(',')[2]) ? false : false : true;
+                        var tranRef = randomdigits();
                         PData.Add(new PDataModel
                         {
                             TranDate = row.Split(',')[0],
-                            Amount = Convert.ToDecimal(row.Split(',')[1]),
-                            Debit1Credit0 = false,
+                            Amount = string.IsNullOrEmpty(row.Split(',')[1]) ? string.IsNullOrEmpty(row.Split(',')[2]) ? 0 : Convert.ToDecimal(row.Split(',')[2]) : Convert.ToDecimal(row.Split(',')[1]),
+                            Debit1Credit0 = Debit1Credit0,
                             PostingCode = "203",
-                            Narration = row.Split(',')[2],
+                            Narration = row.Split(',')[3],
                             Status = 0,
-                            TranID = tranCount.ToString().PadLeft(6, '0').Substring(tranCount.ToString().Length - 1, 6) + "CL"
+                            TranID = tranRef + (!Debit1Credit0 ? "CL" : "GL"),
+                            AccountNumber = !Debit1Credit0 ? string.Empty : glAccount
                         });
-                        PData.Add(new PDataModel
-                        {
-                            AccountNumber = glAccount,
-                            TranDate = row.Split(',')[0],
-                            Amount = Convert.ToDecimal(row.Split(',')[1]),
-                            Debit1Credit0 = true,
-                            PostingCode = "203",
-                            Narration = row.Split(',')[2],
-                            Status = 0,
-                            TranID = tranCount.ToString().PadLeft(6, '0').Substring(tranCount.ToString().Length - 1, 6) + "GL"
-                        });
+                        if (!Debit1Credit0)
+                            PData.Add(new PDataModel
+                            {
+                                AccountNumber = glAccount,
+                                TranDate = row.Split(',')[0],
+                                Amount = Convert.ToDecimal(row.Split(',')[2]),
+                                Debit1Credit0 = true,
+                                PostingCode = "203",
+                                Narration = row.Split(',')[3],
+                                Status = 0,
+                                TranID = tranRef + "GL"
+                            });
                     }
                 }
             }
@@ -369,6 +376,12 @@ namespace CETRA.Controllers
             }
 
             return PData;
+        }
+
+        private string randomdigits()
+        {
+            int guid = Guid.NewGuid().GetHashCode();
+            return guid.ToString().Replace('-', '0').PadLeft(8, '0').Substring(0, 8);
         }
     }
 }

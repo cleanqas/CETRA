@@ -79,7 +79,7 @@ namespace CETRA
                 var branch = new AspNet.Identity.MySQL.IdentityBranch();
                 branch.Name = "Head Office";
                 branch.BranchCode = "HeadOffice";
-                branch.GLAccount = ConfigurationManager.AppSettings["DefaultGLAccount"];
+                //branch.GLAccount = ConfigurationManager.AppSettings["DefaultGLAccount"];
                 branchManager.Create(branch);
                 branchManager.AddUserToBranch(user.Id, branch.Id);
                 //branchManager.CreateUploadStatus();                

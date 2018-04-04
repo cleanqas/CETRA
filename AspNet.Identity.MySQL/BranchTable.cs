@@ -43,6 +43,34 @@ namespace AspNet.Identity.MySQL
         }
 
         /// <summary>
+        /// Deletes all uploads linekd to branch in uploads table
+        /// </summary>
+        /// <param name="branchId">The branch Id</param>
+        /// <returns></returns>
+        public int DeleteBranchUploads(string branchId)
+        {
+            string commandText = "Delete from uploads where BranchId = @id";
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("@id", branchId);
+
+            return _database.Execute(commandText, parameters);
+        }
+
+        /// <summary>
+        /// Deltes all branch users from the userbranches table
+        /// </summary>
+        /// <param name="branchId">The branch Id</param>
+        /// <returns></returns>
+        public int DeleteBranchUsers(string branchId)
+        {
+            string commandText = "Delete from userbranches where BranchId = @id";
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("@id", branchId);
+
+            return _database.Execute(commandText, parameters);
+        }
+
+        /// <summary>
         /// Deltes a branch from the branches table
         /// </summary>
         /// <param name="branchId">The branch Id</param>
@@ -63,11 +91,11 @@ namespace AspNet.Identity.MySQL
         /// <returns></returns>
         public int Insert(IdentityBranch branch)
         {
-            string commandText = "Insert into branches (Id, BranchName, GLAccount, BranchCode) values (@id, @name, @glAccount, @branchCode)";
+            string commandText = "Insert into branches (Id, BranchName, BranchCode) values (@id, @name, @branchCode)";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@name", branch.Name);
             parameters.Add("@id", branch.Id);
-            parameters.Add("@glAccount", branch.GLAccount);
+            //parameters.Add("@glAccount", branch.GLAccount);
             parameters.Add("@branchCode", branch.BranchCode);
 
             return _database.Execute(commandText, parameters);
@@ -80,7 +108,7 @@ namespace AspNet.Identity.MySQL
         /// <returns>branch name</returns>
         public Dictionary<string, string> GetBranchDetail(string branchId)
         {
-            string commandText = "Select BranchName, GLAccount, BranchCode from branches where Id = @id";
+            string commandText = "Select BranchName, BranchCode from branches where Id = @id";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("@id", branchId);
             Dictionary<string, string> branchdetail = new Dictionary<string, string>();
@@ -88,7 +116,7 @@ namespace AspNet.Identity.MySQL
             foreach (var res in result)
             {
                 branchdetail["BranchName"] = res["BranchName"];
-                branchdetail["GLAccount"] = res["GLAccount"];
+                //branchdetail["GLAccount"] = res["GLAccount"];
                 branchdetail["BranchCode"] = res["BranchCode"];
             }
             return branchdetail;
@@ -101,7 +129,7 @@ namespace AspNet.Identity.MySQL
         /// <returns>branch's Id</returns>
         public Dictionary<string, string> GetBranchId(string branchName)
         {
-            string commandText = "Select Id, GLAccount, BranchCode from branches where BranchName = @name";
+            string commandText = "Select Id, BranchCode from branches where BranchName = @name";
             Dictionary<string, object> parameters = new Dictionary<string, object>() { { "@name", branchName } };
 
             Dictionary<string, string> branchdetail = new Dictionary<string, string>();
@@ -109,7 +137,7 @@ namespace AspNet.Identity.MySQL
             foreach (var res in result)
             {
                 branchdetail["Id"] = res["Id"];
-                branchdetail["GLAccount"] = res["GLAccount"];
+                //branchdetail["GLAccount"] = res["GLAccount"];
                 branchdetail["BranchCode"] = res["BranchCode"];
             }
             return branchdetail;
@@ -127,7 +155,7 @@ namespace AspNet.Identity.MySQL
 
             if (branchDetail != null)
             {
-                branch = new IdentityBranch(branchDetail["BranchName"], branchId, branchDetail["GLAccount"], branchDetail["BranchCode"]);
+                branch = new IdentityBranch(branchId, branchDetail["BranchName"], branchDetail["BranchCode"]);
             }
 
             return branch;
@@ -145,7 +173,7 @@ namespace AspNet.Identity.MySQL
 
             if (branchDetail != null)
             {
-                branch = new IdentityBranch(branchName, branchDetail["Id"], branchDetail["GLAccount"], branchDetail["BranchCode"]);
+                branch = new IdentityBranch(branchDetail["Id"], branchName, branchDetail["BranchCode"]);
             }
 
             return branch;
@@ -154,7 +182,7 @@ namespace AspNet.Identity.MySQL
         public List<IdentityBranch> GetAllBranches()
         {
             List<IdentityBranch> branches = new List<IdentityBranch>();
-            string commandText = "Select Id, BranchName, GLAccount, BranchCode from branches";
+            string commandText = "Select Id, BranchName, BranchCode from branches";
             Dictionary<string, object> parameters = new Dictionary<string, object>() { };
 
             var result = _database.Query(commandText, parameters);
@@ -166,7 +194,7 @@ namespace AspNet.Identity.MySQL
                     {
                         Id = res["Id"],
                         Name = res["BranchName"],
-                        GLAccount = res["GLAccount"],
+                        //GLAccount = res["GLAccount"],
                         BranchCode = res["BranchCode"]
                     });
                 }

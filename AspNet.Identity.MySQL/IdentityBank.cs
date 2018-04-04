@@ -20,16 +20,18 @@ namespace AspNet.Identity.MySQL
         /// Constructor that takes names as argument 
         /// </summary>
         /// <param name="name"></param>
-        public IdentityBank(string name)
+        public IdentityBank(string name, string acronym)
             : this()
         {
             Name = name;
+            Acronym = acronym;
         }
 
-        public IdentityBank(string name, string id)
+        public IdentityBank(string name, string acronym, string id)
         {
             Name = name;
             Id = id;
+            Acronym = acronym;
         }
 
         /// <summary>
@@ -41,6 +43,11 @@ namespace AspNet.Identity.MySQL
         /// Bank name
         /// </summary>
         public string Name { get; set; }
+
+        /// <summary>
+        /// Bank Acronym
+        /// </summary>
+        public string Acronym { get; set; }
 
     }
 }

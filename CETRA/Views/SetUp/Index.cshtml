@@ -23,12 +23,12 @@
             <p>
                 Click the button below to add/remove Users
             </p>
-            <p><a class="btn btn-default" data-toggle="modal" href="#manageUser">Manage Users &raquo;</a></p>
+            <p><a class="btn btn-default" data-toggle="modal" href="#" onclick="loadUserList()">Manage Users &raquo;</a></p>
         </div>
         <div class="col-md-3">
             <h2>Banks</h2>
             <p>Click the button below to add Banks</p>
-            <p><a class="btn btn-default" data-toggle="modal" href="#manageBank">Add Bank &raquo;</a></p>
+            <p><a class="btn btn-default" data-toggle="modal" href="#" onclick="loadBankList()">Add Bank &raquo;</a></p>
         </div>
         <div class="col-md-3">
             <h2>GL Accounts</h2>
@@ -45,7 +45,7 @@
         <div class="col-md-3">
             <h2>Branch</h2>
             <p>Add/remove Branch</p>
-            <p><a class="btn btn-default" data-toggle="modal" href="#manageBranch">Manage Branches &raquo;</a></p>
+            <p><a class="btn btn-default" data-toggle="modal" href="#" onclick="loadBranchList()">Manage Branches &raquo;</a></p>
         </div>
     </div>
 
@@ -60,6 +60,7 @@
                     </div>
                     <div class="modal-body">
                         <form>
+                            <input type="hidden" name="userId" id="userId" />
                             <div class="form-group">
                                 <label for="username" class="control-label">User Name:</label>
                                 <input type="text" name="username" id="username" placeholder="User Name" autofocus required class="form-control" />
@@ -96,6 +97,9 @@
                             <div class="form-group">
                                 <button class="btn btn-primary" type="button" id="registerNewUser" data-loading-text="<i class='fa fa-spinner fa-spin '></i> Registering New User ...">Submit </button>
                             </div>
+                            <div class="form-group">
+                                <button class="btn btn-primary" type="button" id="editExistingUser" data-loading-text="<i class='fa fa-spinner fa-spin '></i> Editing User ...">Submit </button>
+                            </div>
                         </form>
                     </div>
                     <div class="modal-footer">
@@ -113,16 +117,24 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-label="close"><span aria-hidden="true">&times;</span></button>
-                        <h3 class="modal-title" id="ManageBankLabel">Manage Bank</h3>
+                        <h3 class="modal-title" id="ManageBankLabel">Manage Bank</h3>                                               
                     </div>
                     <div class="modal-body">
                         <form>
+                            <input type="hidden" name="bankId" id="bankId" />
                             <div class="form-group">
                                 <label for="bankname" class="control-label">Bank Name:</label>
                                 <input type="text" name="bankname" id="bankname" placeholder="Bank Name" autofocus required class="form-control" />
                             </div>
                             <div class="form-group">
+                                <label for="bankacronym" class="control-label">Bank Acronym:</label>
+                                <input type="text" name="bankacronym" id="bankacronym" placeholder="Bank Acronym" autofocus required class="form-control" />
+                            </div>
+                            <div class="form-group">
                                 <button class="btn btn-primary" type="button" id="registerNewBank" data-loading-text="<i class='fa fa-spinner fa-spin '></i> Registering New Bank ...">Submit </button>
+                            </div>
+                            <div class="form-group">
+                                <button class="btn btn-primary" type="button" id="editExistingBank" data-loading-text="<i class='fa fa-spinner fa-spin '></i> Editing Bank ...">Submit </button>
                             </div>
                         </form>
                     </div>
@@ -194,6 +206,9 @@
                             <div class="form-group">
                                 <button class="btn btn-primary" type="button" id="registerNewAccount" data-loading-text="<i class='fa fa-spinner fa-spin '></i> Registering New Account">Submit </button>
                             </div>
+                            <div class="form-group">
+                                <button class="btn btn-primary" type="button" id="editExistingAccount" data-loading-text="<i class='fa fa-spinner fa-spin '></i> Editing Account ...">Submit </button>
+                            </div>
                         </form>
                     </div>
                     <div class="modal-footer">
@@ -217,11 +232,13 @@
             <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="close"><span aria-hidden="true">&times;</span></button>
-                        <h3 class="modal-title" id="ManageBranchLabel">Add Branch</h3>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="close"><span aria-hidden="true">&times;</span></button>                        
+                        <h3 class="modal-title" id="ManageBranchLabel">Add Branch</h3>                     
+
                     </div>
                     <div class="modal-body">
                         <form id="frmManageBranch">
+                            <input type="hidden" name="branchId" id="branchId" />
                             <div class="form-group">
                                 <label for="branchcode" class="control-label">Branch Code</label>
                                 <input type="text" name="branchcode" id="branchcode" placeholder="Branch Code" required class="form-control" />
@@ -230,14 +247,169 @@
                                 <label for="branchname" class="control-label">Branch Name:</label>
                                 <input type="text" name="branchname" id="branchname" placeholder="Branch Name" autofocus autocomplete="off" required class="form-control" />
                             </div>
-                            <div class="form-group">
+                            @*<div class="form-group">
                                 <label for="branch_glaccount" class="control-label">GL Account</label>
                                 <input type="text" name="branch_glaccount" id="branch_glaccount" placeholder="GL Account" required class="form-control" />
-                            </div>
+                            </div>*@
                             <div class="form-group">
                                 <button class="btn btn-primary" type="button" id="registerNewBranch" data-loading-text="<i class='fa fa-spinner fa-spin '></i> Registering New Branch ...">Submit </button>
                             </div>
+                            <div class="form-group">
+                                <button class="btn btn-primary" type="button" id="editExistingBranch" data-loading-text="<i class='fa fa-spinner fa-spin '></i> Editing Branch ...">Submit </button>
+                            </div>
                         </form>
+                    </div>
+                    <div class="modal-footer">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @*Branch List*@
+    <div class="row">
+        <div class="modal fade" id="BranchListModal" tabindex="-1" role="dialog" aria-labelledby="BranchListLabel" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="close"><span aria-hidden="true">&times;</span></button>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h3 class="modal-title" id="BranchListLabel">All Branches</h3>
+                            </div>
+                            <div class="col-md-6">
+                                <button class="btn btn-primary" type="button" id="addNewBranch" name="addNewBranch">Add New Branch</button>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="modal-body">
+                        <table id="BranchListTable" class="display" style="width: 100%">
+                            <thead>
+                                <tr>
+                                    @*<th>ID</th>*@
+                                    <th>Branch Name</th>
+                                    <th>Branch Code</th>
+                                    <th>Edit</th>
+                                    <th>Delete</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @*Bank List*@
+    <div class="row">
+        <div class="modal fade" id="BankListModal" tabindex="-1" role="dialog" aria-labelledby="BankListLabel" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="close"><span aria-hidden="true">&times;</span></button>                        
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h3 class="modal-title" id="BranchListLabel">All Banks</h3>
+                            </div>
+                            <div class="col-md-6">
+                                <button class="btn btn-primary" type="button" id="addNewBank" name="addNewBank">Add New Bank</button>
+                            </div>
+                        </div> 
+                    </div>
+                    <div class="modal-body">
+                        <table id="BankListTable" class="display" style="width: 100%">
+                            <thead>
+                                <tr>
+                                    @*<th>ID</th>*@
+                                    <th>Bank Name</th>
+                                    <th>Bank Acronym</th>
+                                    <th>Edit</th>
+                                    <th>Delete</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @*User List*@
+    <div class="row">
+        <div class="modal fade" id="UserListModal" tabindex="-1" role="dialog" aria-labelledby="UserListLabel" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="close"><span aria-hidden="true">&times;</span></button>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h3 class="modal-title" id="UserListLabel">All Users</h3>
+                            </div>
+                            <div class="col-md-6">
+                                <button class="btn btn-primary" type="button" id="addNewUser" name="addNewUser">Add New User</button>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="modal-body">
+                        <table id="UserListTable" class="display" style="width: 100%">
+                            <thead>
+                                <tr>
+                                    @*<th>ID</th>*@
+                                    <th>UserName</th>
+                                    <th>Branch</th>
+                                    <th>Role</th>
+                                    <th>Edit</th>
+                                    <th>Delete</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @*Account List*@
+    <div class="row">
+        <div class="modal fade" id="AccountListModal" tabindex="-1" role="dialog" aria-labelledby="AccountListLabel" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="close"><span aria-hidden="true">&times;</span></button>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h3 class="modal-title" id="AccountListLabel">All Accounts</h3>
+                            </div>
+                            <div class="col-md-6">
+                                <button class="btn btn-primary" type="button" id="addNewAccount" name="addNewAccount">Add New Account</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-body">
+                        <table id="AccountListTable" class="display" style="width: 100%">
+                            <thead>
+                                <tr>
+                                    @*<th>ID</th>*@
+                                    <th>Account</th>
+                                    <th>Account Name</th>
+                                    <th>Account Branch</th>
+                                    <th>Edit</th>
+                                    <th>Delete</th>
+                                </tr>
+                            </thead>
+                        </table>
                     </div>
                     <div class="modal-footer">
                     </div>
@@ -250,17 +422,257 @@
 @section scripts
 {
     <script type="text/javascript">
+        var BranchList = {};
+        var BankList = {};
+        var UserList = {};
+        var AccountList = {};
         $(function () {
             helpers.getData("/SetUp/GetAllBranches", function (data) {
                 helpers.buildDropdown(data, $('#branch_user'), 'Select Branch', 'BranchCode');
                 helpers.buildDropdown(data, $('#branch_account'), 'Select Branch', 'BranchCode');
+                BranchList = data;
             });
 
             helpers.getData("/SetUp/GetAllBanks", function (data) {
                 helpers.buildDropdown(data, $('#glaccount_bank'), 'Select Bank');
+                BankList = data;
             });
+
+            helpers.getData("/SetUp/GetAllUsers", function (data) {
+                UserList = data;
+            });
+
+            helpers.getData("/SetUp/GetAllAccounts", function (data) {
+                AccountList = data;
+            });
+        });        
+
+        var loadBranchList = function () {
+            $("#BranchListTable").DataTable().clear().destroy();
+            $("#BranchListModal").modal();
+            $("#BranchListTable").DataTable({
+                data: BranchList,
+                columns: [
+                    //{ data: "Id" },
+                    { data: "Name" },
+                    { data: "BranchCode" },
+                    {
+                        render: function (data, type, full, meta) {
+                            return '<a class="btn btn-default" onClick="EditBranch(\'' + full.Id + '\', \'' + full.Name + '\', \'' + full.BranchCode + '\')">Edit</a>'
+                        }
+                    },
+                    {
+                        render: function (data, type, full, meta) {
+                            return '<a class="btn btn-danger" id="btnDeleteBranch" onClick="DeleteBranch(\'' + full.Id + '\', \'' + full.Name + '\', \'' + full.BranchCode + '\')" data-loading-text="<i class=\'fa fa-spinner fa-spin \'></i> Deleting ...">Delete</a>'
+                        }
+                    }
+                ]
+            });
+        }
+
+        var loadBankList = function () {
+            $("#BankListTable").DataTable().clear().destroy();
+            $("#BankListModal").modal();
+            $("#BankListTable").DataTable({
+                data: BankList,
+                columns: [
+                    //{ data: "Id" },
+                    { data: "Name" },
+                    { data: "Acronym" },
+                    {
+                        render: function (data, type, full, meta) {
+                            return '<a class="btn btn-default" onClick="EditBank(\'' + full.Id + '\', \'' + full.Name + '\', \'' + full.Acronym + '\')">Edit</a>'
+                        }
+                    },
+                    {
+                        render: function (data, type, full, meta) {
+                            return '<a class="btn btn-danger" id="btnDeleteBank" onClick="DeleteBank(\'' + full.Id + '\', \'' + full.Name + '\', \'' + full.Acronym + '\')" data-loading-text="<i class=\'fa fa-spinner fa-spin \'></i> Deleting ...">Delete</a>'
+                        }
+                    }
+                ]
+            });
+        }
+
+        var loadUserList = function () {
+            $("#UserListTable").DataTable().clear().destroy();
+            $("#UserListModal").modal();
+            $("#UserListTable").DataTable({
+                data: UserList,
+                columns: [
+                    //{ data: "Id" },
+                    { data: "UserName" },
+                    { data: "BranchName" },
+                    { data: "RoleName" },
+                    {
+                        render: function (data, type, full, meta) {
+                            return '<a class="btn btn-default" onClick="EditUser(\'' + full.Id + '\', \'' + full.UserName + '\', \'' + full.BranchId + '\', \'' + full.RoleId + '\')">Edit</a>'
+                        }
+                    },
+                    {
+                        render: function (data, type, full, meta) {
+                            return '<a class="btn btn-danger" id="btnDeleteUser" onClick="DeleteUser(\'' + full.Id + '\', \'' + full.UserName + '\', \'' + full.BranchId + '\', \'' + full.RoleId + '\')" data-loading-text="<i class=\'fa fa-spinner fa-spin \'></i> Deleting ...">Delete</a>'
+                        }
+                    }
+                ]
+            });
+        }
+
+        var loadAccountList = function () {
+            $("#AccountListTable").DataTable().clear().destroy();
+            $("#AccountListModal").modal();
+            $("#AccountListTable").DataTable({
+                data: AccountList,
+                columns: [
+                    //{ data: "Id" },
+                    { data: "AccountNumber" },
+                    { data: "AccountName" },
+                    { data: "AccountBranch" },
+                    {
+                        render: function (data, type, full, meta) {
+                            return '<a class="btn btn-default" onClick="EditAccount(\'' + full.Id + '\', \'' + full.AccountNumber + '\', \'' + full.AccountName + '\', \'' + full.AccountBranch + '\')">Edit</a>'
+                        }
+                    },
+                    {
+                        render: function (data, type, full, meta) {
+                            return '<a class="btn btn-danger" id="btnDeleteAccount" onClick="DeleteAccount(\'' + full.Id + '\', \'' + full.AccountNumber + '\', \'' + full.AccountName + '\', \'' + full.AccountBranch + '\')" data-loading-text="<i class=\'fa fa-spinner fa-spin \'></i> Deleting ...">Delete</a>'
+                        }
+                    }
+                ]
+            });
+        }
+
+        var DeleteBranch = function (branchId, branchName, branchCode) {
+            $(this).button('loading');
+
+            var _data = {
+                __RequestVerificationToken: helpers.getAntiForgeryToken(),
+                BranchName: branchName,
+                Id: branchId,
+                BranchCode: branchCode
+            };
+
+            $.ajax({
+                type: 'POST',
+                data: _data,
+                url: '/SetUp/DeleteBranch',
+                success: function (data) {
+                    $('#btnDeleteBranch').button('reset');
+                    $('#BranchListModal').modal('hide');
+                    $('#confirmationModal').modal();
+                    $('#notification').text('Branch Deleted Successfully');
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    alert('Error Occured, ' + xhr.responseText);
+                }
+            })
+        };
+
+        var DeleteBank = function (bankId, bankName, bankAcronym) {
+            $(this).button('loading');
+
+            var _data = {
+                __RequestVerificationToken: helpers.getAntiForgeryToken(),
+                BankName: bankName,
+                Id: bankId,
+                BankAcronym: bankAcronym
+            };
+
+            $.ajax({
+                type: 'POST',
+                data: _data,
+                url: '/SetUp/DeleteBank',
+                success: function (data) {
+                    $('#btnDeleteBank').button('reset');
+                    $('#BankListModal').modal('hide');
+                    $('#confirmationModal').modal();
+                    $('#notification').text('Bank Deleted Successfully');
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    alert('Error Occured, ' + xhr.responseText);
+                }
+            })
+        };
+
+        var DeleteUser = function (userId, userName, branchId, roleId) {
+            $(this).button('loading');
+
+            var _data = {
+                __RequestVerificationToken: helpers.getAntiForgeryToken(),
+                Username: userName,
+                Id: userId,
+                BranchId: branchId,
+                RoleId: roleId
+            };
+
+            $.ajax({
+                type: 'POST',
+                data: _data,
+                url: '/SetUp/DeleteUser',
+                success: function (data) {
+                    $('#btnDeleteUser').button('reset');
+                    $('#UserListModal').modal('hide');
+                    $('#confirmationModal').modal();
+                    $('#notification').text('User Deleted Successfully');
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    alert('Error Occured, ' + xhr.responseText);
+                }
+            })
+        };
+
+        $("#addNewUser").click(function () {
+            $('#editExistingUser').hide();
+            $('#registerNewUser').show();
+            $('#UserListModal').modal('hide');
+            $('#manageUser').modal();
         });
 
+        $("#addNewBank").click(function () {
+            $('#editExistingBank').hide();
+            $('#registerNewBank').show();
+            $('#BankListModal').modal('hide');
+            $('#manageBank').modal();
+        });
+
+        $("#addNewBranch").click(function () {
+            $('#editExistingBranch').hide();
+            $('#registerNewBranch').show();
+            $('#BranchListModal').modal('hide');
+            $('#manageBranch').modal();
+        });
+
+        var EditBranch = function (branchId, branchName, branchCode) {
+            $('#branchcode').val(branchCode);
+            $('#branchname').val(branchName);
+            $('#branchId').val(branchId);
+            $('#editExistingBranch').show();
+            $('#registerNewBranch').hide();
+            $('#BranchListModal').modal('hide');
+            $('#manageBranch').modal();
+        }
+
+        var EditBank = function (bankId, bankName, bankAcronym) {
+            $('#bankname').val(bankName);
+            $('#bankacronym').val(bankAcronym);
+            $('#bankId').val(bankId);
+            $('#editExistingBank').show();
+            $('#registerNewBank').hide();
+            $('#BankListModal').modal('hide');
+            $('#manageBank').modal();
+        }
+
+        var EditUser = function (userId, userName, branchId, roleId) {
+            $('#username').val(userName);
+            $('#username').addClass('disabled');
+            $('#branch_user').val(branchId);
+            $('#role').val(roleId);
+            $('#userId').val(bankId);
+            $('#editExistingUser').show();
+            $('#registerNewUser').hide();
+            $('#UserListModal').modal('hide');
+            $('#manageUser').modal();
+        }
+        
         $('#registerNewUser').click(function (e) {
             $(this).button('loading');
 
@@ -308,6 +720,54 @@
             });
         });
 
+        $('#editExistingUser').click(function (e) {
+            $(this).button('loading');
+
+            var username = $('#username').val();
+
+            if (!username.match(/^\S*$/)) {
+                alert("Username cannot contain space");
+                $('#registerNewUser').button('reset');
+                return false;
+            }
+
+            if (!helpers.checkEquality($('#password').val(), $('#confirm_password').val())) {
+                alert('Password strings does not match');
+                $('#registerNewUser').button('reset');
+                return false;
+            }
+
+            var _data = {
+                __RequestVerificationToken: helpers.getAntiForgeryToken(),
+                Id: $('#userId').val(),
+                UserName: $('#username').val(),
+                Email: $('#useremail').val(),
+                Role: $('#role').val(),
+                Branch: $('#branch_user').val(),
+                Password: $('#password').val(),
+                ConfirmPassword: $('#confirm_password').val()
+            };
+            //console.log(_data);
+
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/x-www-form-urlencoded',
+                url: '/SetUp/UpdateUser',
+                data: _data,
+                success: function (data) {
+                    $('#manageUser').modal('hide');
+                    $('#confirmationModal').modal();
+                    $('#notification').text('User updated');
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    alert('Error Occured, ' + xhr.responseText);
+                },
+                complete: function () {
+                    $('#editExistingUser').button('reset');
+                }
+            });
+        });
+
         $('#registerNewBank').click(function (e) {
 
             $(this).button('loading');
@@ -315,7 +775,7 @@
             $.ajax({
                 type: 'POST',
                 contentType: 'application/x-www-form-urlencoded',
-                data: { __RequestVerificationToken: helpers.getAntiForgeryToken(), BankName: $('#bankname').val(), BankCode: $('#bankcode').val() },
+                data: { __RequestVerificationToken: helpers.getAntiForgeryToken(), BankName: $('#bankname').val(), BankAcronym: $('#bankacronym').val() },
                 url: '/SetUp/RegisterNewBank',
                 success: function (data) {
                     $('#manageBank').modal('hide');
@@ -327,6 +787,29 @@
                 },
                 complete: function () {
                     $('#registerNewBank').button('reset');
+                }
+            });
+        });
+
+        $('#editExistingBank').click(function (e) {
+
+            $(this).button('loading');
+
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/x-www-form-urlencoded',
+                data: { __RequestVerificationToken: helpers.getAntiForgeryToken(), Id: $('#bankId').val(), BankName: $('#bankname').val(), BankAcronym: $('#bankacronym').val() },
+                url: '/SetUp/EditExistingBank',
+                success: function (data) {
+                    $('#manageBank').modal('hide');
+                    $('#confirmationModal').modal();
+                    $('#notification').text('Bank Updated');
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    alert('Error Occured, ' + xhr.responseText);
+                },
+                complete: function () {
+                    $('#editExistingBranch').button('reset');
                 }
             });
         });
@@ -428,7 +911,7 @@
             var _data = {
                 __RequestVerificationToken: helpers.getAntiForgeryToken(),
                 BranchName: $('#branchname').val(),
-                GLAccount: $('#branch_glaccount').val(),
+                //GLAccount: $('#branch_glaccount').val(),
                 BranchCode: $('#branchcode').val()
             };
             $.ajax({
@@ -440,6 +923,35 @@
                     $('#manageBranch').modal('hide');
                     $('#confirmationModal').modal();
                     $('#notification').text('New Branch Registered');
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    alert('Error Occured, ' + xhr.responseText);
+                },
+                complete: function () {
+                    $('#registerNewBranch').button('reset');
+                }
+            });
+        });
+
+        $('#editExistingBranch').click(function (e) {
+
+            $(this).button('loading');
+
+            var _data = {
+                __RequestVerificationToken: helpers.getAntiForgeryToken(),
+                BranchName: $('#branchname').val(),
+                Id: $('#branchId').val(),
+                BranchCode: $('#branchcode').val()
+            };
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/x-www-form-urlencoded',
+                data: _data,
+                url: '/SetUp/EditExistingBranch',
+                success: function (data) {
+                    $('#manageBranch').modal('hide');
+                    $('#confirmationModal').modal();
+                    $('#notification').text('Branch Updated');
                 },
                 error: function (xhr, textStatus, errorThrown) {
                     alert('Error Occured, ' + xhr.responseText);

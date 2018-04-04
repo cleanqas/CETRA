@@ -12,8 +12,8 @@ namespace CETRA.Models
         public string Id { get; set; }
         [Required]
         public string BranchName { get; set; }
-        [Required]
-        public string GLAccount { get; set; }
+        //[Required]
+        //public string GLAccount { get; set; }
         [Required]
         public string BranchCode { get; set; }
     }
@@ -23,6 +23,9 @@ namespace CETRA.Models
         public string Id { get; set; }
         [Required]
         public string BankName { get; set; }
+
+        [Required]
+        public string BankAcronym { get; set; }
     }
 
     public class AccountNumberModel
@@ -47,5 +50,16 @@ namespace CETRA.Models
         public string BankId { get; set; }
         [Required]
         public string GLAccount { get; set; }
+    }
+
+    public class UserModel
+    {
+        public string Id { get; set; }
+        public string Username { get; set; }
+        public string Email { get; set; }
+        public string BranchId { get; set; }
+        public string BranchName { get; set; }
+        public string RoleId { get; set; }
+        public string RoleName { get; set; }
     }
 }
